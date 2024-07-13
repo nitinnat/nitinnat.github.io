@@ -1,0 +1,61 @@
+---
+layout: default
+---
+
+<h1>{{ page.title }}</h1>
+<p>{{ content }}</p>
+
+<div class="photo-grid" id="photo-grid">
+  {% for image in page.images %}
+    <div class="photo-item">
+      <a href="{{ image.path }}" target="_blank">
+        <img src="{{ image.path }}" alt="Image from {{ page.title }}">
+      </a>
+    </div>
+  {% endfor %}
+</div>
+
+<style>
+  .photo-grid {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .photo-item {
+    width: 25%; /* Adjust as needed */
+    padding: 5px;
+  }
+  .photo-item img {
+    width: 100%;
+    height: auto;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    let page = 1;
+    let loading = false;
+    let grid = document.getElementById('photo-grid');
+
+    function loadMoreImages() {
+      if (loading) return;
+      loading = true;
+      page++;
+      fetch(`{{ page.url }}?page=${page}`)
+        .then(response => response.text())
+        .then(html => {
+          let parser = new DOMParser();
+          let doc = parser.parseFromString(html, 'text/html');
+          let newImages = doc.querySelectorAll('.photo-item');
+          newImages.forEach(img => grid.appendChild(img));
+          loading = false;
+        })
+        .catch(error => console.error('Error loading more images:', error));
+    }
+
+    window.addEventListener('scroll', () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+        loadMoreImages();
+      }
+    });
+  });
+</script>
