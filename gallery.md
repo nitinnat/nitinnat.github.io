@@ -1,7 +1,7 @@
 ---
 layout: gallery
 title: Photography
-permalink: /photography/
+permalink: /gallery/
 ---
 
 Here is a collection of my photography.
