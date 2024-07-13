@@ -19,6 +19,19 @@
 {% endif %}
 
 <header class="header-section {% if page.bigimg %}has-img{% endif %}">
+
+<!-- Navigation Menu Start -->
+<nav>
+  <ul>
+    <li><a href="{{ site.baseurl }}/">Home</a></li>
+    <li><a href="{{ site.baseurl }}/about/">About</a></li>
+    <li><a href="{{ site.baseurl }}/photography/">Photography</a></li>
+    <li><a href="{{ site.baseurl }}/contact/">Contact</a></li>
+    <!-- Add more links as needed -->
+  </ul>
+</nav>
+<!-- Navigation Menu End -->
+
 {% if page.bigimg %}
 <div class="big-img intro-header">
   <div class="container">

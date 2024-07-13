@@ -1,0 +1,31 @@
+---
+layout: default
+---
+
+<h1>{{ page.title }}</h1>
+
+<div class="gallery">
+  {% for image in site.static_files %}
+    {% if image.path contains '/images/gallery/' %}
+      <div class="gallery-item">
+        <a href="{{ image.path }}" target="_blank">
+          <img src="{{ image.path }}" alt="{{ image.name }}">
+        </a>
+      </div>
+    {% endif %}
+  {% endfor %}
+</div>
+
+<style>
+  .gallery {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .gallery-item {
+    margin: 10px;
+  }
+  .gallery-item img {
+    max-width: 100%;
+    height: auto;
+  }
+</style>
