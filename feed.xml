@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Nitin Nataraj</title>
+    <description>Machine Learning Engineer | AgenticAI | GenAI | LLMs</description>
+    <link></link>
+    <atom:link href="/feed.xml" rel="self" type="application/rss+xml" />
+    
+      <item>
+        <title>University at Buffalo 🎓</title>
+        <description>
+          
+          Graduate Research Assistant September 2018 - May 2019 (9 months) Worked on cursor detection and tracking in Adobe Photoshop videos, in collaboration with Adobe Research. Implemented a fully unsupervised method that incorporated adaptive video-based cursor discovery; multi-scale template matching; and optimal path search to locate the highest scoring cursor trajectory...
+        </description>
+        <pubDate>Sat, 28 Oct 2023 00:00:00 -0700</pubDate>
+        <link>/2023-10-28-university-at-buffalo/</link>
+        <guid isPermaLink="true">/2023-10-28-university-at-buffalo/</guid>
+      </item>
+    
+      <item>
+        <title>Publications 📖</title>
+        <description>
+          
+          Consensus Based Vertically Partitioned Multi-layer Perceptrons for Edge Computing.
+
+GADGET SVM- A Gossip-bAsed sub-graDiEnt Solver, Haimonti Dutta, Nitin Nataraj.
+
+        </description>
+        <pubDate>Thu, 26 Oct 2023 00:00:00 -0700</pubDate>
+        <link>/2023-10-26-publications/</link>
+        <guid isPermaLink="true">/2023-10-26-publications/</guid>
+      </item>
+    
+  </channel>
+</rss>
