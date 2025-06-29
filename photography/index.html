@@ -45,8 +45,6 @@
   
 
   
-  <meta property="og:image" content="/img/avatar-icon.png" />
-  
 
 
   <!-- Twitter summary cards -->
@@ -62,8 +60,6 @@
   <meta name="twitter:description" content="Photography 📸 All {% for folder in site.static_files %} {% if folder.path contains &apos;images/&apos; %} {% assign dirname = folder.path | split: &apos;/&apos; %} {% assign location = dirname[2] %} {% unless locations contains location %} {% assign locations = locations | append: location | append: &apos;,&apos; %} {% endunless...">
   
 
-  
-  <meta name="twitter:image" content="/img/avatar-icon.png" />
   
 
   
@@ -104,17 +100,7 @@
         </ul>
     </div>
 
-	
-	<div class="avatar-container">
-	  <div class="avatar-img-border">
-	    <a href="">
-	      <img class="avatar-img" src="/img/avatar-icon.png" />
-		</a>
-	  </div>
 	</div>
-	
-
-  </div>
 </nav>
 
 

@@ -45,8 +45,6 @@
   
 
   
-  <meta property="og:image" content="/img/avatar-icon.png" />
-  
 
 
   <!-- Twitter summary cards -->
@@ -62,8 +60,6 @@
   <meta name="twitter:description" content="{%- capture site_tags -%} {%- for tag in site.tags -%} {{- tag | first -}}{%- unless forloop.last -%},{%- endunless -%} {%- endfor -%} {%- endcapture -%} {%- assign tags_list = site_tags | split:&apos;,&apos; | sort -%} {%- for tag in tags_list -%} &amp;nbsp;{{- tag -}}&amp;nbsp;({{site.tags[tag].size}}) {%- endfor -%} {%- for...">
   
 
-  
-  <meta name="twitter:image" content="/img/avatar-icon.png" />
   
 
   
@@ -104,17 +100,7 @@
         </ul>
     </div>
 
-	
-	<div class="avatar-container">
-	  <div class="avatar-img-border">
-	    <a href="">
-	      <img class="avatar-img" src="/img/avatar-icon.png" />
-		</a>
-	  </div>
 	</div>
-	
-
-  </div>
 </nav>
 
 
