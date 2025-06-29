@@ -23,38 +23,7 @@
   
 
 
-  
-    
-      
-  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.0/css/font-awesome.min.css" />
-
-
-    
-  
-
-  
-    
-      <link rel="stylesheet" href="/css/bootstrap.min.css" />
-    
-      <link rel="stylesheet" href="/css/bootstrap-social.css" />
-    
-      <link rel="stylesheet" href="/css/main.css" />
-    
-  
-
-  
-    
-      <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" />
-    
-      <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" />
-    
-  
-
-  
-
-  
-
-  
+  <link rel="stylesheet" href="/css/main.css" />
 
     <!-- Facebook OpenGraph tags -->
   
@@ -121,10 +90,18 @@
 
     <div class="collapse navbar-collapse" id="main-navbar">
       <ul class="nav navbar-nav navbar-right">
-          <li><a href="/aboutme">About Me</a></li>
-          <li><a href="/experience">Work Experience</a></li>
+          <li><a class="page-scroll" href="#about">About</a></li>
+        
+          <li><a class="page-scroll" href="#experience">Experience</a></li>
+        
+          <li><a class="page-scroll" href="#education">Education</a></li>
+        
+          <li><a class="page-scroll" href="#projects">Projects</a></li>
+        
           <li><a href="/photography">Photography</a></li>
-          <li><a href="/">Home</a></li></ul>
+          <li><a href="/">Blog</a></li>
+          <li><a class="page-scroll" href="#contact">Contact</a></li>
+        </ul>
     </div>
 
 	
@@ -141,125 +118,251 @@
 </nav>
 
 
-    <!-- TODO this file has become a mess, refactor it -->
+    <div class="intro-header"></div>
 
-
-
-
-
-<header class="header-section ">
-
-<!-- Navigation Menu Start -->
-<nav>
-  <ul>
-    <li><a href="/">Home</a></li>
-    <li><a href="/about/">About</a></li>
-    <li><a href="/photography/">Photography</a></li>
-    <li><a href="/contact/">Contact</a></li>
-    <!-- Add more links as needed -->
-  </ul>
-</nav>
-<!-- Navigation Menu End -->
-
-
-<div class="intro-header no-img">
+<div role="main" class="container-fluid main-onepage-container">
+  <div id="about" class="section">
   <div class="container">
-    <div class="row">
-      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-        <div class="page-heading">
-          <h1>Nitin Nataraj</h1>
-		  
-		    
-            <hr class="small">
-            <span class="page-subheading">Machine Learning Engineer | AgenticAI | GenAI | LLMs</span>
-			
-		  
-		  
-		  
-        </div>
+    <h1 class="section-title">About Me</h1>
+    <p>I am a Machine Learning Engineer with experience in Generative AI, LLMs, and Agentic Workflows, as well as time series forecasting and large-scale machine learning. I hold a Master's degree in Computer Science from the University at Buffalo, where my research focused on Computer Vision and Federated ML.</p>
+    <p>My passion lies in building intelligent systems that solve real-world problems. I enjoy exploring new technologies and contributing to open-source projects.</p>
+    <a href="/resume.pdf" class="btn btn-primary">View Full Résumé</a>
+</div>
+</div>
+
+<div id="experience" class="section">
+  <div class="container">
+    <h1 class="section-title">Work Experience</h1>
+    
+    <div class="experience-item">
+      <h3>University at Buffalo 🎓</h3>
+      <p class="meta"> | </p>
+      <div class="content">
+        <h3 id="graduate-research-assistant">Graduate Research Assistant</h3>
+<p><em>September 2018 - May 2019 (9 months)</em></p>
+
+<p>Worked on cursor detection and tracking in Adobe Photoshop videos, in collaboration with Adobe Research.</p>
+
+<p>Implemented a fully unsupervised method that incorporated adaptive video-based cursor discovery; multi-scale template matching; and optimal path search to locate the highest scoring cursor trajectory in the entire video.</p>
+
+<p>Other methods that were tried, included Optical Flow, Deep Visual Embeddings and Transfer Learning. Our method is able to discover previously unseen mouse cursors in videos, despite fast movement and instant appearance changes in a fully unsupervised manner. It outperforms Online Tracking (TLD, CSRT, MIL), and Deep Learning based object detection methods (Faster-RCNN) which require large training datasets.</p>
+
+<p>Tools: Python, OpenCV, Tensorflow, NetworkX</p>
+
+<h3 id="student-research-assistant">Student Research Assistant</h3>
+<p><em>September 2017 - November 2018 (1 year 3 months)</em></p>
+
+<p>Over the course of the last year as a research assistant for Prof. Haimonti Dutta, I have worked on a variety of problems related to Machine Learning and Natural Language Processing.
+These include:</p>
+<ol>
+  <li>GADGET - A gossip-based sub-gradient solver, which aims to determine a solution for the binary
+classification SVM in a distributed setting. I worked on several improvements for an existing code-
+base, ran baseline experiments, wrote scripts to aggregate results, and performed a literature review.
+I am now working towards converting the whole code-base into Java, using the Pegasos-SVM code
+available within the WEKA library as a foundation.
+Tech stack - Java, C++, Java Native Interface (JNI), Python, Peersim (A distributed simulator).</li>
+  <li>Named Entity Recognition on tweets. Tech stack: Java, StanfordNLP.</li>
+  <li>Vanilla, Lasso and Ridge Logistic Regression for the problem of detecting inter-group prejudice in
+tweets. Tech stack: R</li>
+</ol>
+
       </div>
+    </div>
+    
+    <div class="experience-item">
+      <h3>o9 Solutions, Inc. 💼</h3>
+      <p class="meta"> | </p>
+      <div class="content">
+        <h3 id="senior-software-engineer-genai">Senior Software Engineer, GenAI</h3>
+<p><em>April 2025 - Present (3 months)</em></p>
+
+<p>GenAI - Agentic AI, LLMs, RAG, Memory, etc.</p>
+
+<h3 id="software-engineer-ii-machine-learning">Software Engineer II, Machine Learning</h3>
+<p><em>April 2022 - April 2025 (3 years 1 month)</em></p>
+
+<ol>
+  <li>
+    <p>Generative AI and Large Language Models (LLMs): Developing conversational agentic workflows</p>
+  </li>
+  <li>
+    <p>Automated Machine Learning for Time Series Forecasting: Successfully developed large-scale, end-to-end AutoML pipelines for time series forecasting, utilizing Python, PySpark, TensorFlow, and Kubernetes to improve forecasting accuracy and efficiency.</p>
+  </li>
+</ol>
+
+<h3 id="software-engineer-machine-learning">Software Engineer, Machine Learning</h3>
+<p><em>August 2019 - April 2022 (2 years 9 months)</em></p>
+
+<p>Scalability, optimization, machine learning and monitoring for the world’s largest coffee company. Originally piloted on a limited scale of 30 stores, the solution now powers daily operations in 10000 stores. Skills - Pyspark, Hadoop, Python, Splunk, Databricks, Jupyter</p>
+
+<p>Developed REST APIs and CI/CD pipelines for horizontal scaling of Hadoop cluster nodes.
+Skills - Flask, Jenkins, Airflow, Linux, Python</p>
+
+<p>Enhanced the internal big data ecosystem by integrating JupyterHub to improve data scientist experience. Customized JupyterHub functionalities and developed custom plugins to seamlessly integrate Git with the platform.
+Skills - Typescript, Python, Git</p>
+
+      </div>
+    </div>
+    
+    <div class="experience-item">
+      <h3>Indian Institute of Science 🔬</h3>
+      <p class="meta"> | </p>
+      <div class="content">
+        <h3 id="summer-research-intern-computer-vision">Summer Research Intern (Computer Vision)</h3>
+<p><em>May 2014 - July 2014 (3 months)</em></p>
+
+<p>Compared various feature extraction and supervised learning methods for Offline Optical Character Recognition (under Dr. Rathna G.N.):</p>
+
+<ul>
+  <li>Worked on various facets of Image Processing involving Image Acquisition/ Retrieval; Image Pre- processing and Feature Extraction methods( Principal Component Analysis, Local Binary Patterns, Convex Hulls, Image Metrics, Discrete Cosine Transforms).</li>
+  <li>Studied and applied Supervised Learning Algorithms ( Nearest Neighbours, One-vs-all SVM) on the acquired and processed character data set to conduct a thorough analysis of different feature extraction methods versus the cross-validation accuracy.</li>
+  <li>Used MATLAB to develop the algorithms along with a front-end GUI as a practical implementation</li>
+</ul>
+
+<h3 id="summer-research-intern-embedded-systems">Summer Research Intern (Embedded Systems)</h3>
+<p><em>May 2013 - July 2013 (3 months)</em></p>
+
+<p>Design of an AVR based Oscilloscope(under Dr. Rathna G.N.):</p>
+
+<p>Designed an AVR microcontroller-based Oscilloscope to measure and visualize electrical signals, comprising filter circuits, embedded C programming on AVR Studio using the Atmega-8 microcontroller, culminating in a Matlab GUI for visualization.</p>
+
+      </div>
+    </div>
+    
+    <div class="experience-item">
+      <h3>Fidelity Investments 💰</h3>
+      <p class="meta"> | </p>
+      <div class="content">
+        <h3 id="software-engineer">Software Engineer</h3>
+<p><em>August 2016 - June 2017 (11 months)</em></p>
+
+<p>QBot - A chatbot for customer service interactions in the pre-LLM era</p>
+
+<ul>
+  <li>Led the development of a scalable, enterprise-wide chatbot using ontology, NLP, and machine learning techniques, to automate customer service desk interactions.</li>
+  <li>Designed and implemented REST APIs for query expansion and response retrieval, leveraging semantic word embeddings (GloVe, Word2Vec), synonym augmentation, named entity recognition (NER) and query ranking.</li>
+  <li>Consulted with different business units for chatbot implementations across finance and production support domains.</li>
+  <li>Explored advanced deep learning techniques like sequence-to-sequence models and RNNs for text generation.</li>
+  <li>Streamlined code deployment with Docker, enabling containerization of key components.</li>
+</ul>
+
+<p>Sentiment Analysis Tool for Customer Surveys</p>
+
+<ul>
+  <li>Developed a sentiment and skill mining tool using NLP techniques such as Text Vectorization (TF-IDF) and Topic Modeling to derive insights from employee feedback, enhancing training program outcomes.</li>
+  <li>Processed large-scale unstructured text data and applied unsupervised clustering techniques (KMeans, DBScan) to identify emerging themes in employee feedback.</li>
+  <li>Applied machine learning techniques such as SVM, Naive Bayes, and LSTM classifiers, achieving over 93% cross-validation accuracy.</li>
+</ul>
+
+<p>Skills: Python, Django, Java, Docker, Linux, R, HTML, CSS, Git, NodeJS
+Techniques: Information Retrieval, Topic Modeling, Deep Learning, Dependency Parsing, Statistical Machine Learning Methods, Named Entity Recognition, Text Classification</p>
+
+<h3 id="executive-graduate-trainee">Executive Graduate Trainee</h3>
+<p><em>June 2015 - July 2016 (1 year 2 months)</em></p>
+
+<ol>
+  <li>Business Analysis and Reporting:
+    <ul>
+      <li>Managed reporting and analytics solutions for a team of 120 associates in India, United States and China.</li>
+      <li>Analyzed and consolidated KPIs from complex datasets spread across several schemas and databases.</li>
+      <li>Created interactive Tableau visualizations to enable employees and management in garnering key insights related to routine operations and performance.</li>
+      <li>Interacted regularly with senior management to propose and modify crucial KPIs.</li>
+      <li>Acted as a Tableau Site Administrator responsible for handling dashboard access requests from across the enterprise.</li>
+    </ul>
+  </li>
+</ol>
+
+      </div>
+    </div>
+    
+    <div class="experience-item">
+      <h3>Clarifai 💻</h3>
+      <p class="meta"> | </p>
+      <div class="content">
+        <h3 id="applied-machine-learning-intern">Applied Machine Learning Intern</h3>
+<p><em>May 2018 - August 2018 (4 months)</em></p>
+
+<ol>
+  <li>
+    <p>Object tracking and detection - Developed a hybrid single-object tracker based on existing research that interleaved detection at regular intervals to combat the problem of tracker drift.</p>
+  </li>
+  <li>
+    <p>Depth sensor noise characterization - Characterized and visualized the temporal noise distributions of depth and confidence maps provided by an industry-grade depth camera. Wrote several helper scripts to obtain and store images from the camera into the appropriate format, keeping in mind the pitfalls of image compression when it comes to storing large, high quality images.</p>
+  </li>
+  <li>
+    <p>Visualization - Extended and modified an existing video/image visualization framework to incorporate several functionalities.</p>
+  </li>
+</ol>
+
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+<div id="education" class="section">
+  <div class="container">
+    <h1 class="section-title">Education</h1>
+    
+    <div class="education-item">
+      <h3>Master of Science in Computer Science</h3>
+      <p class="meta">University at Buffalo | 2020 - 2022</p>
+      <p>Focused on Computer Vision and Federated Machine Learning.</p>
+    </div>
+    
+    <div class="education-item">
+      <h3>Bachelor of Technology in Computer Science</h3>
+      <p class="meta">Another University | 2016 - 2020</p>
+      <p>Specialization in Software Engineering.</p>
+    </div>
+    
+  </div>
+</div>
+
+<div id="projects" class="section">
+  <div class="container">
+    <h1 class="section-title">Projects</h1>
+    <div class="projects-grid">
+      
     </div>
   </div>
 </div>
-</header>
 
-
-
-
-
-<div class="container" role="main">
-  <div class="row">
-    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-      <div class="posts-list">
-  
-  
-  <article class="post-preview">
-    <a href="/2023-10-28-university-at-buffalo/">
-	  <h2 class="post-title">University at Buffalo 🎓</h2>
-
-	  
-    </a>
-
-    <p class="post-meta">
-      Posted on October 28, 2023
-    </p>
-
-    <div class="post-entry-container">
+<div id="contact" class="section">
+  <div class="container">
+    <h1 class="section-title">Contact</h1>
+    <p>Feel free to reach out to me via email or connect with me on social media.</p>
+    <p>Email: <a href="mailto:"></a></p>
+    <div class="social-links">
       
-      <div class="post-entry">
-        Graduate Research Assistant
-September 2018 - May 2019 (9 months)
-
-
         
+          
+          
         
-          <a href="/2023-10-28-university-at-buffalo/" class="post-read-more">[Read&nbsp;More]</a>
-        
-      </div>
-    </div>
-
-    
-
-   </article>
-  
-  
-  
-  <article class="post-preview">
-    <a href="/2023-10-26-publications/">
-	  <h2 class="post-title">Publications 📖</h2>
-
-	  
-    </a>
-
-    <p class="post-meta">
-      Posted on October 26, 2023
-    </p>
-
-    <div class="post-entry-container">
       
-      <div class="post-entry">
-        Consensus Based Vertically Partitioned Multi-layer Perceptrons for Edge Computing.
-
-
         
+          
+          
         
-          <a href="/2023-10-26-publications/" class="post-read-more">[Read&nbsp;More]</a>
+      
         
-      </div>
-    </div>
-
-    
-
-   </article>
-  
-  
-</div>
-
-
-
-	    
+          
+          
+        
+      
+        
+          
+          
+        
+      
+        
+          
+          
+        
+      
     </div>
   </div>
+</div>
 </div>
 
 
@@ -321,34 +424,8 @@ September 2018 - May 2019 (9 months)
 </footer>
 
   
-    
-
-
-  
-    <!-- doing something a bit funky here because I want to be careful not to include JQuery twice! -->
-    
-      <script>
-      	if (typeof jQuery == 'undefined') {
-          document.write('<script src="/js/jquery-1.11.2.min.js"></scr' + 'ipt>');
-      	}
-      </script>
-    
-  
-    <!-- doing something a bit funky here because I want to be careful not to include JQuery twice! -->
-    
-      <script src="/js/bootstrap.min.js"></script>
-    
-  
-    <!-- doing something a bit funky here because I want to be careful not to include JQuery twice! -->
-    
-      <script src="/js/main.js"></script>
-    
-  
-
-
-
-
-
+      <script src="/js/jquery-1.11.2.min.js"></script>
+  <script src="/js/main.js"></script>
 
   
   </body>
