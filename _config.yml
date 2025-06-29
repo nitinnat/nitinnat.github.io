@@ -4,7 +4,7 @@
 title: Nitin Nataraj
 
 # Short description of your site
-description: "The internal machinations of my mind are an enigma"
+description: "Machine Learning Engineer | AgenticAI | GenAI | LLMs"
 
 # --- Local development options ---
 # If your website is hosted locally rather than on GitHub, then you need to uncomment the next two parameters to set the url and baseurl
@@ -58,7 +58,7 @@ footer-link-col: "#404040"
 # Change all these values or delete the ones you don't want.
 # Important: you must keep the "name" parameter, everything else you can remove
 author:
-  name: Some Person
+  name: Nitin Nataraj
 
 # Select your active Social Network Links.
 # Uncomment the links you want to show in the footer and add your information to each link.
@@ -67,21 +67,9 @@ author:
 social-network-links:
   rss: true
   email: "nitinnataraj93@gmail.com"
-#  facebook: deanattali
   github: nitinnat
   twitter: nitin_nataraj
-#  reddit: yourname
   linkedin: nitin-nataraj-aa37039b
-#  xing: yourname
-#  stackoverflow: "3943160/daattali"
-#  snapchat: deanat78
-#  instagram: deanat78
-#  youtube: user/deanat78
-#  spotify: yourname
-#  telephone: +14159998888
-#  steam: deanat78
-#  twitch: yourname
-#  yelp: yourname
 
 # Select which share links to show in posts
 share-links-active:
@@ -91,7 +79,7 @@ share-links-active:
 
 # How to display the link to the website in the footer
 # Remove this if you don't want a link in the footer
-url-pretty: "MyWebsite.com"  # eg. "deanattali.com/beautiful-jekyll"
+url-pretty: "nitinnat.github.io"  # eg. "deanattali.com/beautiful-jekyll"
 
 # --- Web Statistics Section --- #
 
