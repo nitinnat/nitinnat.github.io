@@ -1,6 +1,9 @@
 ---
-layout: post
+layout: experience
 title: "o9 Solutions, Inc. 💼"
+start_date: 2019-08-01
+end_date: 2025-04-30
+image: /experience_images/o9-solutions.png
 ---
 
 ### Senior Software Engineer, GenAI

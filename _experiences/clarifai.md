@@ -1,6 +1,9 @@
 ---
-layout: post
+layout: experience
 title: "Clarifai 💻"
+start_date: 2018-05-01
+end_date: 2018-08-31
+image: /experience_images/clarifai.png
 ---
 
 ### Applied Machine Learning Intern

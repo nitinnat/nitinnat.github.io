@@ -1,6 +1,9 @@
 ---
-layout: post
+layout: experience
 title: "Fidelity Investments 💰"
+start_date: 2015-06-01
+end_date: 2017-06-30
+image: /experience_images/fidelity.png
 ---
 
 ### Software Engineer

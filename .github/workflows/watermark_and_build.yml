@@ -20,29 +20,23 @@ jobs:
       run: |
         rm -f Gemfile.lock # Remove old lockfile to force regeneration with compatible Bundler
         bundle install
-      working-directory: .
+      working-directory: nitinnat.github.io
 
     - name: Install ImageMagick
       run: sudo apt-get update && sudo apt-get install -y imagemagick
 
     - name: Run image watermarking script
+      if: steps.changes.outputs.images == 'true' || steps.changes.outputs.experience_images == 'true'
       run: ruby watermark_images.rb
-      working-directory: .
+      working-directory: nitinnat.github.io
 
     - name: Build Jekyll site
       run: bundle exec jekyll build
-      working-directory: .
+      working-directory: nitinnat.github.io
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./nitinnat.github.io/_site
-        # This assumes your GitHub Pages is configured to deploy from the `gh-pages` branch.
-        # If it's configured to deploy from `master` (or `main`) branch's `/docs` folder,
-        # or the root of `master` (or `main`), you might need to adjust `publish_branch`.
-        # For typical User/Organization Pages, `master` (or `main`) branch is often used.
-        # If your site is `username.github.io`, it usually deploys from `master` (or `main`).
-        # If it's a Project Page, it often deploys from `gh-pages` or `master/docs`.
-        # I will assume `gh-pages` for now, but you may need to change this to `master` or `main`.
-        publish_branch: gh-pages
+        publish_dir: ./_site
+        publish_branch: master

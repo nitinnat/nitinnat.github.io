@@ -21,6 +21,7 @@ description: "Machine Learning Engineer | AgenticAI | GenAI | LLMs"
 # List of links in the navigation bar
 navbar-links:
   About Me: "aboutme"
+  Work Experience: "experience"
   Photography: "photography"
   Home: "/"
 
@@ -244,3 +245,6 @@ plugins:
 collections:
   places:
     output: true
+  experiences:
+    output: true
+    permalink: /experience/:title/

@@ -1,6 +1,9 @@
 ---
-layout: post
+layout: experience
 title: "Indian Institute of Science 🔬"
+start_date: 2013-05-01
+end_date: 2014-07-31
+image: /experience_images/iisc.png
 ---
 
 ### Summer Research Intern (Computer Vision)

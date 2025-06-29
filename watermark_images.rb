@@ -11,6 +11,13 @@ MARGIN = 20 # Pixels from the edge
 
 # Directory containing images
 IMAGES_DIR = File.expand_path("../images", __FILE__)
+THUMBS_DIR = File.expand_path("../images/thumbs", __FILE__)
+EXPERIENCE_IMAGES_DIR = File.expand_path("../experience_images", __FILE__)
+EXPERIENCE_THUMBS_DIR = File.expand_path("../experience_images/thumbs", __FILE__)
+
+# Ensure thumbnail directory exists
+FileUtils.mkdir_p(THUMBS_DIR) unless File.directory?(THUMBS_DIR)
+FileUtils.mkdir_p(EXPERIENCE_THUMBS_DIR) unless File.directory?(EXPERIENCE_THUMBS_DIR)
 
 # Function to apply watermark
 def apply_watermark(image_path)
@@ -45,6 +52,13 @@ end
 
 # Iterate through image directories and apply watermark
 Dir.glob(File.join(IMAGES_DIR, "**", "*.{jpg,jpeg,png,gif,JPG,JPEG,PNG,GIF}")).each do |file_path|
+  # Skip if it's a directory
+  next if File.directory?(file_path)
+  apply_watermark(file_path)
+end
+
+# Iterate through experience image directories and apply watermark
+Dir.glob(File.join(EXPERIENCE_IMAGES_DIR, "*.{png,jpg,jpeg,gif,PNG,JPG,JPEG,GIF}")).each do |file_path|
   # Skip if it's a directory
   next if File.directory?(file_path)
   apply_watermark(file_path)

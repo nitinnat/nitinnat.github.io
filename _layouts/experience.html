@@ -1,0 +1,31 @@
+---
+layout: default
+---
+
+<div class="post-content">
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">{{ page.title }}</h1>
+      <p class="post-meta">
+        {% if page.start_date %}
+          {{ page.start_date | date: "%b %Y" }} &ndash; 
+          {% if page.end_date %}
+            {{ page.end_date | date: "%b %Y" }}
+          {% else %}
+            Present
+          {% endif %}
+        {% endif %}
+      </p>
+    </header>
+
+    {% if page.image %}
+      <div class="post-image">
+        <img src="{{ page.image | relative_url }}" alt="{{ page.title }} image">
+      </div>
+    {% endif %}
+
+    <div class="post-body">
+      {{ content }}
+    </div>
+  </article>
+</div>
