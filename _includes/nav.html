@@ -18,7 +18,11 @@
       <ul class="nav navbar-nav navbar-right">
       {%- for link in site.navbar-links -%}
         {%- if link[1] contains '#' %}
-          <li><a class="page-scroll" href="{{ link[1] }}">{{ link[0] }}</a></li>
+          {%- assign anchor_link = link[1] -%}
+          {%- if page.url != '/' and page.url != '/index.html' -%}
+            {%- assign anchor_link = site.baseurl | append: '/' | append: anchor_link -%}
+          {%- endif -%}
+          <li><a class="page-scroll" href="{{ anchor_link }}">{{ link[0] }}</a></li>
         {% else %}
           <li><a href="{{ link[1] | relative_url }}">{{ link[0] }}</a></li>
         {%- endif -%}
