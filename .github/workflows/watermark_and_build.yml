@@ -42,4 +42,4 @@ jobs:
         # If your site is `username.github.io`, it usually deploys from `master` (or `main`).
         # If it's a Project Page, it often deploys from `gh-pages` or `master/docs`.
         # I will assume `gh-pages` for now, but you may need to change this to `master` or `main`.
-        publish_branch: master
+        publish_branch: gh-pages
