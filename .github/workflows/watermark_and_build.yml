@@ -22,6 +22,9 @@ jobs:
         bundle install
       working-directory: .
 
+    - name: Install ImageMagick
+      run: sudo apt-get update && sudo apt-get install -y imagemagick
+
     - name: Run image watermarking script
       run: ruby watermark_images.rb
       working-directory: .
