@@ -17,7 +17,8 @@ jobs:
         bundler: '2.4.22' # Specify a compatible Bundler version
 
     - name: Install Jekyll and dependencies
-      run: | 
+      run: |
+        rm -f Gemfile.lock # Remove old lockfile to force regeneration with compatible Bundler
         bundle install
       working-directory: .
 
