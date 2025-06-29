@@ -14,7 +14,10 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.3.0' # Use a compatible Ruby version
-        bundler-cache: true # speeds up installation of dependencies
+
+    - name: Update Bundler
+      run: gem install bundler --no-document
+      working-directory: ./nitinnat.github.io
 
     - name: Install Jekyll and dependencies
       run: | 
