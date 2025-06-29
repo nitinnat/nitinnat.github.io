@@ -13,7 +13,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.x' # Use a compatible Ruby version
+        ruby-version: '3.3.0' # Use a compatible Ruby version
         bundler-cache: true # speeds up installation of dependencies
 
     - name: Install Jekyll and dependencies
