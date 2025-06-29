@@ -1,72 +1,136 @@
 ---
-layout: page
-title: Nitin Nataraj
-subtitle: "Machine Learning Engineer | AgenticAI | GenAI | LLMs"
-use-site-title: true
+layout: base
 ---
+<div class="main-container">
+    <header class="header">
+        <div class="header-content">
+            <h1>Nitin Nataraj</h1>
+            <p>Machine Learning Engineer | AgenticAI | GenAI | LLMs</p>
+            <nav>
+                <a href="#about">About</a>
+                <a href="#experience">Experience</a>
+                <a href="#projects">Projects</a>
+                <a href="#photography">Photography</a>
+                <a href="#contact">Contact</a>
+            </nav>
+        </div>
+    </header>
 
-<div class="posts-list">
-  {% for post in paginator.posts %}
-  <article class="post-preview">
-    <a href="{{ post.url | relative_url }}">
-	  <h2 class="post-title">{{ post.title }}</h2>
+    <main>
+        <section id="about">
+            <h2>About Me</h2>
+            <p>I am currently a Machine Learning Engineer at o9 Solutions working on Generative AI, LLMs and Agentic Workflows. I have also previously worked on time series forecasting and machine learning algorithms for large scale data. I graduated with a Master's degree in Computer Science from the University at Buffalo, where I worked on Computer Vision and Federated ML.</p>
+            <p>I've previously interned at Clarifai where I worked on computer vision with depth cameras, and at Fidelity Investments where I built dashboards and chatbots.</p>
+        </section>
 
-	  {% if post.subtitle %}
-	  <h3 class="post-subtitle">
-	    {{ post.subtitle }}
-	  </h3>
-	  {% endif %}
-    </a>
+        <section id="experience">
+            <h2>Experience</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h3>o9 Solutions, Inc.</h3>
+                    <p class="timeline-date">April 2022 - Present</p>
+                    <h4>Senior Software Engineer, GenAI</h4>
+                    <p>GenAI - Agentic AI, LLMs, RAG, Memory, etc.</p>
+                    <h4>Software Engineer II, Machine Learning</h4>
+                    <ul>
+                        <li>Generative AI and Large Language Models (LLMs): Developing conversational agentic workflows</li>
+                        <li>Automated Machine Learning for Time Series Forecasting: Successfully developed large-scale, end-to-end AutoML pipelines for time series forecasting, utilizing Python, PySpark, TensorFlow, and Kubernetes to improve forecasting accuracy and efficiency.</li>
+                    </ul>
+                    <h4>Software Engineer, Machine Learning</h4>
+                    <ul>
+                        <li>Scalability, optimization, machine learning and monitoring for the world's largest coffee company. Originally piloted on a limited scale of 30 stores, the solution now powers daily operations in 10000 stores. Skills - Pyspark, Hadoop, Python, Splunk, Databricks, Jupyter</li>
+                        <li>Developed REST APIs and CI/CD pipelines for horizontal scaling of Hadoop cluster nodes. Skills - Flask, Jenkins, Airflow, Linux, Python</li>
+                        <li>Enhanced the internal big data ecosystem by integrating JupyterHub to improve data scientist experience. Customized JupyterHub functionalities and developed custom plugins to seamlessly integrate Git with the platform. Skills - Typescript, Python, Git</li>
+                    </ul>
+                </div>
+                <div class="timeline-item">
+                    <h3>University at Buffalo</h3>
+                    <p class="timeline-date">September 2017 - May 2019</p>
+                    <h4>Graduate Research Assistant</h4>
+                    <p>Worked on cursor detection and tracking in Adobe Photoshop videos, in collaboration with Adobe Research.</p>
+                    <p>Implemented a fully unsupervised method that incorporated adaptive video-based cursor discovery; multi-scale template matching; and optimal path search to locate the highest scoring cursor trajectory in the entire video.</p>
+                    <p>Tools: Python, OpenCV, Tensorflow, NetworkX</p>
+                    <h4>Student Research Assistant</h4>
+                    <p>Over the course of the last year as a research assistant for Prof. Haimonti Dutta, I have worked on a variety of problems related to Machine Learning and Natural Language Processing.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>Clarifai</h3>
+                    <p class="timeline-date">May 2018 - August 2018</p>
+                    <h4>Applied Machine Learning Intern</h4>
+                    <ul>
+                        <li>Object tracking and detection - Developed a hybrid single-object tracker based on existing research that interleaved detection at regular intervals to combat the problem of tracker drift.</li>
+                        <li>Depth sensor noise characterization - Characterized and visualized the temporal noise distributions of depth and confidence maps provided by an industry-grade depth camera.</li>
+                        <li>Visualization - Extended and modified an existing video/image visualization framework to incorporate several functionalities.</li>
+                    </ul>
+                </div>
+                <div class="timeline-item">
+                    <h3>Fidelity Investments</h3>
+                    <p class="timeline-date">August 2016 - June 2017</p>
+                    <h4>Software Engineer</h4>
+                    <p>QBot - A chatbot for customer service interactions in the pre-LLM era</p>
+                    <ul>
+                        <li>Led the development of a scalable, enterprise-wide chatbot using ontology, NLP, and machine learning techniques, to automate customer service desk interactions.</li>
+                        <li>Designed and implemented REST APIs for query expansion and response retrieval, leveraging semantic word embeddings (GloVe, Word2Vec), synonym augmentation, named entity recognition (NER) and query ranking.</li>
+                    </ul>
+                </div>
+                <div class="timeline-item">
+                    <h3>Indian Institute of Science</h3>
+                    <p class="timeline-date">May 2013 - July 2014</p>
+                    <h4>Summer Research Intern</h4>
+                    <p>Compared various feature extraction and supervised learning methods for Offline Optical Character Recognition.</p>
+                    <p>Design of an AVR based Oscilloscope.</p>
+                </div>
+            </div>
+        </section>
 
-    <p class="post-meta">
-      Posted on {{ post.date | date: site.date_format }}
-    </p>
+        <section id="projects">
+            <h2>Projects</h2>
+            <div class="project-grid">
+                <div class="project-item">
+                    <h3>Consensus Based Vertically Partitioned Multi-layer Perceptrons for Edge Computing.</h3>
+                </div>
+                <div class="project-item">
+                    <h3>GADGET SVM- A Gossip-bAsed sub-graDiEnt Solver, Haimonti Dutta, Nitin Nataraj.</h3>
+                </div>
+            </div>
+        </section>
 
-    <div class="post-entry-container">
-      {% if post.image %}
-      <div class="post-image">
-        <a href="{{ post.url | relative_url }}">
-          <img src="{{ post.image | relative_url }}">
-        </a>
-      </div>
-      {% endif %}
-      <div class="post-entry">
-        {{ post.excerpt | strip_html | xml_escape | truncatewords: site.excerpt_length }}
-        {% assign excerpt_word_count = post.excerpt | number_of_words %}
-        {% if post.content != post.excerpt or excerpt_word_count > site.excerpt_length %}
-          <a href="{{ post.url | relative_url }}" class="post-read-more">[Read&nbsp;More]</a>
-        {% endif %}
-      </div>
-    </div>
+        <section id="photography">
+            <h2>Photography</h2>
+            <div class="gallery-grid">
+              {% for image in site.static_files %}
+                {% if image.path contains 'images/lake_tahoe' %}
+                  <div class="gallery-item lake-tahoe">
+                    <a href="{{ image.path | relative_url }}" data-lightbox="lake-tahoe" data-title="Lake Tahoe">
+                      <img src="{{ image.path | relative_url }}" alt="Lake Tahoe">
+                    </a>
+                  </div>
+                {% endif %}
+                {% if image.path contains 'images/san_francisco' %}
+                  <div class="gallery-item san-francisco">
+                    <a href="{{ image.path | relative_url }}" data-lightbox="san-francisco" data-title="San Francisco">
+                      <img src="{{ image.path | relative_url }}" alt="San Francisco">
+                    </a>
+                  </div>
+                {% endif %}
+                {% if image.path contains 'images/oregon_2025' %}
+                  <div class="gallery-item oregon">
+                    <a href="{{ image.path | relative_url }}" data-lightbox="oregon" data-title="Oregon">
+                      <img src="{{ image.path | relative_url }}" alt="Oregon">
+                    </a>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+        </section>
 
-    {% if post.tags.size > 0 %}
-    <div class="blog-tags">
-      Tags:
-      {% if site.link-tags %}
-      {% for tag in post.tags %}
-      <a href="{{ '/tags' | relative_url }}#{{- tag -}}">{{- tag -}}</a>
-      {% endfor %}
-      {% else %}
-        {{ post.tags | join: ", " }}
-      {% endif %}
-    </div>
-    {% endif %}
+        <section id="contact">
+            <h2>Contact</h2>
+            <p>You can reach me at <a href="mailto:nitinnataraj93@gmail.com">nitinnataraj93@gmail.com</a></p>
+        </section>
+    </main>
 
-   </article>
-  {% endfor %}
+    <footer>
+        <p>&copy; 2024 Nitin Nataraj</p>
+    </footer>
 </div>
-
-{% if paginator.total_pages > 1 %}
-<ul class="pager main-pager">
-  {% if paginator.previous_page %}
-  <li class="previous">
-    <a href="{{ paginator.previous_page_path | relative_url }}">&larr; Newer Posts</a>
-  </li>
-  {% endif %}
-  {% if paginator.next_page %}
-  <li class="next">
-    <a href="{{ paginator.next_page_path | relative_url }}">Older Posts &rarr;</a>
-  </li>
-  {% endif %}
-</ul>
-{% endif %}
