@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 
-  <title>San Francisco</title>
+  <title>Blog</title>
 
   <meta name="author" content="Nitin Nataraj" />
 
@@ -29,20 +29,19 @@
   
 
   
-  <meta property="og:title" content="San Francisco" />
+  <meta property="og:title" content="Blog" />
   
 
    
-  <meta property="og:description" content="
-">
+  <meta property="og:description" content="{% for post in site.posts %} {{ post.title }} {% if post.subtitle %} {{ post.subtitle }} {% endif %} Posted on {{ post.date | date: site.date_format }} {% if post.image %} {% endif %} {{ post.excerpt | strip_html | xml_escape | truncatewords: site.excerpt_length }} {% assign excerpt_word_count = post.excerpt |...">
   
 
 
   <meta property="og:type" content="website" />
 
   
-  <meta property="og:url" content="/places/san_francisco/" />
-  <link rel="canonical" href="/places/san_francisco/" />
+  <meta property="og:url" content="/blog/" />
+  <link rel="canonical" href="/blog/" />
   
 
   
@@ -54,12 +53,11 @@
   <meta name="twitter:creator" content="@" />
 
   
-  <meta name="twitter:title" content="San Francisco" />
+  <meta name="twitter:title" content="Blog" />
   
 
   
-  <meta name="twitter:description" content="
-">
+  <meta name="twitter:description" content="{% for post in site.posts %} {{ post.title }} {% if post.subtitle %} {{ post.subtitle }} {% endif %} Posted on {{ post.date | date: site.date_format }} {% if post.image %} {% endif %} {{ post.excerpt | strip_html | xml_escape | truncatewords: site.excerpt_length }} {% assign excerpt_word_count = post.excerpt |...">
   
 
   
@@ -101,55 +99,70 @@
 </nav>
 
 
-    <!-- TODO this file has become a mess, refactor it -->
+    <div class="intro-header"></div>
+
+<div role="main" class="container-fluid">
+  <div class="posts-list">
+  
+  <article class="post-preview">
+    <a href="/2023-10-28-university-at-buffalo/">
+	  <h2 class="post-title">University at Buffalo 🎓</h2>
+
+	  
+    </a>
+
+    <p class="post-meta">
+      Posted on October 28, 2023
+    </p>
+
+    <div class="post-entry-container">
+      
+      <div class="post-entry">
+        Graduate Research Assistant
+September 2018 - May 2019 (9 months)
 
 
-
-
-
-<header class="header-section ">
-
-<!-- Navigation Menu Start -->
-<nav>
-  <ul>
-    <li><a href="/">Home</a></li>
-    <li><a href="/about/">About</a></li>
-    <li><a href="/photography/">Photography</a></li>
-    <li><a href="/contact/">Contact</a></li>
-    <!-- Add more links as needed -->
-  </ul>
-</nav>
-<!-- Navigation Menu End -->
-
-
-<div class="intro-header no-img">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-        <div class="page-heading">
-          <h1>San Francisco</h1>
-		  
-		  
-		  
-        </div>
+        
+        
+          <a href="/2023-10-28-university-at-buffalo/" class="post-read-more">[Read&nbsp;More]</a>
+        
       </div>
     </div>
-  </div>
-</div>
-</header>
 
+    
 
+   </article>
+  
+  <article class="post-preview">
+    <a href="/2023-10-26-publications/">
+	  <h2 class="post-title">Publications 📖</h2>
 
+	  
+    </a>
 
+    <p class="post-meta">
+      Posted on October 26, 2023
+    </p>
 
-<div class="container" role="main">
-  <div class="row">
-    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+    <div class="post-entry-container">
       
+      <div class="post-entry">
+        Consensus Based Vertically Partitioned Multi-layer Perceptrons for Edge Computing.
 
-	    
+
+        
+        
+          <a href="/2023-10-26-publications/" class="post-read-more">[Read&nbsp;More]</a>
+        
+      </div>
     </div>
-  </div>
+
+    
+
+   </article>
+  
+</div>
+
 </div>
 
 
