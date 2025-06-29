@@ -7,31 +7,29 @@ title: Photography
 
 <div class="facet-filter">
   <button class="filter-button active" data-filter="all">All</button>
-  <button class="filter-button" data-filter="lake-tahoe">Lake Tahoe</button>
-  <button class="filter-button" data-filter="san-francisco">San Francisco</button>
-  <button class="filter-button" data-filter="oregon">Oregon</button>
+  {% for folder in site.static_files %}
+    {% if folder.path contains 'images/' %}
+      {% assign dirname = folder.path | split: '/' %}
+      {% assign location = dirname[2] %}
+      {% unless locations contains location %}
+        {% assign locations = locations | append: location | append: ',' %}
+      {% endunless %}
+    {% endif %}
+  {% endfor %}
+  {% assign locations = locations | split: ',' | uniq %}
+  {% for location in locations %}
+    <button class="filter-button" data-filter="{{ location | slugify }}">{{ location | replace: '_', ' ' | capitalize }}</button>
+  {% endfor %}
 </div>
 
 <div class="gallery-grid">
-  {% for image in site.static_files %}
-    {% if image.path contains 'images/lake_tahoe' %}
-      <div class="gallery-item lake-tahoe">
-        <a href="{{ image.path | relative_url }}" data-lightbox="lake-tahoe" data-title="Lake Tahoe">
-          <img src="{{ image.path | relative_url }}" alt="Lake Tahoe">
-        </a>
-      </div>
-    {% endif %}
-    {% if image.path contains 'images/san_francisco' %}
-      <div class="gallery-item san-francisco">
-        <a href="{{ image.path | relative_url }}" data-lightbox="san-francisco" data-title="San Francisco">
-          <img src="{{ image.path | relative_url }}" alt="San Francisco">
-        </a>
-      </div>
-    {% endif %}
-    {% if image.path contains 'images/oregon_2025' %}
-      <div class="gallery-item oregon">
-        <a href="{{ image.path | relative_url }}" data-lightbox="oregon" data-title="Oregon">
-          <img src="{{ image.path | relative_url }}" alt="Oregon">
+  {% for folder in site.static_files %}
+    {% if folder.path contains 'images/' %}
+      {% assign dirname = folder.path | split: '/' %}
+      {% assign location = dirname[2] %}
+      <div class="gallery-item {{ location | slugify }}">
+        <a href="{{ folder.path | relative_url }}" data-lightbox="{{ location }}" data-title="{{ location | replace: '_', ' ' | capitalize }}">
+          <img src="{{ folder.path | relative_url }}" alt="{{ location | replace: '_', ' ' | capitalize }}">
         </a>
       </div>
     {% endif %}
