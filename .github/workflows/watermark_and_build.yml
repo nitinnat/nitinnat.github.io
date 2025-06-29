@@ -22,15 +22,15 @@ jobs:
     - name: Install Jekyll and dependencies
       run: | 
         bundle install
-      working-directory: nitinnat.github.io
+      working-directory: .
 
     - name: Run image watermarking script
       run: ruby watermark_images.rb
-      working-directory: nitinnat.github.io
+      working-directory: .
 
     - name: Build Jekyll site
       run: bundle exec jekyll build
-      working-directory: nitinnat.github.io
+      working-directory: .
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
