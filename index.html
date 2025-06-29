@@ -8,78 +8,98 @@ use-site-title: true
 
 <div id="about" class="section">
   <div class="container">
-    <h1 class="section-title">About Me</h1>
-    <p>I am a Machine Learning Engineer with experience in Generative AI, LLMs, and Agentic Workflows, as well as time series forecasting and large-scale machine learning. I hold a Master's degree in Computer Science from the University at Buffalo, where my research focused on Computer Vision and Federated ML.</p>
-    <p>My passion lies in building intelligent systems that solve real-world problems. I enjoy exploring new technologies and contributing to open-source projects.</p>
-    <a href="/resume.pdf" class="btn btn-primary">View Full Résumé</a>
-</div>
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <h1 class="section-title">About Me</h1>
+        <p>I am a Machine Learning Engineer with experience in Generative AI, LLMs, and Agentic Workflows, as well as time series forecasting and large-scale machine learning. I hold a Master's degree in Computer Science from the University at Buffalo, where my research focused on Computer Vision and Federated ML.</p>
+        <p>My passion lies in building intelligent systems that solve real-world problems. I enjoy exploring new technologies and contributing to open-source projects.</p>
+        <a href="/resume.pdf" class="btn btn-primary">View Full Résumé</a>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="experience" class="section">
   <div class="container">
-    <h1 class="section-title">Work Experience</h1>
-    {% for experience in site.experiences reversed %}
-    <div class="experience-item">
-      <h3>{{ experience.title }}</h3>
-      <p class="meta">{{ experience.company }} | {{ experience.years }}</p>
-      <div class="content">
-        {{ experience.content }}
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <h1 class="section-title">Work Experience</h1>
+        {% for experience in site.experiences reversed %}
+        <div class="experience-item">
+          <h3>{{ experience.title }}</h3>
+          <p class="meta">{{ experience.company }} | {{ experience.years }}</p>
+          <div class="content">
+            {{ experience.content }}
+          </div>
+        </div>
+        {% endfor %}
       </div>
     </div>
-    {% endfor %}
   </div>
 </div>
 
 <div id="education" class="section">
   <div class="container">
-    <h1 class="section-title">Education</h1>
-    {% for education in site.data.education %}
-    <div class="education-item">
-      <h3>{{ education.degree }}</h3>
-      <p class="meta">{{ education.university }} | {{ education.years }}</p>
-      <p>{{ education.details }}</p>
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <h1 class="section-title">Education</h1>
+        {% for education in site.data.education %}
+        <div class="education-item">
+          <h3>{{ education.degree }}</h3>
+          <p class="meta">{{ education.university }} | {{ education.years }}</p>
+          <p>{{ education.details }}</p>
+        </div>
+        {% endfor %}
+      </div>
     </div>
-    {% endfor %}
   </div>
 </div>
 
 <div id="projects" class="section">
   <div class="container">
-    <h1 class="section-title">Projects</h1>
-    <div class="projects-grid">
-      {% for project in site.projects %}
-      <div class="project-item">
-        <h3><a href="{{ project.url | relative_url }}">{{ project.title }}</a></h3>
-        <p class="meta">{{ project.subtitle }}</p>
-        <p>{{ project.description }}</p>
-        {% if project.github_link %}
-        <a href="{{ project.github_link }}" target="_blank" class="btn btn-sm btn-outline">GitHub</a>
-        {% endif %}
-        {% if project.demo_link %}
-        <a href="{{ project.demo_link }}" target="_blank" class="btn btn-sm btn-outline">Demo</a>
-        {% endif %}
+    <div class="row">
+      <div class="col-lg-10 col-lg-offset-1 col-md-12">
+        <h1 class="section-title">Projects</h1>
+        <div class="projects-grid">
+          {% for project in site.projects %}
+          <div class="project-item">
+            <h3><a href="{{ project.url | relative_url }}">{{ project.title }}</a></h3>
+            <p class="meta">{{ project.subtitle }}</p>
+            <p>{{ project.description }}</p>
+            {% if project.github_link %}
+            <a href="{{ project.github_link }}" target="_blank" class="btn btn-sm btn-outline">GitHub</a>
+            {% endif %}
+            {% if project.demo_link %}
+            <a href="{{ project.demo_link }}" target="_blank" class="btn btn-sm btn-outline">Demo</a>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
       </div>
-      {% endfor %}
     </div>
   </div>
 </div>
 
 <div id="contact" class="section">
   <div class="container">
-    <h1 class="section-title">Contact</h1>
-    <p>Feel free to reach out to me via email or connect with me on social media.</p>
-    <p>Email: <a href="mailto:{{ site.author.email }}">{{ site.author.email }}</a></p>
-    <div class="social-links">
-      {% for social in site.social-network-links %}
-        {% if social[1] %}
-          {% assign social_network = site.data.SocialNetworks | where: "name", social[0] | first %}
-          {% if social_network %}
-            <a href="{{ social_network.url }}{{ social[1] }}" target="_blank" title="{{ social_network.name }}">
-              <i class="fa fa-{{ social_network.icon }}"></i>
-            </a>
-          {% endif %}
-        {% endif %}
-      {% endfor %}
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <h1 class="section-title">Contact</h1>
+        <p>Feel free to reach out to me via email or connect with me on social media.</p>
+        <p>Email: <a href="mailto:{{ site.author.email }}">{{ site.author.email }}</a></p>
+        <div class="social-links">
+          {% for social in site.social-network-links %}
+            {% if social[1] %}
+              {% assign social_network = site.data.SocialNetworks | where: "name", social[0] | first %}
+              {% if social_network %}
+                <a href="{{ social_network.url }}{{ social[1] }}" target="_blank" title="{{ social_network.name }}">
+                  <i class="fa fa-{{ social_network.icon }}"></i>
+                </a>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
     </div>
   </div>
 </div>

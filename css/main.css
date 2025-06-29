@@ -2,10 +2,11 @@
 
 /* --- General --- */
 
+/*
 :root {
   --background-dark: #1a1a2e;
   --text-light: #e0e0e0;
-  --accent-color: #00bcd4; /* A vibrant blue-green for highlights */
+  --accent-color: #00bcd4;
   --secondary-text: #a0a0a0;
   --border-color: #33334d;
   --card-background: #2a2a4a;
@@ -19,7 +20,7 @@ body {
   font-size: 18px;
   color: var(--text-light);
   background-color: var(--background-dark);
-  padding-top: 70px; /* Space for fixed navbar */
+  padding-top: 70px;
   line-height: 1.6;
 }
 
@@ -107,11 +108,10 @@ hr.small {
   background-color: var(--background-dark);
   border-bottom: 1px solid var(--border-color);
   font-family: 'Inter', sans-serif;
-  position: fixed; /* Changed to fixed for sticky behavior */
+  position: fixed;
   top: 0;
   width: 100%;
   z-index: 1000;
-  padding: 15px 0;
   transition: padding 0.3s ease;
 }
 
@@ -133,14 +133,13 @@ hr.small {
   letter-spacing: 1px;
   font-weight: 600;
   color: var(--secondary-text);
-  padding: 10px 15px;
   transition: color 0.3s ease;
 }
 
 .navbar-custom .nav li a:hover,
 .navbar-custom .nav li a:focus {
   color: var(--accent-color);
-  background-color: transparent; /* Override Bootstrap hover */
+  background-color: transparent;
 }
 
 /* Smooth scroll effect */
@@ -311,11 +310,16 @@ html {
   margin: 0 15px;
   color: var(--secondary-text);
   transition: color 0.3s ease, transform 0.3s ease;
+  display: inline-block;
 }
 
 .social-links a:hover {
   color: var(--accent-color);
   transform: translateY(-3px);
+}
+
+.social-links .fa {
+  vertical-align: middle;
 }
 
 /* --- Footer --- */
@@ -366,7 +370,7 @@ footer a:hover {
   }
 
   .projects-grid {
-    grid-template-columns: 1fr; /* Single column on small screens */
+    grid-template-columns: 1fr;
   }
 }
 
@@ -400,7 +404,7 @@ footer a:hover {
   margin-bottom: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  border-bottom: none; /* Remove old border */
+  border-bottom: none;
 }
 
 .post-preview a {
@@ -439,7 +443,7 @@ footer a:hover {
 
 /* Code blocks - ensure they look good on dark theme */
 pre {
-  background-color: #282c34; /* Dark background for code */
+  background-color: #282c34;
   color: #abb2bf;
   padding: 1em;
   border-radius: 5px;
@@ -478,3 +482,4 @@ pre {
   border-left-color: #2ecc71;
   color: var(--text-light);
 }
+*/
