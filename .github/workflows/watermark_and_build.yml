@@ -1,0 +1,44 @@
+name: Watermark Images and Deploy Jekyll Site
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.x' # Use a compatible Ruby version
+        bundler-cache: true # speeds up installation of dependencies
+
+    - name: Install Jekyll and dependencies
+      run: | 
+        bundle install
+      working-directory: ./nitinnat.github.io
+
+    - name: Run image watermarking script
+      run: ruby watermark_images.rb
+      working-directory: ./nitinnat.github.io
+
+    - name: Build Jekyll site
+      run: bundle exec jekyll build
+      working-directory: ./nitinnat.github.io
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./nitinnat.github.io/_site
+        # This assumes your GitHub Pages is configured to deploy from the `gh-pages` branch.
+        # If it's configured to deploy from `master` (or `main`) branch's `/docs` folder,
+        # or the root of `master` (or `main`), you might need to adjust `publish_branch`.
+        # For typical User/Organization Pages, `master` (or `main`) branch is often used.
+        # If your site is `username.github.io`, it usually deploys from `master` (or `main`).
+        # If it's a Project Page, it often deploys from `gh-pages` or `master/docs`.
+        # I will assume `gh-pages` for now, but you may need to change this to `master` or `main`.
+        publish_branch: master
