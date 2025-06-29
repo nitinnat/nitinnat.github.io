@@ -1,0 +1,1 @@
+The navigation bar was overlapping with the main content on scroll. This was fixed by increasing the `padding-top` of the `body` element in `css/main.css` to `100px` to accommodate the height of the fixed navigation bar.
