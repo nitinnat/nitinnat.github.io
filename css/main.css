@@ -12,6 +12,7 @@ body {
   color: #404040;
   position: relative;
   background-color: {{ site.page-col }};
+  padding-top: 70px; /* Add padding to the top of the body */
   {% if site.page-img %}
   background-image: url({{ site.page-img | relative_url }});
   background-attachment: fixed;
@@ -109,10 +110,8 @@ img {
   background-color: {{ site.navbar-col }};
   border-bottom: 1px solid #EAEAEA;
   font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  width: 100%;
   z-index: 1000;
   {% if site.navbar-img %}
   background-image: url({{ site.navbar-img | relative_url }});
