@@ -3,24 +3,38 @@ layout: default
 title: Photography
 ---
 
-<h1>Photography</h1>
+<h1>Photography 📸</h1>
 
 <div class="facet-filter">
   <button class="filter-button active" data-filter="all">All</button>
-  {% for place in site.places %}
-    <button class="filter-button" data-filter="{{ place.title | slugify }}">{{ place.title }}</button>
-  {% endfor %}
+  <button class="filter-button" data-filter="lake-tahoe">Lake Tahoe</button>
+  <button class="filter-button" data-filter="san-francisco">San Francisco</button>
+  <button class="filter-button" data-filter="oregon">Oregon</button>
 </div>
 
 <div class="gallery-grid">
-  {% for place in site.places %}
-    {% for image in place.images %}
-      <div class="gallery-item {{ place.title | slugify }}">
-        <a href="{{ image.path | relative_url }}" data-lightbox="{{ place.title }}" data-title="{{ image.caption }}">
-          <img src="{{ image.path | relative_url }}" alt="{{ image.caption }}">
+  {% for image in site.static_files %}
+    {% if image.path contains 'images/lake_tahoe' %}
+      <div class="gallery-item lake-tahoe">
+        <a href="{{ image.path | relative_url }}" data-lightbox="lake-tahoe" data-title="Lake Tahoe">
+          <img src="{{ image.path | relative_url }}" alt="Lake Tahoe">
         </a>
       </div>
-    {% endfor %}
+    {% endif %}
+    {% if image.path contains 'images/san_francisco' %}
+      <div class="gallery-item san-francisco">
+        <a href="{{ image.path | relative_url }}" data-lightbox="san-francisco" data-title="San Francisco">
+          <img src="{{ image.path | relative_url }}" alt="San Francisco">
+        </a>
+      </div>
+    {% endif %}
+    {% if image.path contains 'images/oregon_2025' %}
+      <div class="gallery-item oregon">
+        <a href="{{ image.path | relative_url }}" data-lightbox="oregon" data-title="Oregon">
+          <img src="{{ image.path | relative_url }}" alt="Oregon">
+        </a>
+      </div>
+    {% endif %}
   {% endfor %}
 </div>
 
@@ -28,33 +42,65 @@ title: Photography
 <script src="/js/lightbox-plus-jquery.min.js"></script>
 <script>
   $(document).ready(function(){
+    // Lightbox options
+    lightbox.option({
+      'resizeDuration': 200,
+      'wrapAround': true
+    });
+
+    // Filter functionality
     $('.filter-button').on('click', function(){
       var filter = $(this).data('filter');
-      if(filter == 'all'){
-        $('.gallery-item').show();
-      } else {
-        $('.gallery-item').hide();
-        $('.gallery-item.' + filter).show();
-      }
+      
       $('.filter-button').removeClass('active');
       $(this).addClass('active');
+      
+      if(filter == 'all'){
+        $('.gallery-item').hide().fadeIn('slow');
+      } else {
+        $('.gallery-item').hide();
+        $('.gallery-item.' + filter).fadeIn('slow');
+      }
     });
   });
 </script>
+
 <style>
   .gallery-grid {
-    display: flex;
-    flex-wrap: wrap;
-  }
-  .gallery-item {
-    width: 30%; /* Adjust as needed */
-    margin: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
   }
   .gallery-item img {
     width: 100%;
-    height: auto;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: transform 0.3s ease-in-out;
+  }
+  .gallery-item img:hover {
+    transform: scale(1.05);
+  }
+  .facet-filter {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .filter-button {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    padding: 8px 16px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+  .filter-button:hover {
+    background-color: #e0e0e0;
   }
   .filter-button.active {
-    font-weight: bold;
+    background-color: #008AFF;
+    color: white;
+    border-color: #008AFF;
   }
 </style>
