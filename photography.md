@@ -29,7 +29,7 @@ title: Photography
       {% assign location = dirname[2] %}
       <div class="gallery-item {{ location | slugify }}">
         <a href="{{ folder.path | relative_url }}" data-lightbox="{{ location }}" data-title="{{ location | replace: '_', ' ' | capitalize }}">
-          <img src="/images/thumbs/{{ folder.path | split: '/' | last }}" alt="{{ location | replace: '_', ' ' | capitalize }}" loading="lazy">
+          <img src="{{ folder.path | relative_url }}" alt="{{ location | replace: '_', ' ' | capitalize }}">
         </a>
       </div>
     {% endif %}
