@@ -17,20 +17,20 @@ jobs:
 
     - name: Update Bundler
       run: gem install bundler --no-document
-      working-directory: ./nitinnat.github.io
+      working-directory: nitinnat.github.io
 
     - name: Install Jekyll and dependencies
       run: | 
         bundle install
-      working-directory: .
+      working-directory: nitinnat.github.io
 
     - name: Run image watermarking script
       run: ruby watermark_images.rb
-      working-directory: .
+      working-directory: nitinnat.github.io
 
     - name: Build Jekyll site
       run: bundle exec jekyll build
-      working-directory: .
+      working-directory: nitinnat.github.io
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
