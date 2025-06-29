@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "University at Buffalo"
+title: "University at Buffalo 🎓"
 ---
 
 ### Graduate Research Assistant

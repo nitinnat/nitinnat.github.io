@@ -2,30 +2,18 @@
 layout: default
 ---
 
-<h1>{{ page.title }}</h1>
-
 <div class="gallery">
-  {% for image in site.static_files %}
-    {% if image.path contains '/images/gallery/' %}
+  <h1>{{ page.title }}</h1>
+  <div class="gallery-grid">
+    {% for image in page.images %}
       <div class="gallery-item">
-        <a href="{{ image.path }}" target="_blank">
-          <img src="{{ image.path }}" alt="{{ image.name }}">
+        <a href="{{ image.path | relative_url }}" data-lightbox="{{ page.title }}" data-title="{{ image.caption }}">
+          <img src="{{ image.path | relative_url }}" alt="{{ image.caption }}">
         </a>
       </div>
-    {% endif %}
-  {% endfor %}
+    {% endfor %}
+  </div>
 </div>
 
-<style>
-  .gallery {
-    display: flex;
-    flex-wrap: wrap;
-  }
-  .gallery-item {
-    margin: 10px;
-  }
-  .gallery-item img {
-    max-width: 100%;
-    height: auto;
-  }
-</style>
+<link rel="stylesheet" href="/css/lightbox.min.css">
+<script src="/js/lightbox-plus-jquery.min.js"></script>

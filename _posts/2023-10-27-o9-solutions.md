@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "o9 Solutions, Inc."
+title: "o9 Solutions, Inc. 💼"
 ---
 
 ### Senior Software Engineer, GenAI

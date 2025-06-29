@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Fidelity Investments"
+title: "Fidelity Investments 💰"
 ---
 
 ### Software Engineer

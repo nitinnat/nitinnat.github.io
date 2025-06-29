@@ -1,10 +1,8 @@
 ---
-layout: place
-title: "Lake Tahoe"
+title: Lake Tahoe
 images:
   - path: /images/lake_tahoe/image1.jpg
+    caption: "Lake Tahoe"
   - path: /images/lake_tahoe/image2.jpg
-  # Add more images here
+    caption: "Lake Tahoe"
 ---
-
-Description of Place 1.

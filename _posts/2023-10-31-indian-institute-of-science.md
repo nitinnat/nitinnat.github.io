@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Indian Institute of Science"
+title: "Indian Institute of Science 🔬"
 ---
 
 ### Summer Research Intern (Computer Vision)

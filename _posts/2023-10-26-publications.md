@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Publications"
+title: "Publications 📖"
 ---
 
 ### Consensus Based Vertically Partitioned Multi-layer Perceptrons for Edge Computing.
