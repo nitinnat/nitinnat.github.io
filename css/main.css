@@ -105,14 +105,16 @@ hr.small {
 /* --- Navbar --- */
 
 .navbar-custom {
-  background-color: var(--background-dark);
+  background-color: var(--background-dark); /* Solid background */
   border-bottom: 1px solid var(--border-color);
   font-family: 'Inter', sans-serif;
   position: fixed;
   top: 0;
   width: 100%;
   z-index: 1000;
-  transition: padding 0.3s ease;
+  padding: 15px 0;
+  transition: padding 0.3s ease, background-color 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
 }
 
 .navbar-custom .navbar-brand {
@@ -137,9 +139,10 @@ hr.small {
 }
 
 .navbar-custom .nav li a:hover,
-.navbar-custom .nav li a:focus {
+.navbar-custom .nav li a:focus,
+.navbar-custom .nav li.active a {
   color: var(--accent-color);
-  background-color: transparent;
+  background-color: transparent; /* Override Bootstrap hover */
 }
 
 /* Smooth scroll effect */

@@ -60,6 +60,7 @@ use-site-title: true
     <div class="row">
       <div class="col-lg-10 col-lg-offset-1 col-md-12">
         <h1 class="section-title">Projects</h1>
+        {% if site.projects.size > 0 %}
         <div class="projects-grid">
           {% for project in site.projects %}
           <div class="project-item">
@@ -75,6 +76,9 @@ use-site-title: true
           </div>
           {% endfor %}
         </div>
+        {% else %}
+        <p class="text-center">Projects section is currently under construction. Please check back soon!</p>
+        {% endif %}
       </div>
     </div>
   </div>
