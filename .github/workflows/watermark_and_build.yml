@@ -10,6 +10,14 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Check for image changes
+      uses: dorny/paths-filter@v2
+      id: changes
+      with:
+        filters: |
+          images:
+            - 'images/**'
+
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -26,6 +34,7 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y imagemagick
 
     - name: Run image watermarking script
+      if: steps.changes.outputs.images == 'true'
       run: ruby watermark_images.rb
       working-directory: .
 
