@@ -14,10 +14,7 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.3.0' # Use a compatible Ruby version
-
-    - name: Update Bundler
-      run: gem install bundler --no-document
-      working-directory: .
+        bundler: '2.4.22' # Specify a compatible Bundler version
 
     - name: Install Jekyll and dependencies
       run: | 
