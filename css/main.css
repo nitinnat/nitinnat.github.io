@@ -279,7 +279,7 @@ html {
 
 .project-item:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 30px -15px var(--accent-color);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
 }
 
 .project-item h3 {
@@ -316,8 +316,8 @@ html {
 }
 
 .social-links a:hover {
-  color: var(--hover-color);
-  transform: translateY(-5px);
+  color: var(--accent-color);
+  transform: translateY(-3px);
 }
 
 .social-links .fa {
