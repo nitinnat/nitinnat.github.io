@@ -9,5 +9,3 @@ Enhanced the user experience by adding subtle hover effects to the cards and soc
 The work experiences are now displayed in reverse chronological order.
 
 Updated the end date of the current experience to 'Present', added all projects from the LinkedIn profile, created a 'Skills & Certifications' section, and implemented skill highlighting for projects and experiences.
-
-Moved photography images to `images/photos` and updated relevant paths. Generated placeholder SVG images for each project and included them in the project markdown files.
