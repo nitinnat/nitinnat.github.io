@@ -19,7 +19,7 @@ body {
   font-size: 18px;
   color: var(--text-light);
   background-color: var(--background-dark);
-  padding-top: 100px;
+  padding-top: 60px;
   line-height: 1.6;
 }
 
@@ -104,14 +104,14 @@ hr.small {
 /* --- Navbar --- */
 
 .navbar-custom {
-  background-color: var(--background-dark); /* Solid background */
+  background-color: #1a1a2e; /* Solid background */
   border-bottom: 1px solid var(--border-color);
   font-family: 'Inter', sans-serif;
   position: fixed;
   top: 0;
   width: 100%;
   z-index: 1000;
-  padding: 15px 0;
+  padding: 5px 0;
   transition: padding 0.3s ease, background-color 0.3s ease;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
 }
