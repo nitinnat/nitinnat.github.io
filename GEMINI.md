@@ -7,3 +7,5 @@ The navigation bar was too large. This was fixed by reducing the `padding` in th
 Enhanced the user experience by adding subtle hover effects to the cards and social media icons.
 
 The work experiences are now displayed in reverse chronological order.
+
+Updated the end date of the current experience to 'Present', added all projects from the LinkedIn profile, created a 'Skills & Certifications' section, and implemented skill highlighting for projects and experiences.
