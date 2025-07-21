@@ -28,7 +28,7 @@ use-site-title: true
         {% for experience in sorted_experiences %}
         <div class="experience-item">
           <h3>{{ experience.title }}</h3>
-          <p class="meta">{{ experience.company }} | {{ experience.years }}</p>
+          <p class="meta">{{ experience.company }} {{ experience.years }}</p>
           <div class="content">
             {{ experience.content }}
           </div>
