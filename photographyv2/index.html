@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Beautiful Jekyll | MIT license | Copyright Dean Attali 2016 -->
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+
+  <title>Photography V2</title>
+
+  <meta name="author" content="Nitin Nataraj" />
+
+  
+
+  <link rel="alternate" type="application/rss+xml" title="Nitin Nataraj - Machine Learning Engineer | AgenticAI | GenAI | LLMs" href="/feed.xml" />
+
+  
+
+  
+
+  
+
+
+  <link rel="stylesheet" href="/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="/css/main.css" />
+
+    <!-- Facebook OpenGraph tags -->
+  
+
+  
+  <meta property="og:title" content="Photography V2" />
+  
+
+   
+  <meta property="og:description" content="
+">
+  
+
+
+  <meta property="og:type" content="website" />
+
+  
+  <meta property="og:url" content="/photographyv2/" />
+  <link rel="canonical" href="/photographyv2/" />
+  
+
+  
+
+
+  <!-- Twitter summary cards -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@" />
+  <meta name="twitter:creator" content="@" />
+
+  
+  <meta name="twitter:title" content="Photography V2" />
+  
+
+  
+  <meta name="twitter:description" content="
+">
+  
+
+  
+
+  
+
+  
+
+</head>
+
+
+  <body>
+
+    
+
+  
+    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button><a class="navbar-brand" href="">Nitin Nataraj</a></div>
+
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav navbar-right"><li><a class="page-scroll" href="/#about">About</a></li>
+        <li><a class="page-scroll" href="/#experience">Experience</a></li>
+        <li><a class="page-scroll" href="/#education">Education</a></li>
+        <li><a class="page-scroll" href="/#projects">Projects</a></li>
+        
+          <li><a href="/photography">Photography</a></li>
+          <li><a href="/blog.html">Blog</a></li>
+          <li><a href="/photographyv2.html">PhotographyV2</a></li><li><a class="page-scroll" href="/#contact">Contact</a></li>
+        </ul>
+    </div>
+
+	</div>
+</nav>
+
+
+    <style>
+  body { margin: 0; overflow: hidden; }
+  #globeViz {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+  }
+  .navbar-custom {
+    z-index: 1000;
+  }
+  .globe-thumbnail {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+  }
+  /* Modal styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.8);
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-content {
+    margin: auto;
+    display: block;
+    max-width: 90%;
+    max-height: 90%;
+  }
+  .close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+  }
+  .close:hover,
+  .close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+  }
+</style>
+
+<div id="globeViz"></div>
+
+<!-- The Modal -->
+<div id="imageModal" class="modal">
+  <span class="close">&times;</span>
+  <img class="modal-content" id="modalImage">
+</div>
+
+<script src="//unpkg.com/three"></script>
+<script src="//unpkg.com/three-globe"></script>
+<script src="//unpkg.com/three/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+  const imagesData = [
+    // Colorado
+    { lat: 39.5, lng: -105.5, imageUrl: "/images/Colorado/colorado1.jpg" },
+    { lat: 39.5, lng: -105.5, imageUrl: "/images/Colorado/IMG_20201224_160833.jpg" },
+    { lat: 39.5, lng: -105.5, imageUrl: "/images/Colorado/IMG_20201226_073454.jpg" },
+    { lat: 39.5, lng: -105.5, imageUrl: "/images/Colorado/PXL_20230511_190400871.jpg" },
+    { lat: 39.5, lng: -105.5, imageUrl: "/images/Colorado/PXL_20230512_170611955.jpg" },
+    { lat: 39.5, lng: -105.5, imageUrl: "/images/Colorado/PXL_20230512_175642392.jpg" },
+    { lat: 39.5, lng: -105.5, imageUrl: "/images/Colorado/PXL_20230512_180446518.jpg" },
+    { lat: 39.5, lng: -105.5, imageUrl: "/images/Colorado/PXL_20230512_193301323.jpg" },
+    { lat: 39.5, lng: -105.5, imageUrl: "/images/Colorado/PXL_20230513_182111130.jpg" },
+    // Lake Tahoe
+    { lat: 39.0, lng: -120.0, imageUrl: "/images/Lake Tahoe/image1.jpg" },
+    { lat: 39.0, lng: -120.0, imageUrl: "/images/Lake Tahoe/image2.jpg" },
+    // Oregon
+    { lat: 44.0, lng: -120.5, imageUrl: "/images/Oregon/Oregon1.jpg" },
+    { lat: 44.0, lng: -120.5, imageUrl: "/images/Oregon/Oregon2.JPG" },
+    { lat: 44.0, lng: -120.5, imageUrl: "/images/Oregon/Oregon3.JPG" },
+    // San Francisco
+    { lat: 37.7, lng: -122.4, imageUrl: "/images/San Francisco/image1.jpg" },
+    // Utah
+    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/DSC08914.JPG" },
+    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/DSC09029.JPG" },
+    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/DSC09069.JPG" },
+    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/DSC09643.JPG" },
+    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/DSC09645.JPG" },
+    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241019_174607450.jpg" },
+    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241019_180416189.MP.jpg" },
+    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241019_180420873.jpg" },
+    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241019_180906039.jpg" },
+    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241019_195311175.jpg" },
+    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241020_134406897.jpg" },
+    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241020_134543080.jpg" },
+    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241020_140431065.jpg" },
+    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241020_144154433.jpg" },
+    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241020_185149556.MP.jpg" },
+    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241020_185806066.jpg" },
+    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241020_222348989.jpg" },
+    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241021_134355238.NIGHT.jpg" }
+  ];
+
+  const Globe = new ThreeGlobe()
+    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
+    .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+    .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+    .htmlElementsData(imagesData)
+    .htmlElement(d => {
+      const el = document.createElement('img');
+      el.src = d.imageUrl;
+      el.className = 'globe-thumbnail';
+      el.onclick = () => openModal(d.imageUrl);
+      return el;
+    });
+
+  // Setup renderer
+  const renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.getElementById('globeViz').appendChild(renderer.domElement);
+
+  // Setup scene
+  const scene = new THREE.Scene();
+  scene.add(Globe);
+  scene.add(new THREE.AmbientLight(0xbbbbbb));
+  scene.add(new THREE.DirectionalLight(0xffffff, 0.6));
+
+  // Setup camera
+  const camera = new THREE.PerspectiveCamera();
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  camera.position.z = 300;
+
+  // Add camera controls
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.rotateSpeed = 1;
+  controls.zoomSpeed = 1;
+  controls.panSpeed = 1;
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.1;
+  controls.autoRotate = false;
+  controls.autoRotateSpeed = 0.1;
+
+  // Kick-off renderer
+  (function animate() { // IIFE
+    // Frame cycle
+    controls.update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+  })();
+
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // Modal functionality
+  const modal = document.getElementById("imageModal");
+  const modalImage = document.getElementById("modalImage");
+  const closeBtn = document.getElementsByClassName("close")[0];
+
+  function openModal(imageUrl) {
+    modal.style.display = "flex";
+    modalImage.src = imageUrl;
+  }
+
+  closeBtn.onclick = function() {
+    modal.style.display = "none";
+  }
+
+  modal.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
+</script>
+
+    <footer>
+  <div class="container beautiful-jekyll-footer">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links"><li><a href="/feed.xml" title="RSS"><span class="fa-stack fa-lg" aria-hidden="true">
+                  <i class="fa fa-circle fa-stack-2x"></i>
+                  <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                </span>
+                <span class="sr-only">RSS</span>
+              </a>
+            </li><li><a href="mailto:nitinnataraj93@gmail.com" title="Email me"><span class="fa-stack fa-lg" aria-hidden="true">
+                  <i class="fa fa-circle fa-stack-2x"></i>
+                  <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                </span>
+                <span class="sr-only">Email me</span>
+              </a>
+            </li><li><a href="https://github.com/nitinnat" title="GitHub"><span class="fa-stack fa-lg" aria-hidden="true">
+                  <i class="fa fa-circle fa-stack-2x"></i>
+                  <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                </span>
+                <span class="sr-only">GitHub</span>
+              </a>
+            </li><li><a href="https://twitter.com/nitin_nataraj" title="Twitter"><span class="fa-stack fa-lg" aria-hidden="true">
+                  <i class="fa fa-circle fa-stack-2x"></i>
+                  <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                </span>
+                <span class="sr-only">Twitter</span>
+              </a>
+            </li><li><a href="https://linkedin.com/in/nitin-nataraj-aa37039b" title="LinkedIn"><span class="fa-stack fa-lg" aria-hidden="true">
+                  <i class="fa fa-circle fa-stack-2x"></i>
+                  <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                </span>
+                <span class="sr-only">LinkedIn</span>
+              </a>
+            </li></ul>
+      <p class="copyright text-muted">
+      Nitin Nataraj
+      &nbsp;&bull;&nbsp;
+      2025
+
+      
+      &nbsp;&bull;&nbsp;
+      <a href="">nitinnat.github.io</a>
+      
+
+      
+      </p>
+          <!-- Please don't remove this, keep my open source work credited :) -->
+    <p class="theme-by text-muted">
+      Theme by
+      <a href="https://deanattali.com/beautiful-jekyll/">beautiful-jekyll</a>
+    </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  
+      <script src="/js/jquery-1.11.2.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/main.js"></script>
+
+  
+  </body>
+</html>
