@@ -3,195 +3,155 @@ layout: base
 ---
 
 <style>
-  body { margin: 0; overflow: hidden; } /* Ensure no scrollbars */
+  body { margin: 0; overflow: hidden; }
   #globeViz {
-    width: 100vw;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 0; /* Ensure globe is behind other content if any */
+    width: 100vw; height: 100vh;
+    position: fixed; top: 0; left: 0; z-index: 0;
   }
-  .navbar-custom {
-    z-index: 1000; /* Ensure navbar is on top */
+  .navbar-custom { z-index: 1000; }
+
+  .globe-thumbnail{
+    width:30px;height:30px;border-radius:50%;object-fit:cover;cursor:pointer;
+    border:2px solid #fff;box-shadow:0 0 5px rgba(0,0,0,.5);
   }
-  .globe-thumbnail {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    object-fit: cover;
-    cursor: pointer;
-    border: 2px solid white;
-    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+
+  /* --- modal viewer --- */
+  .modal{
+    display:none;position:fixed;inset:0;z-index:1001;
+    background:rgba(0,0,0,.8);justify-content:center;align-items:center;
   }
-  /* Modal styles */
-  .modal {
-    display: none;
-    position: fixed;
-    z-index: 1001;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.8);
-    justify-content: center;
-    align-items: center;
+  .modal-content{max-width:90%;max-height:90%;display:block;margin:auto;}
+  .close{
+    position:absolute;top:15px;right:35px;font-size:40px;font-weight:bold;
+    color:#f1f1f1;cursor:pointer;transition:.3s;
   }
-  .modal-content {
-    margin: auto;
-    display: block;
-    max-width: 90%;
-    max-height: 90%;
-  }
-  .close {
-    position: absolute;
-    top: 15px;
-    right: 35px;
-    color: #f1f1f1;
-    font-size: 40px;
-    font-weight: bold;
-    transition: 0.3s;
-    cursor: pointer;
-  }
-  .close:hover,
-  .close:focus {
-    color: #bbb;
-    text-decoration: none;
-    cursor: pointer;
-  }
+  .close:hover,.close:focus{color:#bbb;text-decoration:none;}
 </style>
 
 <div id="globeViz"></div>
 
-<!-- The Modal -->
+<!-- full-screen image viewer -->
 <div id="imageModal" class="modal">
   <span class="close">&times;</span>
   <img class="modal-content" id="modalImage">
 </div>
 
-<script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://unpkg.com/three-globe"></script>
+<!-- -------- three.js / three-globe (ES-modules) -------- -->
+<script type="module">
+  /* CDN modules — no build step needed */
+  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js';
+  import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/controls/OrbitControls.js';
+  import ThreeGlobe from 'https://cdn.jsdelivr.net/npm/three-globe@2.43.0/build/three-globe.module.js';
 
-<script>
+  /* three-globe’s UMD build still expects a global */
+  window.THREE = THREE;
+
+  /* ---- photo locations ---- */
   const imagesData = [
-    // Colorado
-    { lat: 39.5, lng: -105.5, imageUrl: "/images/Colorado/colorado1.jpg" },
-    { lat: 39.5, lng: -105.5, imageUrl: "/images/Colorado/IMG_20201224_160833.jpg" },
-    { lat: 39.5, lng: -105.5, imageUrl: "/images/Colorado/IMG_20201226_073454.jpg" },
-    { lat: 39.5, lng: -105.5, imageUrl: "/images/Colorado/PXL_20230511_190400871.jpg" },
-    { lat: 39.5, lng: -105.5, imageUrl: "/images/Colorado/PXL_20230512_170611955.jpg" },
-    { lat: 39.5, lng: -105.5, imageUrl: "/images/Colorado/PXL_20230512_175642392.jpg" },
-    { lat: 39.5, lng: -105.5, imageUrl: "/images/Colorado/PXL_20230512_180446518.jpg" },
-    { lat: 39.5, lng: -105.5, imageUrl: "/images/Colorado/PXL_20230512_193301323.jpg" },
-    { lat: 39.5, lng: -105.5, imageUrl: "/images/Colorado/PXL_20230513_182111130.jpg" },
-    // Lake Tahoe
-    { lat: 39.0, lng: -120.0, imageUrl: "/images/Lake Tahoe/image1.jpg" },
-    { lat: 39.0, lng: -120.0, imageUrl: "/images/Lake Tahoe/image2.jpg" },
-    // Oregon
-    { lat: 44.0, lng: -120.5, imageUrl: "/images/Oregon/Oregon1.jpg" },
-    { lat: 44.0, lng: -120.5, imageUrl: "/images/Oregon/Oregon2.JPG" },
-    { lat: 44.0, lng: -120.5, imageUrl: "/images/Oregon/Oregon3.JPG" },
-    // San Francisco
-    { lat: 37.7, lng: -122.4, imageUrl: "/images/San Francisco/image1.jpg" },
-    // Utah
-    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/DSC08914.JPG" },
-    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/DSC09029.JPG" },
-    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/DSC09069.JPG" },
-    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/DSC09643.JPG" },
-    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/DSC09645.JPG" },
-    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241019_174607450.jpg" },
-    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241019_180416189.MP.jpg" },
-    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241019_180420873.jpg" },
-    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241019_180906039.jpg" },
-    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241019_195311175.jpg" },
-    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241020_134406897.jpg" },
-    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241020_134543080.jpg" },
-    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241020_140431065.jpg" },
-    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241020_144154433.jpg" },
-    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241020_185149556.MP.jpg" },
-    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241020_185806066.jpg" },
-    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241020_222348989.jpg" },
-    { lat: 39.5, lng: -111.5, imageUrl: "/images/Utah/PXL_20241021_134355238.NIGHT.jpg" }
+    /* Colorado */
+    { lat:39.5, lng:-105.5, imageUrl:'/images/Colorado/colorado1.jpg' },
+    { lat:39.5, lng:-105.5, imageUrl:'/images/Colorado/IMG_20201224_160833.jpg' },
+    { lat:39.5, lng:-105.5, imageUrl:'/images/Colorado/IMG_20201226_073454.jpg' },
+    { lat:39.5, lng:-105.5, imageUrl:'/images/Colorado/PXL_20230511_190400871.jpg' },
+    { lat:39.5, lng:-105.5, imageUrl:'/images/Colorado/PXL_20230512_170611955.jpg' },
+    { lat:39.5, lng:-105.5, imageUrl:'/images/Colorado/PXL_20230512_175642392.jpg' },
+    { lat:39.5, lng:-105.5, imageUrl:'/images/Colorado/PXL_20230512_180446518.jpg' },
+    { lat:39.5, lng:-105.5, imageUrl:'/images/Colorado/PXL_20230512_193301323.jpg' },
+    { lat:39.5, lng:-105.5, imageUrl:'/images/Colorado/PXL_20230513_182111130.jpg' },
+
+    /* Lake Tahoe */
+    { lat:39.0, lng:-120.0, imageUrl:'/images/Lake Tahoe/image1.jpg' },
+    { lat:39.0, lng:-120.0, imageUrl:'/images/Lake Tahoe/image2.jpg' },
+
+    /* Oregon */
+    { lat:44.0, lng:-120.5, imageUrl:'/images/Oregon/Oregon1.jpg' },
+    { lat:44.0, lng:-120.5, imageUrl:'/images/Oregon/Oregon2.JPG' },
+    { lat:44.0, lng:-120.5, imageUrl:'/images/Oregon/Oregon3.JPG' },
+
+    /* San Francisco */
+    { lat:37.7, lng:-122.4, imageUrl:'/images/San Francisco/image1.jpg' },
+
+    /* Utah (many) */
+    { lat:39.5, lng:-111.5, imageUrl:'/images/Utah/DSC08914.JPG' },
+    { lat:39.5, lng:-111.5, imageUrl:'/images/Utah/DSC09029.JPG' },
+    { lat:39.5, lng:-111.5, imageUrl:'/images/Utah/DSC09069.JPG' },
+    { lat:39.5, lng:-111.5, imageUrl:'/images/Utah/DSC09643.JPG' },
+    { lat:39.5, lng:-111.5, imageUrl:'/images/Utah/DSC09645.JPG' },
+    { lat:39.5, lng:-111.5, imageUrl:'/images/Utah/PXL_20241019_174607450.jpg' },
+    { lat:39.5, lng:-111.5, imageUrl:'/images/Utah/PXL_20241019_180416189.MP.jpg' },
+    { lat:39.5, lng:-111.5, imageUrl:'/images/Utah/PXL_20241019_180420873.jpg' },
+    { lat:39.5, lng:-111.5, imageUrl:'/images/Utah/PXL_20241019_180906039.jpg' },
+    { lat:39.5, lng:-111.5, imageUrl:'/images/Utah/PXL_20241019_195311175.jpg' },
+    { lat:39.5, lng:-111.5, imageUrl:'/images/Utah/PXL_20241020_134406897.jpg' },
+    { lat:39.5, lng:-111.5, imageUrl:'/images/Utah/PXL_20241020_134543080.jpg' },
+    { lat:39.5, lng:-111.5, imageUrl:'/images/Utah/PXL_20241020_140431065.jpg' },
+    { lat:39.5, lng:-111.5, imageUrl:'/images/Utah/PXL_20241020_144154433.jpg' },
+    { lat:39.5, lng:-111.5, imageUrl:'/images/Utah/PXL_20241020_185149556.MP.jpg' },
+    { lat:39.5, lng:-111.5, imageUrl:'/images/Utah/PXL_20241020_185806066.jpg' },
+    { lat:39.5, lng:-111.5, imageUrl:'/images/Utah/PXL_20241020_222348989.jpg' },
+    { lat:39.5, lng:-111.5, imageUrl:'/images/Utah/PXL_20241021_134355238.NIGHT.jpg' }
   ];
 
+  /* ---- Globe layer ---- */
   const Globe = new ThreeGlobe()
-    .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
-    .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
-    .htmlElementsData(imagesData)
-    .htmlElement(d => {
-      const el = document.createElement('img');
-      el.src = d.imageUrl;
-      el.className = 'globe-thumbnail';
-      el.onclick = () => openModal(d.imageUrl);
-      return el;
-    });
+      .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
+      .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
+      .htmlElementsData(imagesData)
+      .htmlElement(d => {
+        const el = document.createElement('img');
+        el.src   = d.imageUrl;
+        el.className = 'globe-thumbnail';
+        el.onclick   = () => openModal(d.imageUrl);
+        return el;
+      });
 
-  // Setup renderer
-  const renderer = new THREE.WebGLRenderer();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.getElementById('globeViz').appendChild(renderer.domElement);
-
-  // Setup scene
-  const scene = new THREE.Scene();
+  /* ---- Scene / Camera / Renderer ---- */
+  const scene   = new THREE.Scene();
   scene.add(Globe);
   scene.add(new THREE.AmbientLight(0xbbbbbb));
   scene.add(new THREE.DirectionalLight(0xffffff, 0.6));
 
-  // Set background image
-  new THREE.TextureLoader().load('https://unpkg.com/three-globe/example/img/night-sky.png', texture => {
-    scene.background = texture;
-  });
+  new THREE.TextureLoader().load(
+      'https://unpkg.com/three-globe/example/img/night-sky.png',
+      tex => scene.background = tex
+  );
 
-  // Setup camera
-  const camera = new THREE.PerspectiveCamera();
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  camera.position.z = 300;
+  const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
+  camera.position.set(0,0,300);
 
-  // Add camera controls
-  const controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.rotateSpeed = 1;
-  controls.zoomSpeed = 1;
-  controls.panSpeed = 1;
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.1;
-  controls.autoRotate = false;
-  controls.autoRotateSpeed = 0.1;
+  const renderer = new THREE.WebGLRenderer({ antialias:true });
+  renderer.outputColorSpace = THREE.SRGBColorSpace;   // keep colours correct :contentReference[oaicite:5]{index=5}
+  renderer.setPixelRatio(devicePixelRatio);           // Hi-DPI crispness :contentReference[oaicite:6]{index=6}
+  renderer.setSize(innerWidth, innerHeight);
+  document.getElementById('globeViz').appendChild(renderer.domElement);
 
-  // Kick-off renderer
-  (function animate() { // IIFE
-    // Frame cycle
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true; controls.dampingFactor = 0.1;
+
+  /* ---- render loop ---- */
+  function animate(){
+    requestAnimationFrame(animate);
     controls.update();
     renderer.render(scene, camera);
-    requestAnimationFrame(animate);
-  })();
+  }
+  animate();
 
-  // Handle window resize
-  window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
+  /* ---- responsiveness ---- */
+  addEventListener('resize', () => {
+    camera.aspect = innerWidth/innerHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(innerWidth, innerHeight);
   });
 
-  // Modal functionality
-  const modal = document.getElementById("imageModal");
-  const modalImage = document.getElementById("modalImage");
-  const closeBtn = document.getElementsByClassName("close")[0];
+  /* ---- modal viewer ---- */
+  const modal     = document.getElementById('imageModal');
+  const modalImg  = document.getElementById('modalImage');
+  const closeBtn  = document.querySelector('.close');
 
-  function openModal(imageUrl) {
-    modal.style.display = "flex";
-    modalImage.src = imageUrl;
+  function openModal(url){
+    modal.style.display = 'flex';
+    modalImg.src = url;
   }
-
-  closeBtn.onclick = function() {
-    modal.style.display = "none";
-  }
-
-  modal.onclick = function(event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
-    }
-  }
+  closeBtn.onclick = () => modal.style.display = 'none';
+  modal.onclick     = e => e.target === modal && (modal.style.display='none');
 </script>
