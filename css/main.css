@@ -1,21 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap');
 
 /* --- General --- */
 
 :root {
-  --background-dark: #1a1a2e;
-  --text-light: #e0e0e0;
+  --background-dark: #ffffff; /* Changed to white */
+  --text-light: #333333; /* Darker text for white background */
   --accent-color: #00bcd4;
-  --secondary-text: #a0a0a0;
-  --border-color: #33334d;
-  --card-background: #2a2a4a;
+  --secondary-text: #666666; /* Darker secondary text */
+  --border-color: #e0e0e0; /* Lighter border */
+  --card-background: #f8f8f8; /* Lighter card background */
   --button-bg: var(--accent-color);
-  --button-text: #1a1a2e;
+  --button-text: #ffffff; /* White button text for contrast */
   --hover-color: #00e5ff;
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Open Sans', sans-serif; /* Changed font */
   font-size: 18px;
   color: var(--text-light);
   background-color: var(--background-dark);
