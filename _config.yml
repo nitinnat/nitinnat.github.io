@@ -26,6 +26,7 @@ navbar-links:
   Projects: "#projects"
   Photography: "photography"
   Blog: "/blog.html"
+  PhotographyV2: "/photographyv2.html"
   Contact: "#contact" # Assuming a contact section will be added to the one-pager
 
 # Image to show in the navigation bar - image must be a square (width = height)
