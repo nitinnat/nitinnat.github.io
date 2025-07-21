@@ -24,7 +24,8 @@ use-site-title: true
     <div class="row">
       <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
         <h1 class="section-title">Work Experience</h1>
-        {% for experience in site.experiences reversed %}
+        {% assign sorted_experiences = site.experiences | sort: 'start_date' | reverse %}
+        {% for experience in sorted_experiences %}
         <div class="experience-item">
           <h3>{{ experience.title }}</h3>
           <p class="meta">{{ experience.company }} | {{ experience.years }}</p>
