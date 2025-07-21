@@ -189,6 +189,12 @@ defaults:
     values:
       layout: "page"
       show-avatar: false
+  -
+    scope:
+      path: "photographyv2.md"
+    values:
+      layout: "photographyv2"
+      permalink: "/photographyv2.html"
 
 # Use tags index page and make tags on each post clickable
 link-tags: true
