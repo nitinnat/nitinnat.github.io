@@ -1,0 +1,172 @@
+---
+title: "Getting Started with Your Blog"
+date: 2025-01-01
+description: "A quick guide to creating your first blog post and using MDX features."
+tags: [guide, mdx, tutorial]
+categories: [documentation]
+draft: false
+---
+
+# Welcome to Your Blog
+
+This is a sample post demonstrating all the features of your new blog. You can keep this as a reference or delete it once you've created your own posts.
+
+## Creating Posts
+
+Create MDX files in the `content/posts/` directory. Each post needs front matter at the top:
+
+```yaml
+---
+title: "Your Post Title"
+date: 2025-01-01
+description: "A brief description for SEO and previews"
+tags: [tag1, tag2]
+categories: [category]
+draft: false
+---
+```
+
+Set `draft: true` to hide a post from the listing.
+
+## Typography
+
+Your blog supports all standard Markdown formatting:
+
+- **Bold text** and *italic text*
+- ~~Strikethrough~~ text
+- `Inline code` for short snippets
+- [Links](https://example.com) to external sites
+
+> Blockquotes are styled nicely and can span
+> multiple lines for emphasis.
+
+### Lists
+
+Ordered lists:
+1. First item
+2. Second item
+3. Third item
+
+Unordered lists:
+- Bullet point one
+- Bullet point two
+  - Nested item
+  - Another nested item
+
+## Code Blocks
+
+Code blocks have syntax highlighting powered by Shiki:
+
+```typescript
+interface BlogPost {
+  title: string;
+  date: Date;
+  content: string;
+  tags?: string[];
+}
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+const post: BlogPost = {
+  title: "Hello World",
+  date: new Date(),
+  content: "This is my first post!",
+  tags: ["intro", "welcome"],
+};
+
+console.log(`Published: ${formatDate(post.date)}`);
+```
+
+Python example:
+
+```python
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Optional
+
+@dataclass
+class BlogPost:
+    title: str
+    date: datetime
+    content: str
+    tags: Optional[list[str]] = None
+
+    def format_date(self) -> str:
+        return self.date.strftime("%B %d, %Y")
+
+post = BlogPost(
+    title="Hello World",
+    date=datetime.now(),
+    content="This is my first post!",
+    tags=["intro", "welcome"]
+)
+
+print(f"Published: {post.format_date()}")
+```
+
+## Tables
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| MDX Support | Complete | Full MDX with components |
+| Syntax Highlighting | Complete | Via rehype-pretty-code |
+| Dark Mode | Complete | Default theme |
+| Mermaid Diagrams | Complete | Client-side rendering |
+| Search | Planned | Coming soon |
+| Comments | Planned | Via Giscus |
+
+## Mermaid Diagrams
+
+Create diagrams directly in your posts:
+
+<Mermaid chart={`
+flowchart TD
+    A[Write MDX Post] --> B{Has Front Matter?}
+    B -->|Yes| C[Parse Content]
+    B -->|No| D[Add Front Matter]
+    D --> C
+    C --> E[Apply Syntax Highlighting]
+    E --> F[Render Components]
+    F --> G[Display Post]
+`} />
+
+Another example - a sequence diagram:
+
+<Mermaid chart={`
+sequenceDiagram
+    participant U as User
+    participant B as Browser
+    participant S as Server
+
+    U->>B: Navigate to blog
+    B->>S: Request page
+    S->>B: Return static HTML
+    B->>U: Display content
+    U->>B: Toggle dark mode
+    B->>B: Update theme
+`} />
+
+## Images
+
+Place images in `content/assets/` and reference them with standard Markdown:
+
+```markdown
+![Alt text](/assets/your-image.png)
+```
+
+The images will be copied to `public/assets/` during build.
+
+## Next Steps
+
+1. **Customize the header** - Edit `src/components/header.tsx` to change the blog name
+2. **Create an about page** - Add `content/pages/about.mdx` with your bio
+3. **Write your first post** - Create a new `.mdx` file in `content/posts/`
+4. **Deploy to GitHub Pages** - Push to your repository and enable GitHub Actions
+
+Happy blogging!
