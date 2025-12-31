@@ -3,7 +3,6 @@ import createMDX from "@next/mdx";
 
 const nextConfig: NextConfig = {
   output: "export",
-  basePath: "/blog",
   trailingSlash: true,
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   images: {
