@@ -1,5 +1,6 @@
 import { getPageBySlug } from "@/lib/content";
 import { compileMDX } from "@/lib/mdx";
+import { Mail, Linkedin, Github } from "lucide-react";
 
 export const metadata = {
   title: "About",
@@ -44,6 +45,35 @@ Write your bio here...`}
 
   return (
     <article className="prose prose-neutral dark:prose-invert max-w-none">
+      <div className="flex gap-4 mb-8 not-prose">
+        <a
+          href="mailto:nitinnataraj93@gmail.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Email"
+        >
+          <Mail className="w-5 h-5" />
+        </a>
+        <a
+          href="https://www.linkedin.com/in/nitin-nataraj-aa37039b"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="LinkedIn"
+        >
+          <Linkedin className="w-5 h-5" />
+        </a>
+        <a
+          href="https://github.com/nitinnat"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="GitHub"
+        >
+          <Github className="w-5 h-5" />
+        </a>
+      </div>
       <MDXContent />
     </article>
   );
