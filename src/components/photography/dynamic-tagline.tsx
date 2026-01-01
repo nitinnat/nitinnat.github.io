@@ -38,7 +38,7 @@ export function DynamicTagline({
               initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={reduceMotion ? { opacity: 1 } : { opacity: 0, y: -6 }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.35 }}
               className="ml-2"
             >
               {phrases[index]}
