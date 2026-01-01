@@ -21,6 +21,18 @@ export interface Post {
   content: string;
 }
 
+export interface PageMeta extends Record<string, unknown> {
+  slug: string;
+  title: string;
+  description?: string;
+  date?: string;
+}
+
+export interface Page {
+  meta: PageMeta;
+  content: string;
+}
+
 export function getAllPostSlugs(): string[] {
   if (!fs.existsSync(POSTS_PATH)) return [];
 
@@ -79,7 +91,7 @@ export function getAllPosts(): Post[] {
   return posts;
 }
 
-export function getPageBySlug(slug: string): Post | null {
+export function getPageBySlug(slug: string): Page | null {
   const mdxPath = path.join(PAGES_PATH, `${slug}.mdx`);
   const mdPath = path.join(PAGES_PATH, `${slug}.md`);
 
@@ -90,12 +102,26 @@ export function getPageBySlug(slug: string): Post | null {
   const fileContents = fs.readFileSync(filePath, "utf8");
   const { data, content } = matter(fileContents);
 
+  const rawData = data as Record<string, unknown>;
+  const title =
+    typeof rawData.title === "string" ? rawData.title : "Untitled";
+  const description =
+    typeof rawData.description === "string" ? rawData.description : "";
+  const dateValue = rawData.date;
+  const date =
+    dateValue instanceof Date
+      ? dateValue.toISOString()
+      : typeof dateValue === "string"
+      ? dateValue
+      : undefined;
+
   return {
     meta: {
+      ...rawData,
       slug,
-      title: data.title || "Untitled",
-      date: data.date?.toISOString?.() || data.date || "",
-      description: data.description || "",
+      title,
+      description,
+      ...(date ? { date } : {}),
     },
     content,
   };
