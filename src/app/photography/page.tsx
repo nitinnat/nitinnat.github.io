@@ -161,38 +161,40 @@ function getGalleryFromAssets(): PhotoItem[] {
 function parseGallery(value: unknown): PhotoItem[] {
   if (!Array.isArray(value)) return [];
 
-  return value
-    .map((entry, index) => {
-      if (!entry || typeof entry !== "object") return null;
-      const raw = entry as Record<string, unknown>;
-      const image = typeof raw.image === "string" ? raw.image : undefined;
-      const thumb =
-        typeof raw.thumb === "string" ? raw.thumb : image || undefined;
-      const full =
-        typeof raw.full === "string" ? raw.full : image || thumb || undefined;
-      const tags = Array.isArray(raw.tags)
-        ? raw.tags.filter((tag) => typeof tag === "string")
-        : undefined;
+  const items: PhotoItem[] = [];
 
-      if (!thumb && !full) return null;
-      if (full && getBasenameFromUrl(full) === "001") return null;
-      if (thumb && getBasenameFromUrl(thumb) === "001") return null;
+  value.forEach((entry, index) => {
+    if (!entry || typeof entry !== "object") return;
+    const raw = entry as Record<string, unknown>;
+    const image = typeof raw.image === "string" ? raw.image : undefined;
+    const thumb =
+      typeof raw.thumb === "string" ? raw.thumb : image || undefined;
+    const full =
+      typeof raw.full === "string" ? raw.full : image || thumb || undefined;
+    const tags = Array.isArray(raw.tags)
+      ? raw.tags.filter((tag) => typeof tag === "string")
+      : undefined;
 
-      return {
-        id:
-          typeof raw.id === "string"
-            ? raw.id
-            : `${full || thumb}-photo-${index}`,
-        thumb,
-        full,
-        width: typeof raw.width === "number" ? raw.width : undefined,
-        height: typeof raw.height === "number" ? raw.height : undefined,
-        alt: typeof raw.alt === "string" ? raw.alt : undefined,
-        title: typeof raw.title === "string" ? raw.title : undefined,
-        tags: tags && tags.length > 0 ? tags : undefined,
-      } satisfies PhotoItem;
-    })
-    .filter((item): item is PhotoItem => item !== null);
+    if (!thumb && !full) return;
+    if (full && getBasenameFromUrl(full) === "001") return;
+    if (thumb && getBasenameFromUrl(thumb) === "001") return;
+
+    items.push({
+      id:
+        typeof raw.id === "string"
+          ? raw.id
+          : `${full || thumb}-photo-${index}`,
+      thumb,
+      full,
+      width: typeof raw.width === "number" ? raw.width : undefined,
+      height: typeof raw.height === "number" ? raw.height : undefined,
+      alt: typeof raw.alt === "string" ? raw.alt : undefined,
+      title: typeof raw.title === "string" ? raw.title : undefined,
+      tags: tags && tags.length > 0 ? tags : undefined,
+    });
+  });
+
+  return items;
 }
 
 
