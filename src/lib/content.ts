@@ -1,9 +1,11 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import type { Skill } from "@/data/skills-data";
 
 const POSTS_PATH = path.join(process.cwd(), "content/posts");
 const PAGES_PATH = path.join(process.cwd(), "content/pages");
+const SKILLS_PATH = path.join(process.cwd(), "content/skills.md");
 
 export interface PostMeta {
   slug: string;
@@ -125,4 +127,49 @@ export function getPageBySlug(slug: string): Page | null {
     },
     content,
   };
+}
+
+export function getSkillsFromMarkdown(): Skill[] {
+  if (!fs.existsSync(SKILLS_PATH)) return [];
+
+  const fileContents = fs.readFileSync(SKILLS_PATH, "utf8");
+  const skills: Skill[] = [];
+  let currentCategory: Skill["category"] | null = null;
+
+  const categoryMap: Record<string, Skill["category"]> = {
+    frontend: "frontend",
+    backend: "backend",
+    "ml & genai": "ml",
+    "tools & infra": "tools",
+    "domain knowledge": "domain",
+  };
+
+  const lines = fileContents.split("\n");
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    if (trimmed.startsWith("## ")) {
+      const categoryName = trimmed.replace("## ", "").toLowerCase();
+      currentCategory = categoryMap[categoryName] || null;
+    } else if (trimmed.startsWith("- ") && currentCategory) {
+      const match = trimmed.match(/^- (.+?)\s*\|\s*(\d)$/);
+      if (match) {
+        const [, name, proficiencyStr] = match;
+        const proficiency = parseInt(proficiencyStr, 10);
+
+        if (proficiency >= 1 && proficiency <= 5) {
+          const id = name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+          skills.push({
+            id,
+            name,
+            proficiency,
+            category: currentCategory,
+          });
+        }
+      }
+    }
+  }
+
+  return skills;
 }

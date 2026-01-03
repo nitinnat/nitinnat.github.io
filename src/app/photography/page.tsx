@@ -17,6 +17,7 @@ const IMAGE_EXTENSIONS = new Set([
   ".gif",
   ".heic",
   ".heif",
+  ".PNG"
 ]);
 
 function isImageFile(filename: string) {
@@ -199,6 +200,15 @@ function parseGallery(value: unknown): PhotoItem[] {
   return items;
 }
 
+function shuffleArray(array: PhotoItem[]): PhotoItem[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 
 export async function generateMetadata() {
   const page = getPageBySlug("photography");
@@ -244,8 +254,9 @@ export default async function PhotographyPage() {
       ? page.meta.heroSubtitle
       : undefined;
   const galleryFromMeta = parseGallery(page.meta.gallery);
-  const gallery =
+  const baseGallery =
     galleryFromMeta.length > 0 ? galleryFromMeta : getGalleryFromAssets();
+  const gallery = shuffleArray(baseGallery);
   const heroFromAssets = findHeroFromAssets();
   const heroByName = findHeroFromGallery(gallery);
   const heroFallback = gallery[0];

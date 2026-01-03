@@ -11,8 +11,11 @@ const rehypePrettyCodeOptions = {
   keepBackground: true,
 };
 
+type MDXComponents = Record<string, ComponentType<Record<string, unknown>>>;
+
 export async function compileMDX(
-  source: string
+  source: string,
+  components?: MDXComponents
 ): Promise<ComponentType<Record<string, unknown>>> {
   const code = await compile(source, {
     outputFormat: "function-body",
@@ -23,6 +26,12 @@ export async function compileMDX(
     ...runtime,
     baseUrl: import.meta.url,
   });
+
+  if (components) {
+    return function MDXWithComponents(props: Record<string, unknown>) {
+      return MDXContent({ ...props, components });
+    } as ComponentType<Record<string, unknown>>;
+  }
 
   return MDXContent as ComponentType<Record<string, unknown>>;
 }
