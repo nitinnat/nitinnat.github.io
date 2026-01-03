@@ -9,20 +9,26 @@ export function Header() {
           href="/"
           className="text-xl font-bold text-foreground hover:text-primary transition-colors"
         >
-          My Blog
+          Nitin Nataraj
         </Link>
-        <nav className="flex items-center gap-4">
-          <Link
-            href="/photography"
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Photography
-          </Link>
+        <nav className="flex items-center gap-6">
           <Link
             href="/about"
             className="text-muted-foreground hover:text-foreground transition-colors"
           >
             About
+          </Link>
+          <Link
+            href="/blog"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Blog
+          </Link>
+          <Link
+            href="/photography"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Photography
           </Link>
           <ThemeToggle />
         </nav>

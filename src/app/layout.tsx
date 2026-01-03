@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "My Blog",
-  description: "A minimalist blog",
+  title: "Nitin Nataraj",
+  description: "Machine learning software engineer, photography enthusiast, pokemon nerd",
 };
 
 export default function RootLayout({
