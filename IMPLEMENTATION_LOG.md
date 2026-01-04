@@ -298,3 +298,112 @@ Added background images to education timeline entries that appear on hover, show
 </div>
 ```
 
+## Session 3: Markdown-Based Timeline Data Management
+
+### Phase 1: Timeline Markdown Source & Build-Time Generation
+**Status:** Completed
+
+Converted hardcoded TypeScript timeline data to markdown format embedded in about.mdx for easier maintenance and editing, following the same pattern as the skills system.
+
+**Files Created:**
+- `scripts/generate-timeline.js` - Build script to parse timeline data from about.mdx HTML comment and generate TypeScript
+
+**Files Modified:**
+- `src/data/timeline-data.ts` - Now generated from markdown source
+- `content/pages/about.mdx` - Timeline entries now stored in MDX comment block
+- `package.json` - Added generate-timeline.js to prebuild script (runs first, before generate-skills.js)
+
+**Markdown Format:**
+
+Timeline entries are stored in an MDX comment block in `content/pages/about.mdx`, organized into two sections: "# Professional Timeline" and "# Education Timeline"
+
+Each entry uses a simple key-value format (within the MDX comment):
+```markdown
+## Entry Title
+Company: Organization Name
+DateRange: Start - End
+Description: Short summary
+ExpandedContent: Detailed information
+Image: /path/to/image.png | Alt Text | Optional Caption
+Link: https://url | Link Label
+Skills: skill-id-1, skill-id-2, skill-id-3
+BackgroundImage: /path/to/bg-image.jpg
+Type: work|research|education
+```
+
+**Key Implementation Details:**
+
+1. **Section Organization:**
+   - Professional Timeline: Work positions and internships
+   - Education Timeline: Degrees and academic programs
+   - Automatic section tracking via markdown headings
+
+2. **Entry Parsing:**
+   - ID generation: Lowercase, hyphenated from title (e.g., "Senior Software Engineer, GenAI" → "senior-software-engineer-genai")
+   - Optional fields: expandedContent, image, link, skills, backgroundImage
+   - Image parsing: Supports format "path | alt | caption" where caption is optional
+   - Link parsing: Supports format "url | label"
+   - Skills: Comma-separated list of skill IDs
+   - Type field: Sets entry type (work, research, education)
+
+3. **TypeScript Generation:**
+   - Reads `content/pages/about.mdx` at build time
+   - Extracts timeline data from MDX comment block using regex pattern matching
+   - Generates properly typed TypeScript exports: `professionalTimeline` and `educationTimeline` arrays
+   - Escapes strings properly (quotes, newlines, backslashes)
+   - Runs automatically during `npm run build` via prebuild hook
+   - Runs before skills generation to ensure timeline structure is ready
+
+4. **Data Structure:**
+   - Generated TimelineEntry objects match `TimelineEntry` interface from timeline-types.ts
+   - All required fields: id, title, company, dateRange, description, type
+   - Optional fields only included when present in markdown
+
+**Testing:**
+- Build succeeds: `npm run build` compiles without errors
+- Correct parsing: Generated 7 professional + 3 education + research entries
+- All entries have proper TypeScript types
+- Images, links, skills, and background images parse correctly
+- Skills reference existing skill IDs from skills-data
+- Routes generate successfully: /, /about, /blog, /photography
+
+**Build Output:**
+```
+✓ Generated 7 professional + 3 education timeline entries from about.mdx
+✓ Generated 28 skills from content/skills.md
+Assets copied successfully from content/assets to public/assets
+✓ Compiled successfully
+```
+
+**Why This Approach:**
+
+Same benefits as markdown-based skills system:
+- **Separation of concerns**: Content (markdown) vs. code (TypeScript)
+- **Browser-safe**: Node.js APIs only used at build time, not runtime
+- **Type-safe**: Generated TypeScript maintains full type safety
+- **Easy updates**: Edit markdown, run build, changes propagate automatically
+- **Human-readable**: Markdown format is easier to read and edit than JSON/TS
+- **Git-friendly**: Markdown diffs show actual content changes clearly
+
+**Maintenance:**
+
+To update timeline entries:
+1. Edit the timeline entries in the MDX comment block at the top of `content/pages/about.mdx`
+2. Run `npm run build` or `npm run dev`
+3. The generate-timeline.js script automatically extracts from about.mdx and updates `src/data/timeline-data.ts`
+
+The timeline data is stored as a markdown block inside an MDX comment (`{/* ... */}`) within about.mdx, keeping all related content in one place.
+
+Format example:
+```markdown
+## Job Title
+Company: Company Name
+DateRange: Month YYYY - Present
+Description: Short summary for the timeline card
+ExpandedContent: Longer description that appears in the expanded modal
+Image: /assets/image.png | Alt Text | Optional Caption
+Link: https://example.com | Visit link text
+Skills: python, react, kubernetes
+Type: work
+```
+

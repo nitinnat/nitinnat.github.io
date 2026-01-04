@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/generate-skills.js && node scripts/copy-assets.js",
+    "prebuild": "node scripts/generate-timeline.js && node scripts/generate-skills.js && node scripts/copy-assets.js",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
