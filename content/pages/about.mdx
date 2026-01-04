@@ -2,11 +2,122 @@
 title: "About"
 ---
 
+{/* Timeline data in markdown format - parsed by scripts/generate-timeline.js
+
+# Professional Timeline
+
+## Senior Software Engineer, GenAI
+Company: o9 Solutions
+DateRange: April 2025 - Present
+Description: Building production-grade GenAI systems with agentic workflows, retrieval-augmented generation, and long-running conversation support.
+ExpandedContent: My work centers on the engineering layer required to ship LLM applications reliably: tool-using agent patterns, RAG ingestion and retrieval pipelines, context + memory management for long conversations, evaluation approaches for non-deterministic behavior, and observability/debuggability in production.
+Image: /assets/genai_workflow.png | GenAI Agentic Workflow | Illustrative diagram only; does not reflect actual implementation.
+Skills: python, fastapi, llms, rag-systems, agentic-ai
+Type: work
+
+## Software Engineer II, Machine Learning
+Company: o9 Solutions
+DateRange: April 2022 - April 2025
+Description: Built large-scale AutoML pipelines for time series forecasting using Python, PySpark, TensorFlow, and Kubernetes.
+ExpandedContent: Focused on developing end-to-end forecasting pipelines and automation that improved accuracy and efficiency, spanning data processing, training workflows, and operationalization. Over time, I also worked on early LLM/conversational workflow efforts as the ecosystem matured.
+Image: /assets/automl_forecasting.png | AutoML Time Series Forecasting | Illustrative diagram only; does not reflect actual implementation.
+Skills: python, tensorflow, pyspark, kubernetes, time-series-forecasting
+Type: work
+
+## Software Engineer, Machine Learning
+Company: o9 Solutions
+DateRange: August 2019 - April 2022
+Description: Worked on scalability, optimization, and monitoring for a large retail forecasting system deployed across 10,000 stores.
+ExpandedContent: Built and maintained big-data/ML platform pieces in a production environment: PySpark + Hadoop workflows, operational monitoring, and tooling that improved reliability and developer experience. Also developed REST APIs and CI/CD pipelines to support horizontal scaling of Hadoop cluster nodes, and integrated/customized JupyterHub (including plugins and Git integration) to improve the data science workflow.
+Skills: python, pyspark, hadoop, databricks, splunk, jupyterhub, cicd
+Type: work
+
+## Graduate Research Assistant
+Company: University at Buffalo
+DateRange: September 2018 - May 2019
+Description: Cursor detection and tracking in Adobe Photoshop screen-recording videos (with Adobe Research).
+ExpandedContent: Implemented a fully unsupervised approach combining adaptive cursor discovery, multi-scale template matching, and optimal path search to recover a high-scoring cursor trajectory across a video—robust to tiny object size, fast motion, and appearance changes. Evaluated against online trackers and Faster R-CNN-based detection methods.
+Image: /assets/cursor_tracking.png | Cursor Tracking System | Illustrative diagram only; does not reflect actual implementation.
+Skills: python, computer-vision, opencv, tensorflow
+Type: research
+
+## Student Research Assistant
+Company: University at Buffalo
+DateRange: September 2017 - November 2018
+Description: Research with Prof. Haimonti Dutta across distributed machine learning and NLP.
+ExpandedContent: Worked on GADGET, a gossip-based distributed solver for linear SVMs; ran experiments, improved an existing codebase, and supported literature review. Also worked on NLP tasks including NER on tweets and detecting inter-group prejudice in social media text.
+Image: /assets/federated_learning.png | Distributed Learning | Illustrative diagram only; does not reflect actual implementation.
+Skills: python, java, distributed-systems, nlp
+Type: research
+
+## Applied Machine Learning Intern
+Company: Clarifai
+DateRange: May 2018 - August 2018
+Description: Built hybrid tracking approaches and analyzed depth sensor noise characteristics.
+ExpandedContent: Developed a single-object tracking approach that periodically interleaved detection to reduce tracker drift; characterized temporal noise distributions for industrial depth sensors; and extended internal visualization tooling for video/image workflows.
+Image: /assets/clarifai_tracking.png | Object Tracking System | Illustrative diagram only; does not reflect actual implementation.
+Skills: python, computer-vision
+Type: work
+
+## Software Engineer
+Company: Fidelity Investments
+DateRange: August 2016 - June 2017
+Description: Built an enterprise customer-service chatbot and NLP analytics tools in the pre-LLM era.
+ExpandedContent: Led development of a chatbot using ontology + NLP + ML for intent understanding and response retrieval. Built REST APIs for query expansion and ranking using semantic embeddings (GloVe/Word2Vec), synonym augmentation, NER, and query ranking; containerized components with Docker. Also developed a sentiment/skill-mining tool using techniques like TF-IDF, topic modeling, clustering, and standard classifiers.
+Image: /assets/fidelity_chatbot.png | Enterprise Chatbot | Illustrative diagram only; does not reflect actual implementation.
+Skills: python, nlp, docker, java, sql
+Type: work
+
+## Executive Graduate Trainee
+Company: Fidelity Investments
+DateRange: June 2015 - July 2016
+Description: Analytics, KPI reporting, and Tableau-based dashboards for distributed teams.
+ExpandedContent: Managed reporting and analytics for a cross-geo team, consolidated KPIs across multiple datasets/schemas, built interactive Tableau dashboards, partnered with leadership on KPI definitions, and handled Tableau access administration.
+Skills: sql, tableau, analytics
+Type: work
+
+## Summer Research Intern (Computer Vision)
+Company: Indian Institute of Science
+DateRange: May 2014 - July 2014
+Description: Classical CV feature extraction + supervised learning for offline OCR (Dr. Rathna G. N.).
+ExpandedContent: Compared feature extraction methods (e.g., PCA, LBP) and supervised learning approaches (e.g., k-NN, one-vs-all SVM), and built MATLAB tooling (including a GUI) to support experiments and visualization.
+Skills: computer-vision, matlab
+Type: research
+
+## Summer Research Intern (Embedded Systems)
+Company: Indian Institute of Science
+DateRange: May 2013 - July 2013
+Description: Designed an AVR microcontroller-based oscilloscope and visualization workflow (Dr. Rathna G. N.).
+ExpandedContent: Implemented embedded C on AVR (ATmega-8), designed supporting circuits, and produced a MATLAB GUI for signal visualization.
+Skills: embedded-systems, c, matlab
+Type: research
+
+# Education Timeline
+
+## Master of Science (MS), Computer Science
+Company: University at Buffalo
+DateRange: 2017 - 2019
+Description: Focused on computer vision, distributed machine learning, and NLP through research and coursework.
+BackgroundImage: /assets/photos/buffalo_tagline.jpg
+Type: education
+
+## Bachelor of Technology (B.Tech.), Electrical and Electronics Engineering
+Company: National Institute of Technology Karnataka
+DateRange: 2011 - 2015
+Description: Undergraduate training with foundations in math, signals, and systems.
+BackgroundImage: /assets/photos/nitk_tagline.webp
+Type: education
+*/}
+
 # About Me
 
-I build production GenAI systems at o9 Solutions. Currently focused on agentic workflows with LLMs, RAG architectures, document ingestion pipelines, and the infrastructure that makes these systems work at scale. I work on interesting problems in the GenAI engineering layer - effective API design, context and memory management for long conversations, making non-deterministic systems debuggable, prompt design, agent behavior evaluation in production, hierarchical memory systems, and making LLM applications observable.
+I’m a Senior Software Engineer at o9 Solutions, building production GenAI systems - agents that can use tools, pull the right context through RAG, and maintain memory across long-running conversations.
 
-Before GenAI, I spent years building AutoML systems for time series forecasting at retail scale, processing terabytes of data for 10,000+ locations using PySpark and Hadoop for distributed training. Worked on the full ML infrastructure stack: big data pipelines, model serving APIs, monitoring systems, hyperparameter optimization, automated retraining. Earlier in grad school, I did research in computer vision (unsupervised cursor tracking with Adobe Research) and federated learning (distributed SVM training without centralizing data). I have an MS in Computer Science from the University at Buffalo, where I specialized in computer vision and distributed machine learning.
+What I enjoy most is the part that turns demos into reliable products: shaping clean APIs, managing context and memory without blowing up latency or cost, and making “non-deterministic” behavior something you can actually measure, debug, and operate in the real world.
+
+Before this, I worked on large-scale AutoML for time-series forecasting, helping build pipelines and services that supported thousands of retail locations. Earlier at o9, I also spent time on data and platform foundations - PySpark/Hadoop workflows, reliability and monitoring, CI/CD, and improving the day-to-day data science experience. In grad school, I worked on interesting research problems in computer vision and federated learning.
+
+
 
 ---
 
@@ -22,7 +133,7 @@ Before GenAI, I spent years building AutoML systems for time series forecasting 
 
 ---
 
-## Publications
+## Selected Publications
 
 ### Mouse Cursor Detection and Tracking in Instructional Videos
 **Nataraj, N., Zhou, C., & Yuan, J.** (2019). *Technical Report, University at Buffalo*. [Submitted to WACV 2019]
