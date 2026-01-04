@@ -21,10 +21,10 @@ Create content/pages/photography.mdx with front matter like:
 
 ---
 title: "Landscape Portfolio"
-description: "A selection of recent work"
+description: "Some photos I've taken over the past 6 years or so"
 heroImage: "/assets/photos/hero.jpg"
 heroAlt: "Sunset over the mountains"
-heroSubtitle: "A selection of recent work"
+heroSubtitle: "Some photos I've taken over the past 6 years or so"
 taglinePhrases:
   - "ANIMATED GIFS"
   - "LOVE OF PIZZA"
