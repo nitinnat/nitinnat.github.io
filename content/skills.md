@@ -1,39 +1,40 @@
 # Skills
 
-## Frontend
-- React | 4
-- TypeScript | 4
-- TailwindCSS | 4
-- Next.js | 4
-- Framer Motion | 3
-
 ## Backend
 - Python | 5
-- FastAPI | 4
 - SQL | 4
-- Docker | 4
-- Kubernetes | 3
+- C# | 2
+- Java | 2
 
 ## ML & GenAI
-- LLMs & Transformers | 5
-- TensorFlow | 4
-- PyTorch | 4
-- scikit-learn | 4
-- PySpark | 4
-- LangChain | 4
-- RAG Systems | 4
-
-## Tools & Infra
-- Git | 4
-- PostgreSQL | 4
-- AWS | 3
-- GCP | 3
-- Elasticsearch | 3
-- Redis | 3
-
-## Domain Knowledge
+- LLMs & GenAI Systems | 5
+- Machine Learning | 4
+- Langchain / Langgraph | 4
+- RAG and Vector Databases | 4
+- Time Series Forecasting | 4
+- TensorFlow / PyTorch | 2
 - Computer Vision | 4
 - NLP | 4
-- Time Series Forecasting | 4
-- Federated Learning | 3
-- AutoML | 3
+
+## Tools & Infra
+- PySpark | 2
+- Git | 4
+- Docker | 4
+- PostgreSQL | 4
+- MongoDB | 4
+- Redis | 4
+- Kubernetes / ArgoCD | 3
+- OpenLens - 3
+- Hadoop | 2
+- Databricks | 3
+- Splunk | 3
+- Jupyter / JupyterHub | 4
+- Jenkins | 3
+- Airflow | 3
+- Linux | 4
+- Tableau | 2
+
+## Frontend
+- TypeScript | 2
+- HTML | 2
+- CSS | 2
