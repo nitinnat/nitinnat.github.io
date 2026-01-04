@@ -23,7 +23,7 @@ function isImageFile(filename: string) {
 
 function isExcludedImage(filename: string) {
   const base = path.basename(filename, path.extname(filename)).toLowerCase();
-  return base === "heroimage";
+  return base === "buffalo_tagline" || base === "nitk_tagline";
 }
 
 function isHeroImage(filename: string) {
