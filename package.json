@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/generate-timeline.js && node scripts/generate-skills.js && node scripts/copy-assets.js",
+    "prebuild": "node scripts/generate-timeline.js && node scripts/generate-skills.js && node scripts/convert-heic.js && node scripts/copy-assets.js",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -19,6 +19,7 @@
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.26",
     "gray-matter": "^4.0.3",
+    "heic-convert": "^2.1.0",
     "lucide-react": "^0.562.0",
     "mermaid": "^11.12.2",
     "next": "16.1.1",

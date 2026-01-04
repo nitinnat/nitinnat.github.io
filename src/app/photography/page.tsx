@@ -14,10 +14,7 @@ const IMAGE_EXTENSIONS = new Set([
   ".jpeg",
   ".png",
   ".webp",
-  ".gif",
-  ".heic",
-  ".heif",
-  ".PNG"
+  ".gif"
 ]);
 
 function isImageFile(filename: string) {
@@ -181,7 +178,11 @@ function parseGallery(value: unknown): PhotoItem[] {
     if (!thumb && !full) return;
     if (full && getBasenameFromUrl(full) === "001") return;
     if (thumb && getBasenameFromUrl(thumb) === "001") return;
-
+    if (full && getBasenameFromUrl(full) === "nitk_tagline") return;
+    if (thumb && getBasenameFromUrl(thumb) === "nitk_tagline") return;
+    if (full && getBasenameFromUrl(full) === "buffalo_tagline") return;
+    if (thumb && getBasenameFromUrl(thumb) === "buffalo_tagline") return;
+    console.log(full, thumb, raw.id);
     items.push({
       id:
         typeof raw.id === "string"

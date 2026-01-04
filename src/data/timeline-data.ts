@@ -110,7 +110,10 @@ export const professionalTimeline: TimelineEntry[] = [
     expandedContent: "Managed reporting and analytics for a cross-geo team, consolidated KPIs across multiple datasets/schemas, built interactive Tableau dashboards, partnered with leadership on KPI definitions, and handled Tableau access administration.",
     skills: ["sql", "tableau", "analytics"],
     type: "work"
-  },
+  }
+];
+
+export const educationTimeline: TimelineEntry[] = [
   {
     id: "summer-research-intern-computer-vision",
     title: "Summer Research Intern (Computer Vision)",
@@ -119,19 +122,6 @@ export const professionalTimeline: TimelineEntry[] = [
     description: "Classical CV feature extraction + supervised learning for offline OCR (Dr. Rathna G. N.).",
     expandedContent: "Compared feature extraction methods (e.g., PCA, LBP) and supervised learning approaches (e.g., k-NN, one-vs-all SVM), and built MATLAB tooling (including a GUI) to support experiments and visualization.",
     skills: ["computer-vision", "matlab"],
-    type: "research"
-  }
-];
-
-export const educationTimeline: TimelineEntry[] = [
-  {
-    id: "summer-research-intern-embedded-systems",
-    title: "Summer Research Intern (Embedded Systems)",
-    company: "Indian Institute of Science",
-    dateRange: "May 2013 - July 2013",
-    description: "Designed an AVR microcontroller-based oscilloscope and visualization workflow (Dr. Rathna G. N.).",
-    expandedContent: "Implemented embedded C on AVR (ATmega-8), designed supporting circuits, and produced a MATLAB GUI for signal visualization.",
-    skills: ["embedded-systems", "c", "matlab"],
     type: "research"
   },
   {
