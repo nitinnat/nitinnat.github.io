@@ -383,44 +383,6 @@ Production memory systems require:
 
 These are not theoretical concerns. The OpenClaw/Moltbook security incidents in January 2026 exposed numerous agent instances with cleartext API keys and credentials stored in memory, with some gateways completely open to the public internet without authentication. The incidents prompted emergency security hardening and highlighted the risks of moving fast without security-first design.
 
-## Future Directions
-
-The trajectory of agent memory research points toward several emerging directions.
-
-### Multi-Modal Memory
-
-Current memory systems are text-centric, but agents increasingly operate in multi-modal contexts (images, audio, code, structured data). Future memory architectures must handle:
-- Visual episodic memory (screenshots, diagrams)
-- Audio experiences (transcribed meetings, voice interactions)
-- Code artifacts (functions written, bugs fixed)
-- Structured data (database schemas, API specs)
-
-This requires multi-modal embeddings (CLIP-style models), multi-modal consolidation (extracting structured facts from images), and multi-modal retrieval (finding relevant images given text queries). The foundational models exist, but integration into production agent memory systems remains nascent.
-
-### Federated and Collaborative Memory
-
-Agents increasingly work in teams, raising questions about shared memory. Should agents share episodic memories, semantic knowledge, or procedural workflows? How do agents reconcile conflicting memories from different perspectives?
-
-Federated memory architectures allow agents to maintain private memories while selectively sharing curated knowledge with a team memory pool. This mirrors human organizations: individuals remember personal experiences but contribute to shared organizational knowledge bases.
-
-Research in collaborative memory for multi-agent systems is active but early-stage. LangGraph's support for cross-agent working memory provides basic infrastructure, but sophisticated consolidation, conflict resolution, and access control for team memory remain open problems.
-
-### Continual Learning and Memory Consolidation
-
-Current agent memory is largely static after initial training. The agent accumulates new episodic memories but doesn't update its base knowledge (model parameters) from experience. This creates a gap between what the agent "knows" (parametric knowledge) and what it "remembers" (external memory).
-
-Future systems may implement continual learning: periodically fine-tuning the base model on consolidated memories to internalize frequently used knowledge. This reduces retrieval overhead (knowledge moves from external memory to parameters) and improves reasoning quality (internalized knowledge integrates seamlessly with parametric reasoning).
-
-The challenge is catastrophic forgetting: updating parameters risks degrading performance on unrelated tasks. Techniques from continual learning research (elastic weight consolidation, experience replay) may enable safe parameter updates, but integration with agent memory systems is unexplored territory.
-
-### Memory-Augmented Tool Use
-
-Tools extend agent capabilities, but current architectures treat tools and memory separately. An emerging pattern is memory-augmented tool use: tools that query agent memory to provide context-aware functionality.
-
-Example: A code generation tool that queries procedural memory ("How did I solve similar problems before?") and semantic memory ("What libraries does this user prefer?") to generate personalized, contextually relevant code.
-
-This inverts the typical flow: instead of the agent querying memory then calling tools, tools directly access memory to improve their outputs. This requires exposing memory as a first-class API surface that tools can query, blurring the boundary between agent reasoning and tool execution.
-
 ## Architecture Decision Guide
 
 Choosing the right memory architecture depends on your specific use case. Here's a quick reference:
@@ -460,6 +422,44 @@ Before building an agent memory system, address these key decisions:
 - [ ] Monitor consolidation quality (extraction accuracy, summary coherence)
 - [ ] Measure retrieval precision (relevance metrics, false positive rates)
 - [ ] Alert on anomalies (memory bloat, high latency, failed consolidations)
+
+## Future Directions
+
+The trajectory of agent memory research points toward several emerging directions.
+
+### Multi-Modal Memory
+
+Current memory systems are text-centric, but agents increasingly operate in multi-modal contexts (images, audio, code, structured data). Future memory architectures must handle:
+- Visual episodic memory (screenshots, diagrams)
+- Audio experiences (transcribed meetings, voice interactions)
+- Code artifacts (functions written, bugs fixed)
+- Structured data (database schemas, API specs)
+
+This requires multi-modal embeddings (CLIP-style models), multi-modal consolidation (extracting structured facts from images), and multi-modal retrieval (finding relevant images given text queries). The foundational models exist, but integration into production agent memory systems remains nascent.
+
+### Federated and Collaborative Memory
+
+Agents increasingly work in teams, raising questions about shared memory. Should agents share episodic memories, semantic knowledge, or procedural workflows? How do agents reconcile conflicting memories from different perspectives?
+
+Federated memory architectures allow agents to maintain private memories while selectively sharing curated knowledge with a team memory pool. This mirrors human organizations: individuals remember personal experiences but contribute to shared organizational knowledge bases.
+
+Research in collaborative memory for multi-agent systems is active but early-stage. LangGraph's support for cross-agent working memory provides basic infrastructure, but sophisticated consolidation, conflict resolution, and access control for team memory remain open problems.
+
+### Continual Learning and Memory Consolidation
+
+Current agent memory is largely static after initial training. The agent accumulates new episodic memories but doesn't update its base knowledge (model parameters) from experience. This creates a gap between what the agent "knows" (parametric knowledge) and what it "remembers" (external memory).
+
+Future systems may implement continual learning: periodically fine-tuning the base model on consolidated memories to internalize frequently used knowledge. This reduces retrieval overhead (knowledge moves from external memory to parameters) and improves reasoning quality (internalized knowledge integrates seamlessly with parametric reasoning).
+
+The challenge is catastrophic forgetting: updating parameters risks degrading performance on unrelated tasks. Techniques from continual learning research (elastic weight consolidation, experience replay) may enable safe parameter updates, but integration with agent memory systems is unexplored territory.
+
+### Memory-Augmented Tool Use
+
+Tools extend agent capabilities, but current architectures treat tools and memory separately. An emerging pattern is memory-augmented tool use: tools that query agent memory to provide context-aware functionality.
+
+Example: A code generation tool that queries procedural memory ("How did I solve similar problems before?") and semantic memory ("What libraries does this user prefer?") to generate personalized, contextually relevant code.
+
+This inverts the typical flow: instead of the agent querying memory then calling tools, tools directly access memory to improve their outputs. This requires exposing memory as a first-class API surface that tools can query, blurring the boundary between agent reasoning and tool execution.
 
 ## Conclusion
 
