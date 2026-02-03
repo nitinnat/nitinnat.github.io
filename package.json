@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "prebuild": "node scripts/generate-timeline.js && node scripts/generate-skills.js && node scripts/convert-heic.js && node scripts/copy-assets.js",
-    "build": "next build",
+    "build": "npm run prebuild && node scripts/build-with-admin-exclusion.js",
     "start": "next start",
     "lint": "eslint"
   },
