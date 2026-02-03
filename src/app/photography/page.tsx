@@ -5,6 +5,10 @@ import {
   PhotoGallery,
   type PhotoItem,
 } from "@/components/photography/photo-gallery";
+import {
+  loadPhotoMetadata,
+  mergeMetadataIntoPhotos,
+} from "@/lib/photo-metadata";
 import fs from "fs";
 import path from "path";
 
@@ -105,7 +109,7 @@ function findHeroFromAssets(): PhotoItem | null {
   return null;
 }
 
-function getGalleryFromAssets(): PhotoItem[] {
+export function getGalleryFromAssets(): PhotoItem[] {
   if (!fs.existsSync(PHOTO_ASSETS_PATH)) return [];
 
   const entries = fs
@@ -131,6 +135,10 @@ function getGalleryFromAssets(): PhotoItem[] {
         .sort((a, b) => a.name.localeCompare(b.name));
 
       for (const file of files) {
+        const filePath = path.join(folderPath, file.name);
+        const stats = fs.statSync(filePath);
+        if (stats.size === 0) continue;
+
         const relativePath = `${folderName}/${file.name}`;
         const imageUrl = encodeURI(`/assets/photos/${relativePath}`);
         const slug = toSlug(`${folderName}-${file.name}`);
@@ -144,6 +152,10 @@ function getGalleryFromAssets(): PhotoItem[] {
       }
     } else if (entry.isFile() && isImageFile(entry.name)) {
       if (isExcludedImage(entry.name) || isHeroImage(entry.name)) continue;
+      const filePath = path.join(PHOTO_ASSETS_PATH, entry.name);
+      const stats = fs.statSync(filePath);
+      if (stats.size === 0) continue;
+
       const imageUrl = encodeURI(`/assets/photos/${entry.name}`);
       const slug = toSlug(entry.name);
       items.push({
@@ -257,7 +269,9 @@ export default async function PhotographyPage() {
   const galleryFromMeta = parseGallery(page.meta.gallery);
   const baseGallery =
     galleryFromMeta.length > 0 ? galleryFromMeta : getGalleryFromAssets();
-  const gallery = shuffleArray(baseGallery);
+  const metadata = loadPhotoMetadata();
+  const galleryWithMetadata = mergeMetadataIntoPhotos(baseGallery, metadata);
+  const gallery = shuffleArray(galleryWithMetadata);
   const heroFromAssets = findHeroFromAssets();
   const heroByName = findHeroFromGallery(gallery);
   const heroFallback = gallery[0];
