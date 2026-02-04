@@ -86,23 +86,23 @@
   },
   "0002-utah-dsc08914-jpg": {
     "date": "October, 2024",
-    "tagged": true
+    "tagged": false
   },
   "0002-utah-dsc09029-jpg": {
     "date": "October, 2024",
-    "tagged": true
+    "tagged": false
   },
   "0002-utah-dsc09069-jpg": {
     "date": "October, 2024",
-    "tagged": true
+    "tagged": false
   },
   "0002-utah-dsc09643-jpg": {
     "date": "October, 2024",
-    "tagged": true
+    "tagged": false
   },
   "0002-utah-dsc09645-jpg": {
     "date": "October, 2024",
-    "tagged": true
+    "tagged": false
   },
   "0002-utah-heroimage-jpg": {
     "date": "October, 2024",
@@ -171,27 +171,27 @@
   },
   "0003-oregon-dsc00326-jpg": {
     "date": "May, 2025",
-    "tagged": true
+    "tagged": false
   },
   "0003-oregon-dsc00715-arw-jpg": {
     "date": "May, 2025",
-    "tagged": true
+    "tagged": false
   },
   "0003-oregon-dsc00831-arw-jpg": {
     "date": "May, 2025",
-    "tagged": true
+    "tagged": false
   },
   "0003-oregon-dsc00863-arw-jpg": {
     "date": "May, 2025",
-    "tagged": true
+    "tagged": false
   },
   "0003-oregon-img-2833-jpg": {
     "date": "May, 2025",
-    "tagged": true
+    "tagged": false
   },
   "0003-oregon-img-2853-jpg": {
     "date": "May, 2025",
-    "tagged": true
+    "tagged": false
   },
   "0003-oregon-img-2895-jpg": {
     "date": "May, 2025",
@@ -260,7 +260,7 @@
   },
   "0004-buffalo-img-20181106-110901-03-01-jpeg": {
     "date": "November, 2018",
-    "tagged": true
+    "tagged": false
   },
   "0004-buffalo-img-20190331-074414-jpg": {
     "date": "March, 2019",
@@ -268,8 +268,8 @@
     "tagged": true
   },
   "0004-buffalo-img-20190404-070618-320-jpg": {
-    "location": "Buffalo Area, New York",
-    "tagged": true
+    "location": "Town of Amherst, New York",
+    "tagged": false
   },
   "0004-buffalo-img-20190607-023708-02-01-jpeg": {
     "date": "June, 2019",
@@ -278,11 +278,11 @@
   },
   "0004-buffalo-img-20190621-204408-01-jpeg": {
     "date": "June, 2019",
-    "tagged": true
+    "tagged": false
   },
   "0004-buffalo-img-20190624-211256-jpg": {
     "date": "June, 2019",
-    "tagged": true
+    "tagged": false
   },
   "0005-newyork-img-20180622-184414-01-jpeg": {
     "date": "June, 2018",
@@ -306,19 +306,19 @@
   },
   "0005-newyork-img-20190522-184810-01-jpeg": {
     "date": "May, 2019",
-    "tagged": true
+    "tagged": false
   },
   "0005-newyork-img-20190524-231343-311-jpg": {
     "location": "New York, New York",
-    "tagged": true
+    "tagged": false
   },
   "0006-sanfrancisco-image1-jpg": {
     "date": "May, 2024",
-    "tagged": true
+    "tagged": false
   },
   "0006-sanfrancisco-img-20210625-193345-jpg": {
     "date": "June, 2021",
-    "tagged": true
+    "tagged": false
   },
   "0006-sanfrancisco-img-20210625-193546-jpg": {
     "date": "June, 2021",
@@ -357,23 +357,23 @@
   },
   "0007-laketahoe-image1-jpg": {
     "date": "May, 2024",
-    "tagged": true
+    "tagged": false
   },
   "0007-laketahoe-image2-jpg": {
     "date": "May, 2024",
-    "tagged": true
+    "tagged": false
   },
   "0008-india-img-20190227-152744-372-jpg": {
-    "location": "Bangalore, Karnataka",
-    "tagged": true
+    "location": "Bengaluru, Karnataka",
+    "tagged": false
   },
   "0008-india-img-20191225-122903-jpg": {
     "date": "December, 2019",
-    "tagged": true
+    "tagged": false
   },
   "0008-india-img-20191225-125610-jpg": {
     "date": "December, 2019",
-    "tagged": true
+    "tagged": false
   },
   "0008-india-img-20221015-065857-01-01-jpeg": {
     "date": "October, 2022",
@@ -386,12 +386,12 @@
     "tagged": true
   },
   "0008-india-img-20221018-183553-852-jpg": {
-    "location": "South Goa Beaches, Goa",
-    "tagged": true
+    "location": "Salcete, Goa",
+    "tagged": false
   },
   "0008-india-img-2594-01-01-jpeg": {
     "date": "October, 2022",
-    "tagged": true
+    "tagged": false
   },
   "0008-india-pxl-20231029-011603409-jpg": {
     "date": "October, 2023",
@@ -464,16 +464,16 @@
     "tagged": true
   },
   "0010-washingtondc-img-20190521-110928-208-jpg": {
-    "location": "National Mall Area, Washington D.C.",
-    "tagged": true
+    "location": "Washington, District of Columbia",
+    "tagged": false
   },
   "0011-alaska-00000img-00000-burst20191128104214658-cover-jpg": {
     "date": "November, 2019",
-    "tagged": true
+    "tagged": false
   },
   "0011-alaska-00100sportrait-00100-burst20191128104229429-cover-jpg": {
     "date": "November, 2019",
-    "tagged": true
+    "tagged": false
   },
   "0011-alaska-12515-01-jpeg": {
     "date": "February, 2020",
@@ -541,8 +541,8 @@
     "tagged": true
   },
   "0011-alaska-img-20200719-153950-495-jpg": {
-    "location": "Denali National Park, Alaska",
-    "tagged": true
+    "location": "Denali Borough, Alaska",
+    "tagged": false
   },
   "0012-newmexico-img-0214-jpg": {
     "date": "December, 2024",
@@ -641,7 +641,7 @@
   },
   "0001-colorado-colorado1-jpg": {
     "location": "Rocky Mountain National Park, Colorado",
-    "tagged": true
+    "tagged": false
   },
   "0005-newyork-img-20190604-211055-644-jpg": {
     "location": "Statue of Liberty, New York",
@@ -650,10 +650,99 @@
   },
   "0011-alaska-img-20191129-022907-845-jpg": {
     "location": "Fairbanks, Alaska",
-    "tagged": true
+    "tagged": false
   },
   "0008-india-img-20200111-070127-360-jpg": {
     "location": "Sikkim, India",
+    "tagged": false
+  },
+  "0014-texas-carrollton-snow-jpg": {
+    "location": "Carrollton, Texas",
+    "date": "January, 2026",
+    "tagged": true
+  },
+  "test-photo": {
+    "location": "Test Location",
+    "date": "January, 2026",
+    "tagged": true
+  },
+  "0008-india-1-jpg": {
+    "location": "Bengaluru, Karnataka",
+    "date": "November, 2025",
+    "tagged": true
+  },
+  "0015-california-img-4732-snapseedcopy-jpg": {
+    "location": "Joshua Tree National Park, California",
+    "date": "September, 2025",
+    "tagged": true
+  },
+  "0015-california-dsc08586-2-jpg": {
+    "date": "May, 2024",
+    "tagged": false
+  },
+  "0015-california-dsc08595-jpg": {
+    "date": "May, 2024",
+    "tagged": false
+  },
+  "0015-california-img-20220713-193438-01-jpeg": {
+    "date": "July, 2022",
+    "tagged": false
+  },
+  "0015-california-img-20220713-193609-01-jpeg": {
+    "date": "July, 2022",
+    "tagged": false
+  },
+  "0015-california-img-20220713-194307-01-jpeg": {
+    "date": "July, 2022",
+    "tagged": false
+  },
+  "0015-california-img-20220715-153317-01-jpeg": {
+    "location": "Los Angeles, California",
+    "date": "July, 2022",
+    "tagged": true
+  },
+  "0015-california-img-20220715-153915-jpg": {
+    "location": "Los Angeles, California",
+    "date": "July, 2022",
+    "tagged": true
+  },
+  "0015-california-img-20221217-154229-01-jpeg": {
+    "location": "Mariposa County, California",
+    "date": "December, 2022",
+    "tagged": true
+  },
+  "0015-california-img-20221217-162002-01-jpeg": {
+    "location": "Mariposa County, California",
+    "date": "December, 2022",
+    "tagged": true
+  },
+  "0015-california-img-20221217-162002-02-jpeg": {
+    "location": "Mariposa County, California",
+    "date": "December, 2022",
+    "tagged": true
+  },
+  "0015-california-img-20230104-185444-649-jpg": {
+    "location": "Mariposa County, California",
+    "tagged": false
+  },
+  "0015-california-pxl-20231229-000317996-01-jpeg": {
+    "location": "Monterey, California",
+    "date": "December, 2023",
+    "tagged": true
+  },
+  "0015-california-pxl-20240514-002336329-01-jpeg": {
+    "location": "San Francisco, California",
+    "date": "May, 2024",
+    "tagged": true
+  },
+  "0015-california-pxl-20240514-002337771-01-jpeg": {
+    "location": "San Francisco, California",
+    "date": "May, 2024",
+    "tagged": true
+  },
+  "0015-california-img-20190707-131733-jpg": {
+    "location": "Humboldt County, California",
+    "date": "July, 2019",
     "tagged": true
   }
 }

@@ -2,18 +2,28 @@ import { NextResponse } from "next/server";
 import { execSync } from "child_process";
 import path from "path";
 
+export const dynamic = "force-dynamic";
+
 export async function POST() {
   try {
-    const scriptPath = path.join(process.cwd(), "scripts/auto-tag-photos.js");
+    const autoTagScriptPath = path.join(process.cwd(), "scripts/auto-tag-photos.js");
+    const copyAssetsScriptPath = path.join(process.cwd(), "scripts/copy-assets.js");
 
-    const output = execSync(`node "${scriptPath}"`, {
+    // Run auto-tag script
+    const autoTagOutput = execSync(`node "${autoTagScriptPath}"`, {
+      encoding: "utf8",
+      cwd: process.cwd(),
+    });
+
+    // Copy assets to public folder for dev mode
+    const copyAssetsOutput = execSync(`node "${copyAssetsScriptPath}"`, {
       encoding: "utf8",
       cwd: process.cwd(),
     });
 
     return NextResponse.json({
       success: true,
-      output,
+      output: autoTagOutput + "\n" + copyAssetsOutput,
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
