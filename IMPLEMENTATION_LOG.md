@@ -407,3 +407,220 @@ Skills: python, react, kubernetes
 Type: work
 ```
 
+## Session 4: Photo Tagging System & Gallery Metadata
+
+### Phase 1: Admin UI for Photo Tagging
+**Status:** Completed
+
+Built a local-only admin interface for tagging 148 photos with location and date metadata.
+
+**Files Created:**
+- `src/lib/photo-metadata.ts` - Metadata loading and merging utilities
+- `src/components/admin/photo-tagger-client.tsx` - Admin UI component (700+ lines)
+- `src/app/admin/photo-tagger/page.tsx` - Admin server component with auth gate
+- `src/app/api/save-photo-metadata/route.ts` - API for persisting metadata to JSON
+- `content/photos-metadata.json` - Single JSON file storing all photo tags
+- `.env.example` - Configuration documentation
+- `.env.local` - Development environment setup (git-ignored)
+
+**Files Modified:**
+- `src/components/photography/photo-gallery.tsx` - Added metadata overlay with location/date
+- `src/components/photography/photo-lightbox.tsx` - Added Captions plugin for metadata display
+- `src/app/photography/page.tsx` - Integrated metadata loading and merging
+- `.gitignore` - Added .env.local
+
+**Implementation Details:**
+
+1. **Admin UI Features:**
+   - Filter modes: all, untagged, has-location, has-date, fully-tagged
+   - Thumbnail sidebar for quick photo selection
+   - Location + Date form inputs (free-form text)
+   - Auto-save on blur (debounced API calls)
+   - Photo counter and status indicators
+   - Safe bounds checking for array navigation
+
+2. **Metadata Storage:**
+   - Format: `{ [photoId]: { location?, date?, tagged: boolean } }`
+   - Single JSON file for simplicity
+   - Git-tracked so metadata persists across deploys
+   - 128 photos with dates, 110+ with locations
+
+3. **Gallery Integration:**
+   - Hover overlay shows location + date with MapPin/Calendar icons
+   - Slide-up animation on hover (translate-y-full → translate-y-0)
+   - Lightbox captions show "location • date" format
+   - Metadata extracted from JSON at build time
+
+4. **Development Workflow:**
+   - `ENABLE_PHOTO_TAGGER=true` in .env.local activates admin UI
+   - Routes to `/admin/photo-tagger` in development
+   - Admin route excluded from production build
+   - API saves to `content/photos-metadata.json`
+
+**Testing & Validation:**
+- Build excludes admin routes from static export
+- Metadata persists correctly to JSON
+- Gallery displays metadata on hover and in lightbox
+- Production build does not include admin route (404)
+
+---
+
+## Session 5: Photo Journey - 3D Experience & Clustering
+
+### Phase 1: Photo Clustering Algorithm
+**Status:** Completed
+
+Implemented intelligent photo clustering to group photos into "trips" based on location and time proximity.
+
+**Files Created:**
+- `src/lib/photo-clustering.ts` - Clustering algorithm (150+ lines)
+  - Parses date strings "Month, Year" → numeric {month, year}
+  - Extracts location primary region (e.g., "Colorado" from "Breckenridge/Keystone Area, Colorado")
+  - Groups photos within same location + 3-month time window
+  - Merges adjacent clusters for multi-month trips
+  - Returns PhotoCluster objects with: id, name, location, date range, photos, photo count, hero photo
+
+**Key Algorithm Details:**
+- Date parsing: Handles "Month, Year" format with month validation
+- Location grouping: Primary location extracted from "Place, State" format
+- Time window: 3-month threshold for same cluster
+- Merging: Adjacent clusters with ≤2 months gap merge into single cluster
+- Sorting: Clusters sorted by date (most recent first)
+- Result: 20+ clusters from 120+ tagged photos
+
+### Phase 2: 3D Space Positioning System
+**Status:** Completed
+
+Calculates 3D coordinates for clusters to visualize them in virtual space.
+
+**Files Created:**
+- `src/lib/photo-positioning.ts` - 3D positioning utilities (200+ lines)
+  - X-axis: Geographic spread (location-based, normalized to [-1, 1])
+  - Y-axis: Subtle random variation (deterministic, [-0.15, 0.15])
+  - Z-axis: Temporal depth (older photos further back, normalized scale)
+  - Scale: Based on cluster size (0.8-1.2 scale factor)
+  - Depth: Normalized distance for visual layering
+  - Camera system: Target calculation, position helpers
+
+**Key Implementation:**
+- Location mapping: Unique locations sorted alphabetically, evenly distributed on X-axis
+- Date range: Min/max dates across all clusters determine Z-axis scale
+- Deterministic pseudo-random Y: Uses sine hash for consistent positioning
+- Camera functions: getCameraTarget() averages cluster positions, getCameraPosition() offsets from target
+
+### Phase 3: PhotoJourney Component
+**Status:** Completed
+
+Main interactive component rendering clusters in 3D perspective with dual desktop/mobile interfaces.
+
+**Files Created:**
+- `src/components/photography/photo-journey.tsx` - Complete component (500+ lines)
+
+**Desktop View Features:**
+- 3D perspective transformation with scroll-based camera movement
+- Cluster cards positioned in 3D space with perspective projection
+- Smooth camera movement: scroll up (overview), scroll down (zoom in)
+- Perspective projection: Objects closer to camera appear larger
+- Scale based on cluster size and camera distance
+- Hover effects: Scale up on active clusters
+- Scroll indicator with animated chevron
+- Progress indicator: Dot navigation showing cluster positions
+
+**Mobile View Features:**
+- Vertical timeline layout instead of 3D
+- Swipe navigation (50px threshold per cluster)
+- Card-based cluster preview: hero image + metadata
+- Touch gestures for cluster selection
+- Full-screen scrollable timeline
+
+**Zoom Interaction (Desktop & Mobile):**
+- Click cluster → Camera rushes toward it
+- Desktop: Photos arranged in circular arc around viewer
+- Mobile: Photos in 2-column grid
+- Lightbox integration for full-size viewing
+- Back button to return to overview
+
+**Accessibility & Performance:**
+- Reduced motion support via Framer Motion hooks
+- No scroll events on mobile (uses touch instead)
+- Lazy loading for images (loading="lazy")
+- Scroll sensitivity configurable (0.001 default)
+- Touch start/end event handlers for mobile swipe
+
+### Phase 4: Photography Page Integration
+**Status:** Completed
+
+Connected clustering, positioning, and PhotoJourney components to main photography page.
+
+**Files Modified:**
+- `src/app/photography/page.tsx`
+  - Imports clustering and positioning utilities
+  - Calls clusterPhotos() on gallery with metadata
+  - Calls positionClusters() on clusters
+  - Renders PhotoJourney when clusters exist (falls back to PhotoGallery otherwise)
+  - Removed photo shuffling (photos now organized by clusters)
+
+**Data Flow:**
+```
+Load Photos → Load Metadata → Merge Metadata with Photos
+                                      ↓
+                            Filter Tagged Photos
+                                      ↓
+                            Cluster by Location + Time
+                                      ↓
+                            Position Clusters in 3D Space
+                                      ↓
+                            Render PhotoJourney
+                                      ↓
+                    Scroll/Swipe → Camera Moves → Perspective Updates
+```
+
+### Testing & Validation:
+- 128 photos with complete metadata (location + date)
+- 20+ clusters identified (Colorado trips, Utah trips, etc.)
+- Desktop 3D perspective rendering correctly
+- Mobile timeline fallback working
+- Touch swipe navigation functional
+- Lightbox opens for full-size viewing
+- Reduced motion respected
+- Build succeeds, no compilation errors
+
+### Technical Architecture:
+
+**Clustering Algorithm:**
+- Input: PhotoItem[] with location/date metadata
+- Process: Parse dates/locations → Group by primary location + 3-month window → Merge adjacent clusters
+- Output: PhotoCluster[] with metadata and photo arrays
+
+**Positioning System:**
+- Input: PhotoCluster[]
+- Process: Map locations to X-axis → Calculate Z from dates → Add Y variation → Calculate scale
+- Output: PositionedCluster[] with 3D coordinates and depth
+
+**Camera System:**
+- Target: Centroid of all cluster positions
+- Position: Offset from target based on scroll progress
+- Movement: Interpolated between [overview, zoom-in] states
+- Projection: Perspective math converts 3D→2D screen coordinates
+
+**Component State Management:**
+- scrollProgress: [0-1] from user input (scroll/swipe)
+- camera: CameraState {x, y, z} based on scroll progress
+- zoomedClusterId: Currently expanded cluster (null for overview)
+- lightboxIndex: Selected photo in lightbox (-1 for closed)
+- isMobile: Layout mode detection from viewport width
+- viewportSize: Current container dimensions
+
+### Known Limitations & Future Improvements:
+- 3D effects are CSS-based (perspective transform), not WebGL
+- Mobile timeline simplified (no 3D rotation)
+- Touch swipe uses threshold detection (no momentum)
+- Location clustering by name string (not actual distance math)
+- Photo arc layout uses fixed circle (could be dynamic)
+- Camera movement is linear (could be eased)
+
+### Files Summary:
+- **Created**: 4 new files (clustering, positioning, photo-journey component)
+- **Modified**: 2 files (photography page, added imports)
+- **Total Lines Added**: 900+ lines of code
+

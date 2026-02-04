@@ -5,10 +5,13 @@ import {
   PhotoGallery,
   type PhotoItem,
 } from "@/components/photography/photo-gallery";
+import { ClusteredGallery } from "@/components/photography/clustered-gallery";
 import {
   loadPhotoMetadata,
   mergeMetadataIntoPhotos,
 } from "@/lib/photo-metadata";
+import { clusterPhotos } from "@/lib/photo-clustering";
+import { positionClusters } from "@/lib/photo-positioning";
 import fs from "fs";
 import path from "path";
 
@@ -213,14 +216,6 @@ function parseGallery(value: unknown): PhotoItem[] {
   return items;
 }
 
-function shuffleArray(array: PhotoItem[]): PhotoItem[] {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
 
 
 export async function generateMetadata() {
@@ -271,7 +266,13 @@ export default async function PhotographyPage() {
     galleryFromMeta.length > 0 ? galleryFromMeta : getGalleryFromAssets();
   const metadata = loadPhotoMetadata();
   const galleryWithMetadata = mergeMetadataIntoPhotos(baseGallery, metadata);
-  const gallery = shuffleArray(galleryWithMetadata);
+
+  // Cluster and position photos for Photo Journey
+  const clusters = clusterPhotos(galleryWithMetadata);
+  const positionedClusters = positionClusters(clusters);
+
+  // Keep unsorted gallery for fallback and hero
+  const gallery = galleryWithMetadata;
   const heroFromAssets = findHeroFromAssets();
   const heroByName = findHeroFromGallery(gallery);
   const heroFallback = gallery[0];
@@ -294,21 +295,24 @@ export default async function PhotographyPage() {
         imageUrl={heroImageUrl}
         imageAlt={heroAltText}
       />
-      <div className="container mx-auto px-4 pt-10 max-w-6xl">
-        <div className="prose prose-neutral dark:prose-invert max-w-none">
-          <MDXContent />
-        </div>
-
-        {gallery.length === 0 ? (
-          <div className="mt-10 rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">
-            Add photos under{" "}
-            <code>content/assets/photos/</code> to render the grid.
+      {positionedClusters.length > 0 ? (
+        <ClusteredGallery clusters={positionedClusters} />
+      ) : (
+        <div className="container mx-auto px-4 pt-10 max-w-6xl">
+          <div className="prose prose-neutral dark:prose-invert max-w-none">
+            <MDXContent />
           </div>
-        ) : (
-          <PhotoGallery items={gallery} />
-        )}
 
-      </div>
+          {gallery.length === 0 ? (
+            <div className="mt-10 rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">
+              Add photos under{" "}
+              <code>content/assets/photos/</code> to render the grid.
+            </div>
+          ) : (
+            <PhotoGallery items={gallery} />
+          )}
+        </div>
+      )}
     </div>
   );
 }

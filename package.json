@@ -7,7 +7,8 @@
     "prebuild": "node scripts/generate-timeline.js && node scripts/generate-skills.js && node scripts/convert-heic.js && node scripts/copy-assets.js",
     "build": "npm run prebuild && node scripts/build-with-admin-exclusion.js",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "sync-photos": "node scripts/auto-tag-photos.js"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",

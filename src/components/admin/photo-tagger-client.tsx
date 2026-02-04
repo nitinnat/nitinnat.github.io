@@ -28,6 +28,8 @@ export function PhotoTaggerClient({ photos }: PhotoTaggerClientProps) {
   const [formState, setFormState] = useState<FormState>({ location: "", date: "" });
   const [localMetadata, setLocalMetadata] = useState<Record<string, FormState>>({});
   const [isSaving, setIsSaving] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState<string>("");
 
   // Filter photos based on selected filter
   const filteredPhotos = useMemo(() => {
@@ -177,6 +179,36 @@ export function PhotoTaggerClient({ photos }: PhotoTaggerClientProps) {
     setCurrentIndex(0);
   };
 
+  const handleSync = async () => {
+    setIsSyncing(true);
+    setSyncMessage("Syncing new photos...");
+
+    try {
+      const response = await fetch("/api/auto-tag-photos", {
+        method: "POST",
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSyncMessage("✅ Sync complete! Refresh the page to see new photos.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        setSyncMessage(`❌ Sync failed: ${data.error}`);
+      }
+    } catch (error) {
+      console.error("Sync error:", error);
+      setSyncMessage("❌ Sync failed. Check console for details.");
+    } finally {
+      setTimeout(() => {
+        setIsSyncing(false);
+        setSyncMessage("");
+      }, 3000);
+    }
+  };
+
   if (filteredPhotos.length === 0 || !currentPhoto) {
     return (
       <div className="flex items-center justify-center h-screen bg-background">
@@ -200,6 +232,21 @@ export function PhotoTaggerClient({ photos }: PhotoTaggerClientProps) {
           <h2 className="text-lg font-semibold text-foreground mb-4">
             Photo Tagger
           </h2>
+
+          {/* Sync Button */}
+          <button
+            onClick={handleSync}
+            disabled={isSyncing}
+            className="w-full mb-4 px-4 py-2 rounded bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
+          >
+            {isSyncing ? "Syncing..." : "🔄 Sync New Photos"}
+          </button>
+
+          {syncMessage && (
+            <div className="mb-4 p-3 rounded bg-muted text-sm">
+              {syncMessage}
+            </div>
+          )}
 
           {/* Filter buttons */}
           <div className="space-y-2 mb-6">
