@@ -85,6 +85,25 @@ function extractEXIF(filePath) {
   }
 }
 
+// Convert DMS (degrees, minutes, seconds) to decimal degrees
+function dmsToDecimal(dmsStr) {
+  if (typeof dmsStr === 'number') return dmsStr;
+
+  // Parse "43 deg 0' 6.00\" N" format
+  const match = dmsStr.match(/^(\d+(?:\.\d+)?)\s*deg\s*(\d+(?:\.\d+)?)\'\s*(\d+(?:\.\d+)?)\"\s*([NSEW])$/);
+  if (!match) return null;
+
+  const [, degrees, minutes, seconds, direction] = match;
+  let decimal = parseFloat(degrees) + parseFloat(minutes) / 60 + parseFloat(seconds) / 3600;
+
+  // Make negative if South or West
+  if (direction === 'S' || direction === 'W') {
+    decimal = -decimal;
+  }
+
+  return decimal;
+}
+
 // Parse GPS coordinates
 function parseGPS(exif) {
   const lat = exif.GPSLatitude;
@@ -92,7 +111,13 @@ function parseGPS(exif) {
 
   if (!lat || !lon) return null;
 
-  return { latitude: lat, longitude: lon };
+  // Convert from DMS to decimal if needed
+  const latitude = dmsToDecimal(lat);
+  const longitude = dmsToDecimal(lon);
+
+  if (latitude === null || longitude === null) return null;
+
+  return { latitude, longitude };
 }
 
 // Parse date from EXIF
@@ -202,20 +227,28 @@ async function main() {
   for (const photo of photos) {
     const existing = metadata[photo.id];
 
-    // Skip if already tagged
-    if (existing && existing.tagged) {
+    // Skip if photo has both location and date
+    if (existing && existing.location && existing.date) {
       continue;
     }
 
     const tags = await autoTagPhoto(photo);
 
-    if (tags.tagged) {
-      metadata[photo.id] = tags;
-      if (existing) {
-        updatedCount++;
-      } else {
-        newCount++;
-      }
+    // Merge with existing data to preserve any manually entered tags
+    const mergedTags = {
+      location: tags.location || (existing && existing.location),
+      date: tags.date || (existing && existing.date),
+      tagged: !!(
+        (tags.location || (existing && existing.location)) &&
+        (tags.date || (existing && existing.date))
+      ),
+    };
+
+    metadata[photo.id] = mergedTags;
+    if (existing) {
+      updatedCount++;
+    } else {
+      newCount++;
     }
 
     console.log("");
