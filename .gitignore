@@ -43,3 +43,7 @@ next-env.d.ts
 # claude
 .claude/
 .env.local
+
+# Assets (downloaded from R2 during build)
+content/assets/*
+!content/assets/.gitkeep
