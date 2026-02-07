@@ -170,46 +170,128 @@ I also create quick prompts in `.github/copilot/prompts/`:
 
 ## My Workflow
 
-Here's what a typical feature implementation looks like:
+Here's the step-by-step process I follow for any coding task:
 
-![Complete AI-assisted coding workflow showing circular process from planning through PR creation](/assets/ai_coding_workflow.png)
+![Complete AI-assisted coding workflow showing 9-step process from setup through testing](/assets/ai_coding_workflow.png)
 
-**1. Plan** (for complex features)
-```
-@task-planner Implement rate limiting using Redis...
-```
-Review the plan, answer clarification questions.
+### Step 1: Setup Instructions File
 
-**2. Implement**
-```
-@python-coder Implement the rate limiter according to the plan...
-```
-Review the generated code carefully.
+Before starting any work, I ensure `copilot-instructions.md` is updated with:
+- Code styling preferences
+- Design document format
+- Repository outline (can be LLM-generated)
+- How to run tests
 
-**3. Test**
-Select the code, run:
-```
-/generate-unit-tests
-```
-Review tests, add domain-specific cases.
+I also create a fresh README.md if needed. This becomes the foundation for all subsequent chats.
 
-**4. Review**
-```
-@code-reviewer Review this implementation...
-```
-Then:
-```
-/security-review
-```
-Address critical issues before committing.
+### Step 2: Describe the Problem
 
-**5. Document and PR**
+Open a **new chat** and describe the problem with maximum specificity:
+- Business context
+- What's possible, what's not
+- Infrastructure constraints
+- Any domain-specific requirements
+
+**Critical**: You're responsible for providing context the LLM doesn't have—your tribal knowledge, preferences, constraints.
+
+### Step 3: Ask for Clarification Questions
+
 ```
-@readme-generator Update README with rate limiting documentation...
+Think about this problem and ask me a detailed list of clarification questions.
 ```
+
+The LLM generates questions about edge cases, technical approach, constraints, and requirements.
+
+### Step 4: Answer in Great Detail
+
+Answer each question thoroughly. This is where you transfer your tribal knowledge—stuff that's not in the codebase or docs.
+
+### Step 5: Create Technical Design Document
+
 ```
-@pr-description-generator Create PR description...
+Understand the codebase and the problem. Do NOT write any code yet.
+Create a detailed technical design document that is:
+- Very detailed
+- Self-contained
+- Readable by a capable intern to implement without issues
 ```
+
+The LLM explores the codebase and produces a comprehensive design doc.
+
+### Step 6: Review and Iterate the Document
+
+**This is critical.** Review the design doc carefully. A lot might be incorrect or incomplete.
+
+Provide feedback:
+- What needs to change
+- What's missing
+- What assumptions are wrong
+
+You can open another chat session and ask a fresh LLM to review the document as well.
+
+Iterate until you have a document you're confident in.
+
+### Step 7: Implementation
+
+```
+Begin implementation following the design document.
+Do NOT touch anything outside [specific folders].
+Do NOT delete anything without permission.
+```
+
+The LLM implements according to the reviewed design.
+
+### Step 8: Review Code with Diffs
+
+Use VSCode's diff editor to carefully review every change:
+- What was modified and why
+- Whether the approach matches your expectations
+- If there's a better way to do it
+
+If you don't like something, tell the LLM immediately. Don't let bad code accumulate.
+
+### Step 9: Run Tests
+
+```
+Run the test suite.
+```
+
+If you have existing tests, ensure instructions for running them are in `copilot-instructions.md` so the LLM knows how to test every time.
+
+Address any failures, then commit.
+
+## Working Across Multiple Repositories
+
+For projects with multiple repos, I place shared configuration in the parent directory:
+
+```
+workspace/
+├── .github/
+│   └── copilot-instructions.md  ← Shared instructions
+├── backend/                      ← Python/FastAPI repo
+├── frontend/                     ← React repo
+└── infrastructure/               ← Kubernetes repo
+```
+
+In the shared `copilot-instructions.md`, I add explicit boundaries:
+
+```markdown
+# Multi-Repository Workspace
+
+This workspace contains three repositories:
+- backend: Python FastAPI application
+- frontend: React TypeScript application
+- infrastructure: Kubernetes and Terraform configs
+
+**CRITICAL CONSTRAINT**: Only modify files within the repository
+you're currently working on. Do NOT make changes to files in other
+repository directories without explicit permission.
+
+When working on backend code, only touch files in backend/.
+When working on frontend code, only touch files in frontend/.
+```
+
+VSCode Copilot automatically loads instructions from parent directories, giving all repos access to shared context while respecting boundaries.
 
 ## Layer 3: Implementation Logs
 
@@ -259,26 +341,44 @@ I always:
 ## What Actually Works
 
 **Works:**
-- Explicit instructions ("Use type hints" vs "prefer type hints")
-- Specialized agents for different roles
-- Implementation logs for continuity
-- Starting fresh when context degrades
+- **Starting with a detailed design doc** before any code - catch mistakes early
+- **Fresh chat sessions** for new features - don't let context degrade
+- **Human review at critical points** - design doc review and code diff review
+- **Explicit boundaries** - "don't touch files outside this folder"
+- **Clarification questions** - force the LLM to think before implementing
+- **Tribal knowledge transfer** - answer questions thoroughly with your context
 
 **Doesn't work:**
-- Vague requests ("make this better")
-- Blind acceptance of generated code
-- Pushing past 100+ turns without starting fresh
-- Treating AI as infallible
+- **Skipping the design doc** - jumping straight to implementation causes rework
+- **Vague problem descriptions** - "make this better" produces random changes
+- **Blind acceptance** - never merge without reviewing diffs carefully
+- **Ignoring the review step** - the design doc review is where you catch conceptual errors
+- **Working across 100+ turns** - start fresh with a new chat and reference the design doc
 
 ## Getting Started
 
 Here's what I recommend:
 
-1. **Create `.github/copilot-instructions.md`** with project overview, tech stack, and code standards
-2. **Create 2-3 agents** you'll use most (I started with @python-coder and @python-tester)
-3. **Try a small task** - implement one simple function
-4. **Update instructions** based on what you learn
-5. **Iterate** - this is a system that improves with use
+1. **Create `.github/copilot-instructions.md`** with:
+   - Project overview and tech stack
+   - Code standards and formatting rules
+   - Design document format expectations
+   - How to run tests
+   - Repository structure
+
+2. **Create 2-3 custom agents** you'll use most (I use @task-planner, @code-reviewer, @pr-reviewer, @gemini-image-generator)
+
+3. **Try the workflow on a small feature**:
+   - Describe the problem with context
+   - Ask for clarification questions
+   - Create a design doc (review it carefully!)
+   - Implement
+   - Review diffs
+   - Run tests
+
+4. **Update instructions** based on what you learn - add patterns, constraints, preferences
+
+5. **Iterate** - this system improves as you encode more of your tribal knowledge
 
 ## Key Takeaway
 
