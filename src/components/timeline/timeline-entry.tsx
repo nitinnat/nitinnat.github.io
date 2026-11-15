@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence, useReducedMotion, type Variants } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { useAnimate, useInView, useReducedMotion } from "framer-motion";
 import { ChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { TimelineEntry } from "./timeline-types";
 import { SkillBadges } from "./skill-badges";
+import { ProjectVisual } from "@/components/visuals/project-visual";
 
 interface TimelineEntryCardProps {
   entry: TimelineEntry;
@@ -16,51 +17,57 @@ interface TimelineEntryCardProps {
 export function TimelineEntryCard({ entry, index, variant = "work" }: TimelineEntryCardProps) {
   const [expanded, setExpanded] = useState(false);
   const reduceMotion = useReducedMotion();
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [cardRef, animate] = useAnimate<HTMLDivElement>();
+  const inView = useInView(cardRef, { once: true, margin: "0px 0px -60px 0px" });
+  const deferred = useRef(false);
 
-  const variants: Variants | undefined = reduceMotion
-    ? undefined
-    : {
-        hidden: { opacity: 0, y: 10 },
-        visible: {
-          opacity: 1,
-          y: 0,
-          transition: {
-            duration: 0.5,
-            ease: [0.25, 0.46, 0.45, 0.94]
-          }
-        }
-      };
+  // Cards render visible; only those still below the fold at mount wait to be revealed,
+  // so a card scrolled past before hydration can never get stuck hidden.
+  useEffect(() => {
+    if (reduceMotion) return;
+    const card = cardRef.current;
+    if (!inView && !deferred.current && card.getBoundingClientRect().top > window.innerHeight) {
+      deferred.current = true;
+      animate(card, { opacity: 0, y: 12 }, { duration: 0 });
+    } else if (inView && deferred.current) {
+      animate(card, { opacity: 1, y: 0 }, { duration: 0.5, ease: [0.23, 1, 0.32, 1] });
+    }
+  }, [inView, reduceMotion, animate, cardRef]);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    if (expanded && !dialog.open) dialog.showModal();
+    if (!expanded && dialog.open) dialog.close();
+  }, [expanded]);
+
+  const closeDialog = () => {
+    setExpanded(false);
+    triggerRef.current?.focus();
+  };
 
   return (
-    <motion.div
-      variants={variants}
-      className="relative grid grid-cols-[20px_1fr] gap-4 pb-6 md:pb-8"
-    >
+    <div ref={cardRef} className="relative grid grid-cols-[20px_1fr] gap-4 pb-6 md:pb-8">
       {/* Timeline dot and line */}
       <div className="flex flex-col items-center">
-        <motion.div
+        <div
           className={cn(
             "w-5 h-5 rounded-full flex items-center justify-center border-2",
             variant === "education"
               ? "bg-background border-emerald-500"
               : "bg-background border-primary"
           )}
-          initial={reduceMotion ? {} : { scale: 0 }}
-          whileInView={reduceMotion ? {} : { scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: index * 0.05, duration: 0.3, type: "spring", stiffness: 120 }}
         >
-          <motion.div
+          <div
             className={cn(
               "w-1.5 h-1.5 rounded-full",
               variant === "education" ? "bg-emerald-500" : "bg-primary"
             )}
-            initial={reduceMotion ? {} : { scale: 0 }}
-            whileInView={reduceMotion ? {} : { scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: index * 0.05 + 0.1, duration: 0.2 }}
           />
-        </motion.div>
+        </div>
         <div
           className={cn(
             "w-0.5 flex-1 mt-2",
@@ -72,46 +79,36 @@ export function TimelineEntryCard({ entry, index, variant = "work" }: TimelineEn
       </div>
 
       {/* Content */}
-      <motion.article
+      <article
         className={cn(
-          "rounded-md transition-all duration-300 relative overflow-hidden group",
+          "rounded-md transition-colors duration-300 relative overflow-hidden group",
           "grid grid-cols-1 md:grid-cols-[auto_1fr] gap-3 md:gap-4",
-          entry.image ? "items-start" : "",
-          !entry.backgroundImage && "bg-card/40 hover:bg-card/60",
+          (entry.visual || entry.image) && "items-start",
+          entry.backgroundImage ? "bg-card" : "bg-card/40 hover:bg-card/60",
           variant === "education"
             ? "border border-emerald-500/10 hover:border-emerald-500/20 focus-within:ring-2 focus-within:ring-emerald-500/50"
             : "border border-primary/10 hover:border-primary/20 focus-within:ring-2 focus-within:ring-primary/50"
         )}
-        initial={reduceMotion ? {} : { opacity: 0, x: 10 }}
-        whileInView={reduceMotion ? {} : { opacity: 1, x: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay: index * 0.05 + 0.05, duration: 0.5 }}
-        whileHover={reduceMotion ? {} : { x: 4 }}
-        style={entry.backgroundImage ? { backgroundColor: "hsl(var(--card))" } : {}}
       >
         {/* Background image layer for education entries */}
         {entry.backgroundImage && (
-          <motion.div
+          <div
             className="absolute inset-0 bg-cover bg-center opacity-0 group-hover:opacity-30 transition-opacity duration-500 pointer-events-none"
             style={{
               backgroundImage: `url('${entry.backgroundImage}')`
             }}
-            initial={false}
           />
         )}
 
-        {/* Image on the left (only on md+ screens if present) */}
-        {entry.image && (
+        {entry.visual ? (
+          <ProjectVisual name={entry.visual} className="relative z-10 m-3 mb-0 md:mb-3 md:mr-0 md:w-56 md:flex-shrink-0" />
+        ) : entry.image && (
           <figure className="md:flex md:flex-col md:w-56 md:flex-shrink-0 relative z-10">
-            <motion.img
+            <img
               src={entry.image.src}
               alt={entry.image.alt}
               className="rounded h-32 md:h-40 w-full md:w-56 object-cover"
               loading="lazy"
-              initial={reduceMotion ? {} : { opacity: 0, scale: 0.95 }}
-              whileInView={reduceMotion ? {} : { opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.05 + 0.15, duration: 0.4 }}
             />
             {entry.image.caption && (
               <figcaption className="text-xs text-muted-foreground mt-1 hidden md:block">
@@ -143,6 +140,7 @@ export function TimelineEntryCard({ entry, index, variant = "work" }: TimelineEn
           {/* More button */}
           {entry.expandedContent && (
             <button
+              ref={triggerRef}
               onClick={() => setExpanded(true)}
               className={cn(
                 "inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80",
@@ -170,41 +168,30 @@ export function TimelineEntryCard({ entry, index, variant = "work" }: TimelineEn
             </a>
           )}
         </div>
-      </motion.article>
+      </article>
 
-      {/* Modal backdrop and content */}
-      <AnimatePresence>
-        {expanded && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setExpanded(false)}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-            />
-
-            {/* Modal */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="fixed inset-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-2xl max-h-[90vh] overflow-y-auto z-50"
-            >
-              <div className={cn(
-                "bg-card rounded-lg border p-4 md:p-8",
-                variant === "education"
-                  ? "border-emerald-500/20"
-                  : "border-primary/20"
-              )}>
+      <dialog
+        ref={dialogRef}
+        aria-labelledby={`timeline-dialog-${variant}-${index}`}
+        className="m-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto rounded-lg bg-transparent p-0 backdrop:bg-black/55 backdrop:backdrop-blur-sm"
+        onCancel={(event) => {
+          event.preventDefault();
+          closeDialog();
+        }}
+        onClick={(event) => {
+          if (event.target === dialogRef.current) closeDialog();
+        }}
+      >
+        <div className={cn(
+          "rounded-lg border bg-card p-4 shadow-2xl md:p-8",
+          variant === "education" ? "border-emerald-500/20" : "border-primary/20"
+        )}>
                 {/* Close button */}
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1" />
                   <button
-                    onClick={() => setExpanded(false)}
-                    className="p-1 text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
+                    onClick={closeDialog}
+                    className="inline-flex size-11 flex-shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                     aria-label="Close modal"
                   >
                     <X className="w-5 h-5" />
@@ -213,29 +200,10 @@ export function TimelineEntryCard({ entry, index, variant = "work" }: TimelineEn
 
                 {/* Modal header */}
                 <div className="mb-6 pr-2">
-                  <h2 className="text-lg md:text-2xl font-bold text-foreground mb-1">{entry.title}</h2>
+                  <h2 id={`timeline-dialog-${variant}-${index}`} className="text-lg md:text-2xl font-bold text-foreground mb-1">{entry.title}</h2>
                   <p className="text-muted-foreground text-xs md:text-sm">{entry.company} • {entry.dateRange}</p>
                   {entry.skills && <SkillBadges skillIds={entry.skills} className="mt-3" />}
                 </div>
-
-                {/* Modal image - larger */}
-                {entry.image && (
-                  <figure className="mb-6">
-                    <motion.img
-                      src={entry.image.src}
-                      alt={entry.image.alt}
-                      className="rounded-lg w-full h-64 md:h-80 object-cover"
-                      initial={reduceMotion ? {} : { opacity: 0, scale: 0.95 }}
-                      animate={reduceMotion ? {} : { opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.1, duration: 0.4 }}
-                    />
-                    {entry.image.caption && (
-                      <figcaption className="text-sm text-muted-foreground mt-2">
-                        {entry.image.caption}
-                      </figcaption>
-                    )}
-                  </figure>
-                )}
 
                 {/* Main description */}
                 <div className="mb-6">
@@ -266,11 +234,8 @@ export function TimelineEntryCard({ entry, index, variant = "work" }: TimelineEn
                     </a>
                   </div>
                 )}
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-    </motion.div>
+        </div>
+      </dialog>
+    </div>
   );
 }

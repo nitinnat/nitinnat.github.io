@@ -283,14 +283,14 @@ export default async function PhotographyPage() {
     heroByName?.thumb ||
     heroFallback?.full ||
     heroFallback?.thumb ||
-    undefined;
+    "https://nitinnataraj.com/assets/photos/001.png";
   const heroAltText =
     heroFromAssets?.alt || heroByName?.alt || heroFallback?.alt;
 
   return (
-    <div className="pb-16">
+    <div className="min-h-screen bg-background pb-16 text-foreground">
       <PhotoHero
-        title={page.meta.title || "Photography"}
+        title="Photography"
         subtitle={heroSubtitle || page.meta.description}
         imageUrl={heroImageUrl}
         imageAlt={heroAltText}

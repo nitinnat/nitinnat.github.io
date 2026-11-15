@@ -624,3 +624,77 @@ Load Photos → Load Metadata → Merge Metadata with Photos
 - **Modified**: 2 files (photography page, added imports)
 - **Total Lines Added**: 900+ lines of code
 
+## 2026-11-15: Portfolio UX Upgrade and Design Directions
+
+**Status:** Unified production routes ready for local review on `codex/portfolio-ux-variants`; not committed.
+
+### Implemented
+
+- Added responsive primary navigation with active-page states, a mobile menu, larger touch targets, and consistent `Writing` terminology.
+- Replaced the generic footer with portfolio-specific identity and navigation.
+- Reworked timeline details around native `<dialog>` behavior for focus containment, Escape handling, backdrop dismissal, focus restoration, and unique accessible labels.
+- Made code blocks keyboard-focusable and kept copy controls visible on touch devices.
+- Converted skill icons to non-interactive, labelled presentation and removed unnecessary badge animation.
+- Changed photography filters to a one-row horizontal mobile rail with `aria-pressed` states and removed ornamental scroll/hover scaling.
+- Improved article hierarchy with a back link, reading time, responsive title scale, and wrapping tags.
+- Prototyped three data-backed directions, then used their strongest traits as page-level accents instead of independent themes.
+- Established one warm editorial canvas, shared typography hierarchy, navigation, surfaces, borders, spacing, and light/dark behavior across every route.
+- Kept About technical through a subtle grid, monospaced display type, and restrained cyan/emerald accents without changing the site palette.
+- Kept Photography cinematic through its full-bleed image hero, returning immediately to the shared editorial canvas below it.
+- Replaced the root redirect with a visual homepage connecting engineering, writing, and photography within the same foundation.
+- Removed the temporary preview switcher and routes after promotion.
+- Removed the route-scoped palettes after review showed that they made the site feel like three unrelated templates.
+
+### Validation
+
+- Production build passed in Node 22 Docker; the homepage and all public content routes are statically generated.
+- Playwright desktop and 390px mobile checks passed for Home, About, Writing, and Photography with no page errors or horizontal overflow.
+- Focused Playwright checks passed for native dialog Escape behavior and keyboard focus on code blocks.
+- Cross-route checks confirmed the same light-mode background token on Home, About, Writing, and Photography, with dark-mode preference persisting between routes.
+- Screenshots reviewed at 1440×1000 and 390×844.
+
+### Local Review URLs
+
+- `http://localhost:3000/`
+- `http://localhost:3000/about`
+- `http://localhost:3000/blog`
+- `http://localhost:3000/photography`
+
+## 2026-11-15: Animated Project Visuals on About
+
+**Status:** Implemented on `codex/portfolio-ux-variants`; not committed.
+
+### Implemented
+
+- Added `src/components/visuals/`: one animated SVG scene per project, explaining how the work functions (agent loop, AutoML model selection, Spark scaling, cursor tracking, gossip consensus, tracking with detection resets, chatbot pipeline, KPI dashboard, OCR features → k-NN, consensus MLPs).
+- Scenes use SVG SMIL animations sharing a single per-scene cycle (`Cycle` context), so loops never drift. Primitives (`A`, `Show`, `Draw`, `Packet`, `Box`, `Layer`) keep each scene declarative.
+- `ProjectVisual` pauses scenes off-screen (`useInView`) and freezes them on a representative `still` frame under `prefers-reduced-motion`.
+- Timeline entries take a new `Visual:` field in `about.mdx` (parsed by `generate-timeline.js`); the visual replaces the static R2 image in both the card and the dialog. Publications use `<PaperVisual name="..." />`.
+- Collapsed timeline motion to one entrance per card (removed container stagger, `scale(0)` dots, slide-in, image scale, ungated hover shift).
+- Fixed cards that could stay invisible: SSR rendered them at `opacity: 0`, and a card scrolled past before hydration never received an in-view event. Cards now render visible and only defer the reveal if still below the fold on mount.
+- Fixed `generate-timeline.js` assigning the last entry of a section to the next section (the IISc internship appeared under Education).
+- Fixed an invalid `hsl(var(--card))` background on education cards (tokens are oklch).
+- Dialog visuals mount only while the dialog is open.
+- `compileMDX` now uses `MDXComponents` from `mdx/types` so MDX components can take props.
+
+### Validation
+
+- `tsc --noEmit` and ESLint clean for touched files (one pre-existing `<img>` warning).
+- Playwright: repeated fast-scroll runs at 1440px and 390px leave no hidden cards and no horizontal overflow; no page errors.
+- Frozen-frame contact sheets (t = 1.6/3.6/5.6s) reviewed in light and dark mode for all nine scenes.
+- Reduced motion: every scene paused at its `still` time. Dialog opens with the visual, closes on Escape, and unmounts it.
+- Production build not re-run in this pass.
+
+## 2026-11-15: Text-only Timeline Dialogs
+
+- The "More" dialog now shows only title, meta, skills, Overview, and Details; the visual/image were removed from it (the card already shows the visual).
+- Installed `animate`, `choreograph`, and `animation-performance` from `emilkowalski/skills` (commit `64eb3de`) into `~/.claude/skills/`.
+- Found that most timeline `Skills:` IDs don't match `skills-data.ts` IDs (e.g. `llms` vs `llms-genai-systems`), so their badges are silently dropped; the current GenAI role shows 1 of 5. Not yet fixed — pending user decision with the copy edits.
+
+## 2026-11-15: Publication Cleanup
+
+- Reordered publications: ICMLA 2021, arXiv 2021, 2019 tech report, arXiv 2018.
+- Replaced emoji links with plain `Springer ↗` / `arXiv ↗` / `PDF ↗` labels.
+- Abstracts collapse behind a native `<details>` "Read abstract" toggle (`Abstract` MDX component in the About page).
+- Fixed visual labels ignoring per-label `fontSize`: the default size moved from the `.viz-text` class to the `<svg>` attribute so element attributes take precedence.
+- Production build re-run in a throwaway Node 22 container: passed, all public routes static.

@@ -1,7 +1,3 @@
-"use client";
-
-import { useState } from "react";
-import { motion } from "framer-motion";
 import { skillsData } from "@/data/skills-data";
 import { cn } from "@/lib/utils";
 
@@ -92,8 +88,6 @@ interface SkillBadgesProps {
 }
 
 export function SkillBadges({ skillIds = [], className, showLabels = false }: SkillBadgesProps) {
-  const [hoveredSkillId, setHoveredSkillId] = useState<string | null>(null);
-
   if (!skillIds.length) return null;
 
   const skills = skillIds
@@ -104,50 +98,23 @@ export function SkillBadges({ skillIds = [], className, showLabels = false }: Sk
 
   return (
     <div className={cn("flex flex-wrap gap-3 mt-3", className)}>
-      {skills.map((skill, index) => {
+      {skills.map((skill) => {
         const Icon = skillIcons[skill.id];
         const colors = categoryColors[skill.category] || categoryColors.tools;
         const IconComponent = Icon || SiPython;
 
         return (
-          <motion.div
+          <span
             key={skill.id}
-            initial={{ opacity: 0, scale: 0.7 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{
-              delay: index * 0.05,
-              duration: 0.3,
-              type: "spring",
-              stiffness: 200,
-            }}
-            className="relative group"
-            onMouseEnter={() => setHoveredSkillId(skill.id)}
-            onMouseLeave={() => setHoveredSkillId(null)}
-          >
-            <motion.div
-              className={cn(
-                "p-2 rounded-lg transition-all duration-200 cursor-pointer",
-                colors.bg
-              )}
-              whileHover={{ scale: 1.2 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <IconComponent className={cn("w-5 h-5", colors.text)} />
-            </motion.div>
-
-            {/* Tooltip */}
-            {hoveredSkillId === skill.id && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.15 }}
-                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1.5 bg-foreground text-background text-xs font-semibold rounded whitespace-nowrap z-50 pointer-events-none"
-              >
-                {skill.name}
-              </motion.div>
+            title={skill.name}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-lg p-2 transition-colors",
+              colors.bg,
             )}
-          </motion.div>
+          >
+            <IconComponent aria-hidden="true" className={cn("h-5 w-5", colors.text)} />
+            {showLabels && <span className="text-xs text-muted-foreground">{skill.name}</span>}
+          </span>
         );
       })}
     </div>

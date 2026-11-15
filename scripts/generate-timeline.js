@@ -27,11 +27,12 @@ function parseTimelineMarkdown(markdown) {
     if (trimmed.startsWith("## ")) {
       // Save previous entry
       if (currentEntry) {
-        entries.push({ ...currentEntry, section: currentSection });
+        entries.push(currentEntry);
       }
 
       currentEntry = {
         id: generateId(trimmed.replace("## ", "")),
+        section: currentSection,
         title: trimmed.replace("## ", ""),
         company: "",
         dateRange: "",
@@ -41,6 +42,7 @@ function parseTimelineMarkdown(markdown) {
         link: null,
         skills: [],
         backgroundImage: null,
+        visual: null,
         type: "",
       };
     } else if (currentEntry && trimmed.startsWith("Company:")) {
@@ -75,6 +77,8 @@ function parseTimelineMarkdown(markdown) {
       currentEntry.skills = skillsStr.split(",").map((s) => s.trim());
     } else if (currentEntry && trimmed.startsWith("BackgroundImage:")) {
       currentEntry.backgroundImage = trimmed.replace("BackgroundImage:", "").trim();
+    } else if (currentEntry && trimmed.startsWith("Visual:")) {
+      currentEntry.visual = trimmed.replace("Visual:", "").trim();
     } else if (currentEntry && trimmed.startsWith("Type:")) {
       currentEntry.type = trimmed.replace("Type:", "").trim();
     }
@@ -82,7 +86,7 @@ function parseTimelineMarkdown(markdown) {
 
   // Save last entry
   if (currentEntry) {
-    entries.push({ ...currentEntry, section: currentSection });
+    entries.push(currentEntry);
   }
 
   return entries;
@@ -134,6 +138,10 @@ function generateTypeScriptFile(entries) {
 
     if (entry.backgroundImage) {
       result += `    backgroundImage: "${entry.backgroundImage}",\n`;
+    }
+
+    if (entry.visual) {
+      result += `    visual: "${entry.visual}",\n`;
     }
 
     result += `    type: "${entry.type}"\n`;

@@ -14,6 +14,7 @@ export const professionalTimeline: TimelineEntry[] = [
       caption: "Illustrative diagram only; does not reflect actual implementation.",
     },
     skills: ["python", "fastapi", "llms", "rag-systems", "agentic-ai"],
+    visual: "genai-agent",
     type: "work"
   },
   {
@@ -29,6 +30,7 @@ export const professionalTimeline: TimelineEntry[] = [
       caption: "Illustrative diagram only; does not reflect actual implementation.",
     },
     skills: ["python", "tensorflow", "pyspark", "kubernetes", "time-series-forecasting"],
+    visual: "automl-forecast",
     type: "work"
   },
   {
@@ -39,6 +41,7 @@ export const professionalTimeline: TimelineEntry[] = [
     description: "Worked on scalability, optimization, and monitoring for a large retail forecasting system deployed across 10,000 stores.",
     expandedContent: "Built and maintained big-data/ML platform pieces in a production environment: PySpark + Hadoop workflows, operational monitoring, and tooling that improved reliability and developer experience. Also developed REST APIs and CI/CD pipelines to support horizontal scaling of Hadoop cluster nodes, and integrated/customized JupyterHub (including plugins and Git integration) to improve the data science workflow.",
     skills: ["python", "pyspark", "hadoop", "databricks", "splunk", "jupyterhub", "cicd"],
+    visual: "data-platform",
     type: "work"
   },
   {
@@ -54,6 +57,7 @@ export const professionalTimeline: TimelineEntry[] = [
       caption: "Illustrative diagram only; does not reflect actual implementation.",
     },
     skills: ["python", "computer-vision", "opencv", "tensorflow"],
+    visual: "cursor-tracking",
     type: "research"
   },
   {
@@ -69,6 +73,7 @@ export const professionalTimeline: TimelineEntry[] = [
       caption: "Illustrative diagram only; does not reflect actual implementation.",
     },
     skills: ["python", "java", "distributed-systems", "nlp"],
+    visual: "gossip-svm",
     type: "research"
   },
   {
@@ -84,6 +89,7 @@ export const professionalTimeline: TimelineEntry[] = [
       caption: "Illustrative diagram only; does not reflect actual implementation.",
     },
     skills: ["python", "computer-vision"],
+    visual: "hybrid-tracking",
     type: "work"
   },
   {
@@ -99,6 +105,7 @@ export const professionalTimeline: TimelineEntry[] = [
       caption: "Illustrative diagram only; does not reflect actual implementation.",
     },
     skills: ["python", "nlp", "docker", "java", "sql"],
+    visual: "chatbot",
     type: "work"
   },
   {
@@ -109,11 +116,9 @@ export const professionalTimeline: TimelineEntry[] = [
     description: "Analytics, KPI reporting, and Tableau-based dashboards for distributed teams.",
     expandedContent: "Managed reporting and analytics for a cross-geo team, consolidated KPIs across multiple datasets/schemas, built interactive Tableau dashboards, partnered with leadership on KPI definitions, and handled Tableau access administration.",
     skills: ["sql", "tableau", "analytics"],
+    visual: "kpi-dashboard",
     type: "work"
-  }
-];
-
-export const educationTimeline: TimelineEntry[] = [
+  },
   {
     id: "summer-research-intern-computer-vision",
     title: "Summer Research Intern (Computer Vision)",
@@ -122,8 +127,12 @@ export const educationTimeline: TimelineEntry[] = [
     description: "Classical CV feature extraction + supervised learning for offline OCR (Dr. Rathna G. N.).",
     expandedContent: "Compared feature extraction methods (e.g., PCA, LBP) and supervised learning approaches (e.g., k-NN, one-vs-all SVM), and built MATLAB tooling (including a GUI) to support experiments and visualization.",
     skills: ["computer-vision", "matlab"],
+    visual: "ocr-features",
     type: "research"
-  },
+  }
+];
+
+export const educationTimeline: TimelineEntry[] = [
   {
     id: "master-of-science-ms-computer-science",
     title: "Master of Science (MS), Computer Science",

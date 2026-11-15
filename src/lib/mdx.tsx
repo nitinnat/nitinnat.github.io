@@ -2,6 +2,7 @@ import { compile, run } from "@mdx-js/mdx";
 import * as runtime from "react/jsx-runtime";
 import rehypePrettyCode from "rehype-pretty-code";
 import { ComponentType } from "react";
+import type { MDXComponents } from "mdx/types";
 
 const rehypePrettyCodeOptions = {
   theme: {
@@ -10,8 +11,6 @@ const rehypePrettyCodeOptions = {
   },
   keepBackground: true,
 };
-
-type MDXComponents = Record<string, ComponentType<Record<string, unknown>>>;
 
 export async function compileMDX(
   source: string,

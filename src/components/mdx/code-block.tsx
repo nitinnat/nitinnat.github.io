@@ -44,7 +44,7 @@ export function CodeBlock({ children, className, ...props }: CodeBlockProps) {
       <Button
         variant="ghost"
         size="icon"
-        className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute right-2 top-2 z-10 h-8 w-8 opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
         onClick={handleCopy}
         aria-label={copied ? "Copied" : "Copy code"}
       >
@@ -54,7 +54,7 @@ export function CodeBlock({ children, className, ...props }: CodeBlockProps) {
           <Copy className="h-4 w-4" />
         )}
       </Button>
-      <pre className={className} {...props}>
+      <pre tabIndex={0} className={className} {...props}>
         {children}
       </pre>
     </div>
