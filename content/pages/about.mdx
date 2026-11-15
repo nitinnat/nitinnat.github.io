@@ -13,6 +13,7 @@ Description: Building production-grade GenAI systems with agentic workflows, ret
 ExpandedContent: My work centers on the engineering layer required to ship LLM applications reliably: tool-using agent patterns, RAG ingestion and retrieval pipelines, context + memory management for long conversations, evaluation approaches for non-deterministic behavior, and observability/debuggability in production.
 Image: /assets/genai_workflow.png | GenAI Agentic Workflow | Illustrative diagram only; does not reflect actual implementation.
 Skills: python, fastapi, llms, rag-systems, agentic-ai
+Visual: genai-agent
 Type: work
 
 ## Software Engineer II, Machine Learning
@@ -22,6 +23,7 @@ Description: Built large-scale AutoML pipelines for time series forecasting usin
 ExpandedContent: Focused on developing end-to-end forecasting pipelines and automation that improved accuracy and efficiency, spanning data processing, training workflows, and operationalization. Over time, I also worked on early LLM/conversational workflow efforts as the ecosystem matured.
 Image: /assets/automl_forecasting.png | AutoML Time Series Forecasting | Illustrative diagram only; does not reflect actual implementation.
 Skills: python, tensorflow, pyspark, kubernetes, time-series-forecasting
+Visual: automl-forecast
 Type: work
 
 ## Software Engineer, Machine Learning
@@ -30,6 +32,7 @@ DateRange: August 2019 - April 2022
 Description: Worked on scalability, optimization, and monitoring for a large retail forecasting system deployed across 10,000 stores.
 ExpandedContent: Built and maintained big-data/ML platform pieces in a production environment: PySpark + Hadoop workflows, operational monitoring, and tooling that improved reliability and developer experience. Also developed REST APIs and CI/CD pipelines to support horizontal scaling of Hadoop cluster nodes, and integrated/customized JupyterHub (including plugins and Git integration) to improve the data science workflow.
 Skills: python, pyspark, hadoop, databricks, splunk, jupyterhub, cicd
+Visual: data-platform
 Type: work
 
 ## Graduate Research Assistant
@@ -39,6 +42,7 @@ Description: Cursor detection and tracking in Adobe Photoshop screen-recording v
 ExpandedContent: Implemented a fully unsupervised approach combining adaptive cursor discovery, multi-scale template matching, and optimal path search to recover a high-scoring cursor trajectory across a video—robust to tiny object size, fast motion, and appearance changes. Evaluated against online trackers and Faster R-CNN-based detection methods.
 Image: /assets/cursor_tracking.png | Cursor Tracking System | Illustrative diagram only; does not reflect actual implementation.
 Skills: python, computer-vision, opencv, tensorflow
+Visual: cursor-tracking
 Type: research
 
 ## Student Research Assistant
@@ -48,6 +52,7 @@ Description: Research with Prof. Haimonti Dutta across distributed machine learn
 ExpandedContent: Worked on GADGET, a gossip-based distributed solver for linear SVMs; ran experiments, improved an existing codebase, and supported literature review. Also worked on NLP tasks including NER on tweets and detecting inter-group prejudice in social media text.
 Image: /assets/federated_learning.png | Distributed Learning | Illustrative diagram only; does not reflect actual implementation.
 Skills: python, java, distributed-systems, nlp
+Visual: gossip-svm
 Type: research
 
 ## Applied Machine Learning Intern
@@ -57,6 +62,7 @@ Description: Built hybrid tracking approaches and analyzed depth sensor noise ch
 ExpandedContent: Developed a single-object tracking approach that periodically interleaved detection to reduce tracker drift; characterized temporal noise distributions for industrial depth sensors; and extended internal visualization tooling for video/image workflows.
 Image: /assets/clarifai_tracking.png | Object Tracking System | Illustrative diagram only; does not reflect actual implementation.
 Skills: python, computer-vision
+Visual: hybrid-tracking
 Type: work
 
 ## Software Engineer
@@ -66,6 +72,7 @@ Description: Built an enterprise customer-service chatbot and NLP analytics tool
 ExpandedContent: Led development of a chatbot using ontology + NLP + ML for intent understanding and response retrieval. Built REST APIs for query expansion and ranking using semantic embeddings (GloVe/Word2Vec), synonym augmentation, NER, and query ranking; containerized components with Docker. Also developed a sentiment/skill-mining tool using techniques like TF-IDF, topic modeling, clustering, and standard classifiers.
 Image: /assets/fidelity_chatbot.png | Enterprise Chatbot | Illustrative diagram only; does not reflect actual implementation.
 Skills: python, nlp, docker, java, sql
+Visual: chatbot
 Type: work
 
 ## Executive Graduate Trainee
@@ -74,6 +81,7 @@ DateRange: June 2015 - July 2016
 Description: Analytics, KPI reporting, and Tableau-based dashboards for distributed teams.
 ExpandedContent: Managed reporting and analytics for a cross-geo team, consolidated KPIs across multiple datasets/schemas, built interactive Tableau dashboards, partnered with leadership on KPI definitions, and handled Tableau access administration.
 Skills: sql, tableau, analytics
+Visual: kpi-dashboard
 Type: work
 
 ## Summer Research Intern (Computer Vision)
@@ -82,6 +90,7 @@ DateRange: May 2014 - July 2014
 Description: Classical CV feature extraction + supervised learning for offline OCR (Dr. Rathna G. N.).
 ExpandedContent: Compared feature extraction methods (e.g., PCA, LBP) and supervised learning approaches (e.g., k-NN, one-vs-all SVM), and built MATLAB tooling (including a GUI) to support experiments and visualization.
 Skills: computer-vision, matlab
+Visual: ocr-features
 Type: research
 
 
@@ -132,46 +141,54 @@ Before this, I worked on large-scale AutoML for time-series forecasting, helping
 
 ## Selected Publications
 
-### Mouse Cursor Detection and Tracking in Instructional Videos
-**Nataraj, N., Zhou, C., & Yuan, J.** (2019). *Technical Report, University at Buffalo*. [Submitted to WACV 2019]
-
-[📄 Download PDF](/assets/papers/cursor_tracking.pdf)
-
-![Cursor Detection and Tracking](/assets/cursor_tracking.png)
-
-**Abstract:** Many expert users of particular software, e.g. Adobe Photoshop regularly post instructional videos online, imparting knowledge on how to perform certain tasks. An important feature that can be used to understand the instructor's actions in an instructional video, is to detect and track the mouse cursor throughout the entirety of each video. Despite recent progress of object detection and tracking, identifying the mouse cursor in such videos is a unique and difficult problem since the mouse cursor typically occupies a very small percentage of the entire frame (0.05-1%), exhibits fast movement, and is prone to instant appearance changes and background clutter. We propose a novel three-step tracking-by-detection approach for mouse cursor detection and tracking: unsupervised cursor discovery, multi-scale template matching, and optimal spatiotemporal path search. Our approach is completely unsupervised and is able to handle instant appearance changes and fast movements of the mouse cursor. We present evaluations on a dataset of annotated Adobe Photoshop instructional videos, and show that our method beats conventional online tracking methods such as TLD, MIL and CSRT trackers by a large margin. For a more fair comparison, we also compare our results with Faster-RCNN, a deep learning based object detector, and show comparable success rates.
-
----
-
 ### Consensus Based Vertically Partitioned Multi-layer Perceptrons for Edge Computing
 **Dutta, H., Mahindre, S., & Nataraj, N.** (2021). *Proceedings of the 20th IEEE International Conference on Machine Learning and Applications (ICMLA)*.
 
-[📄 View Paper](https://link.springer.com/chapter/10.1007/978-3-030-88942-5_20)
+[Springer ↗](https://link.springer.com/chapter/10.1007/978-3-030-88942-5_20)
 
-![Consensus Based Vertically Partitioned MLPs](/assets/consensus_mlp_vertical.png)
+<PaperVisual name="consensus-mlp" />
 
-**Abstract:** Storing large volumes of data on distributed devices has become commonplace in recent years. Applications involving sensors capture data in different modalities including image, video, audio, GPS and others. Novel distributed algorithms are required to learn from this rich, multi-modal data. We present an algorithm for learning consensus based multi-layer perceptrons on resource-constrained devices. Assuming nodes (devices) in the distributed system are arranged in a graph and contain vertically partitioned data and labels, the goal is to learn a global function that minimizes the loss. Each node learns a feed-forward multi-layer perceptron and obtains a loss on data stored locally. It then gossips with a neighbor, chosen uniformly at random, and exchanges information about the loss. The updated loss is used to run a back propagation algorithm and adjust local weights appropriately. This method enables nodes to learn the global function without exchange of data in the network. Empirical results reveal that the consensus algorithm converges to the centralized model and has performance comparable to centralized multi-layer perceptrons and tree-based algorithms.
+<Abstract>
+Storing large volumes of data on distributed devices has become commonplace in recent years. Applications involving sensors capture data in different modalities including image, video, audio, GPS and others. Novel distributed algorithms are required to learn from this rich, multi-modal data. We present an algorithm for learning consensus based multi-layer perceptrons on resource-constrained devices. Assuming nodes (devices) in the distributed system are arranged in a graph and contain vertically partitioned data and labels, the goal is to learn a global function that minimizes the loss. Each node learns a feed-forward multi-layer perceptron and obtains a loss on data stored locally. It then gossips with a neighbor, chosen uniformly at random, and exchanges information about the loss. The updated loss is used to run a back propagation algorithm and adjust local weights appropriately. This method enables nodes to learn the global function without exchange of data in the network. Empirical results reveal that the consensus algorithm converges to the centralized model and has performance comparable to centralized multi-layer perceptrons and tree-based algorithms.
+</Abstract>
 
 ---
 
 ### Consensus Based Multi-Layer Perceptrons for Edge Computing
 **Dutta, H., Nataraj, N., & Mahindre, S.** (2021). *arXiv preprint*.
 
-[📄 View on arXiv](https://arxiv.org/abs/2102.05021)
+[arXiv ↗](https://arxiv.org/abs/2102.05021)
 
-![Consensus Based MLPs for Edge Computing](/assets/consensus_mlp_edge.png)
+<PaperVisual name="consensus-mlp" />
 
-**Abstract:** In recent years, storing large volumes of data on distributed devices has become commonplace. Applications involving sensors capture data in different modalities including image, video, audio, GPS and others. Novel algorithms are required to learn from this rich distributed data. We present consensus based multi-layer perceptrons for resource-constrained devices. Assuming nodes (devices) in the distributed system are arranged in a graph and contain vertically partitioned data, the goal is to learn a global function that minimizes the loss. Each node learns a feed-forward multi-layer perceptron and obtains a loss on data stored locally. It then gossips with a neighbor, chosen uniformly at random, and exchanges information about the loss. The updated loss is used to run a back propagation algorithm and adjust weights appropriately. This method enables nodes to learn the global function without exchange of data in the network.
+<Abstract>
+In recent years, storing large volumes of data on distributed devices has become commonplace. Applications involving sensors capture data in different modalities including image, video, audio, GPS and others. Novel algorithms are required to learn from this rich distributed data. We present consensus based multi-layer perceptrons for resource-constrained devices. Assuming nodes (devices) in the distributed system are arranged in a graph and contain vertically partitioned data, the goal is to learn a global function that minimizes the loss. Each node learns a feed-forward multi-layer perceptron and obtains a loss on data stored locally. It then gossips with a neighbor, chosen uniformly at random, and exchanges information about the loss. The updated loss is used to run a back propagation algorithm and adjust weights appropriately. This method enables nodes to learn the global function without exchange of data in the network.
+</Abstract>
+
+---
+
+### Mouse Cursor Detection and Tracking in Instructional Videos
+**Nataraj, N., Zhou, C., & Yuan, J.** (2019). *Technical Report, University at Buffalo*. [Submitted to WACV 2019]
+
+[PDF ↗](/assets/papers/cursor_tracking.pdf)
+
+<PaperVisual name="cursor-tracking" />
+
+<Abstract>
+Many expert users of particular software, e.g. Adobe Photoshop regularly post instructional videos online, imparting knowledge on how to perform certain tasks. An important feature that can be used to understand the instructor's actions in an instructional video, is to detect and track the mouse cursor throughout the entirety of each video. Despite recent progress of object detection and tracking, identifying the mouse cursor in such videos is a unique and difficult problem since the mouse cursor typically occupies a very small percentage of the entire frame (0.05-1%), exhibits fast movement, and is prone to instant appearance changes and background clutter. We propose a novel three-step tracking-by-detection approach for mouse cursor detection and tracking: unsupervised cursor discovery, multi-scale template matching, and optimal spatiotemporal path search. Our approach is completely unsupervised and is able to handle instant appearance changes and fast movements of the mouse cursor. We present evaluations on a dataset of annotated Adobe Photoshop instructional videos, and show that our method beats conventional online tracking methods such as TLD, MIL and CSRT trackers by a large margin. For a more fair comparison, we also compare our results with Faster-RCNN, a deep learning based object detector, and show comparable success rates.
+</Abstract>
 
 ---
 
 ### GADGET SVM: A Gossip-bAseD sub-GradiEnT Solver for Linear SVMs
 **Dutta, H., & Nataraj, N.** (2018). *arXiv preprint*.
 
-[📄 View on arXiv](https://arxiv.org/abs/1812.02261)
+[arXiv ↗](https://arxiv.org/abs/1812.02261)
 
-![Federated Learning System](/assets/federated_learning.png)
+<PaperVisual name="gossip-svm" />
 
-**Abstract:** In the era of big data, an important weapon in a machine learning researcher's arsenal is a scalable Support Vector Machine (SVM) algorithm. SVMs are extensively used for solving classification problems. Traditional algorithms for learning SVMs often scale super linearly with training set size which becomes infeasible very quickly for large data sets. In recent years, scalable algorithms have been designed which study the primal or dual formulations of the problem. This often suggests a way to decompose the problem and facilitate development of distributed algorithms. We present a distributed algorithm for learning linear Support Vector Machines in the primal form for binary classification called Gossip-bAseD sub-GradiEnT (GADGET) SVM. The algorithm is designed such that it can be executed locally on nodes of a distributed system. Each node processes its local homogeneously partitioned data and learns a primal SVM model. It then gossips with random neighbors about the classifier learnt and uses this information to update the model. Extensive theoretical and empirical results suggest that this anytime algorithm has performance comparable to its centralized and online counterparts.
+<Abstract>
+In the era of big data, an important weapon in a machine learning researcher's arsenal is a scalable Support Vector Machine (SVM) algorithm. SVMs are extensively used for solving classification problems. Traditional algorithms for learning SVMs often scale super linearly with training set size which becomes infeasible very quickly for large data sets. In recent years, scalable algorithms have been designed which study the primal or dual formulations of the problem. This often suggests a way to decompose the problem and facilitate development of distributed algorithms. We present a distributed algorithm for learning linear Support Vector Machines in the primal form for binary classification called Gossip-bAseD sub-GradiEnT (GADGET) SVM. The algorithm is designed such that it can be executed locally on nodes of a distributed system. Each node processes its local homogeneously partitioned data and learns a primal SVM model. It then gossips with random neighbors about the classifier learnt and uses this information to update the model. Extensive theoretical and empirical results suggest that this anytime algorithm has performance comparable to its centralized and online counterparts.
+</Abstract>
 
 ---

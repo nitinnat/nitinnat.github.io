@@ -47,39 +47,40 @@
   --radius-4xl: calc(var(--radius) + 16px);
 }
 
+/* claim: 2026-11-15-editorial-foundation */
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --background: oklch(0.955 0.018 88);
+  --foreground: oklch(0.25 0.02 145);
+  --card: oklch(0.975 0.012 88);
+  --card-foreground: var(--foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.3 0.03 145);
+  --primary-foreground: oklch(0.98 0.01 88);
+  --secondary: oklch(0.91 0.02 88);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.91 0.02 88);
+  --muted-foreground: oklch(0.48 0.025 145);
+  --accent: oklch(0.91 0.02 88);
+  --accent-foreground: var(--foreground);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: oklch(0.35 0.02 145 / 24%);
+  --input: var(--border);
+  --ring: oklch(0.48 0.025 145);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: var(--card);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
 }
 
 .dark {
@@ -163,4 +164,50 @@
 /* Mermaid diagram container */
 .mermaid-container {
   @apply my-6 flex justify-center;
+}
+
+.technical-grid {
+  background-image:
+    linear-gradient(rgb(8 145 178 / 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(8 145 178 / 0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.dark .technical-grid {
+  background-image:
+    linear-gradient(rgb(103 232 249 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(103 232 249 / 0.05) 1px, transparent 1px);
+}
+
+.viz {
+  color: var(--foreground);
+}
+
+.viz-a {
+  color: var(--color-cyan-700);
+}
+
+.viz-b {
+  color: var(--color-emerald-600);
+}
+
+.dark .viz-a {
+  color: var(--color-cyan-300);
+}
+
+.dark .viz-b {
+  color: var(--color-emerald-300);
+}
+
+.viz-surface {
+  fill: var(--card);
+}
+
+.viz-surface-stroke {
+  stroke: var(--card);
+}
+
+.viz-text {
+  fill: currentColor;
+  letter-spacing: 0.04em;
 }

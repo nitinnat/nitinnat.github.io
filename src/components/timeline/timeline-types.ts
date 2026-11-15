@@ -1,3 +1,5 @@
+import type { VisualName } from "@/components/visuals/project-visual";
+
 export interface TimelineEntry {
   id: string;
   title: string;
@@ -15,6 +17,7 @@ export interface TimelineEntry {
     label: string;
   };
   skills?: string[]; // Skill IDs to display as badges
+  visual?: VisualName;
   backgroundImage?: string; // Background image for education entries on hover
   type: "work" | "education" | "research";
 }

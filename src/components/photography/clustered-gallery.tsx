@@ -1,11 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { motion, useReducedMotion } from "framer-motion";
 import type { PositionedCluster } from "@/lib/photo-positioning";
 import { MapPin, Calendar } from "lucide-react";
 import { PhotoLightbox } from "./photo-lightbox";
-import type { Slide } from "yet-another-react-lightbox";
 import type { PhotoItem } from "./photo-gallery";
 
 interface ClusteredGalleryProps {
@@ -13,7 +11,6 @@ interface ClusteredGalleryProps {
 }
 
 export function ClusteredGallery({ clusters }: ClusteredGalleryProps) {
-  const reduceMotion = useReducedMotion();
   const [selectedLocation, setSelectedLocation] = useState<string>("all");
   const [lightboxPhotos, setLightboxPhotos] = useState<PhotoItem[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState(-1);
@@ -51,11 +48,12 @@ export function ClusteredGallery({ clusters }: ClusteredGalleryProps) {
       {/* Filter Bar */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm text-muted-foreground mr-2">Filter:</span>
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <span className="mr-2 shrink-0 text-sm text-muted-foreground">Filter:</span>
             <button
               onClick={() => setSelectedLocation("all")}
-              className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
+              aria-pressed={selectedLocation === "all"}
+              className={`min-h-11 shrink-0 rounded-full px-4 py-2 text-sm transition-colors ${
                 selectedLocation === "all"
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted hover:bg-muted/80"
@@ -67,7 +65,8 @@ export function ClusteredGallery({ clusters }: ClusteredGalleryProps) {
               <button
                 key={location}
                 onClick={() => setSelectedLocation(location)}
-                className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
+                aria-pressed={selectedLocation === location}
+                className={`min-h-11 shrink-0 rounded-full px-4 py-2 text-sm transition-colors ${
                   selectedLocation === location
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted hover:bg-muted/80"
@@ -82,13 +81,9 @@ export function ClusteredGallery({ clusters }: ClusteredGalleryProps) {
 
       {/* Clustered Sections */}
       <div className="container mx-auto px-4 py-8 space-y-16">
-        {filteredClusters.map((cluster, clusterIndex) => (
-          <motion.section
+        {filteredClusters.map((cluster) => (
+          <section
             key={cluster.id}
-            initial={reduceMotion ? {} : { opacity: 0, y: 20 }}
-            whileInView={reduceMotion ? {} : { opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.5, delay: clusterIndex * 0.1 }}
           >
             {/* Section Header */}
             <div className="mb-6">
@@ -119,16 +114,11 @@ export function ClusteredGallery({ clusters }: ClusteredGalleryProps) {
                 if (!src) return null;
 
                 return (
-                  <motion.button
+                  <button
                     key={photo.id}
                     type="button"
                     onClick={() => openLightbox(cluster, photoIndex)}
                     className="relative mb-4 w-full break-inside-avoid group cursor-pointer"
-                    initial={reduceMotion ? {} : { opacity: 0, scale: 0.95 }}
-                    whileInView={reduceMotion ? {} : { opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.3, delay: photoIndex * 0.05 }}
-                    whileHover={reduceMotion ? {} : { scale: 1.02 }}
                   >
                     <div className="relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow">
                       <img
@@ -159,11 +149,11 @@ export function ClusteredGallery({ clusters }: ClusteredGalleryProps) {
                         </div>
                       )}
                     </div>
-                  </motion.button>
+                  </button>
                 );
               })}
             </div>
-          </motion.section>
+          </section>
         ))}
       </div>
 

@@ -5,59 +5,36 @@ export default function BlogPage() {
   const posts = getAllPosts();
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-3xl">
-      <div className="space-y-8">
-        <h1 className="text-3xl font-bold text-foreground">Recent Posts</h1>
+    <div className="min-h-screen bg-background text-foreground">
+      <div className="mx-auto max-w-6xl px-5 py-16 md:px-10 md:py-24">
+        <header className="grid gap-8 border-b border-border pb-14 md:grid-cols-[1.2fr_.8fr] md:items-end md:pb-20">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">Field notes on building</p>
+            <h1 className="mt-5 max-w-4xl font-serif text-6xl leading-[0.95] tracking-[-0.04em] sm:text-7xl md:text-8xl">Writing</h1>
+          </div>
+          <p className="font-serif text-xl leading-relaxed text-muted-foreground">
+            Practical essays on production AI, software architecture, and the workflows that make complex systems easier to operate.
+          </p>
+        </header>
 
         {posts.length === 0 ? (
-          <div className="text-muted-foreground space-y-4">
-            <p>No posts yet.</p>
-            <p className="text-sm">
-              Create your first post by adding an MDX file to{" "}
-              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-                content/posts/
-              </code>
-            </p>
-            <div className="bg-muted p-4 rounded-lg text-sm">
-              <p className="font-medium mb-2">Example front matter:</p>
-              <pre className="text-xs">
-                {`---
-title: "My First Post"
-date: 2025-01-01
-description: "A brief description"
----
-
-Your content here...`}
-              </pre>
-            </div>
-          </div>
+          <p className="py-16 text-muted-foreground">No posts yet.</p>
         ) : (
-          <ul className="space-y-6">
-            {posts.map((post) => (
-              <li
+          <div className="grid border-t border-border md:grid-cols-2">
+            {posts.map((post, index) => (
+              <Link
                 key={post.meta.slug}
-                className="border-b border-border pb-6 last:border-0"
+                href={`/posts/${post.meta.slug}`}
+                className="group border-b border-border py-9 md:border-r md:px-9 md:odd:pl-0 md:even:border-r-0"
               >
-                <Link href={`/posts/${post.meta.slug}`} className="block group">
-                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
-                    {post.meta.title}
-                  </h2>
-                  <time className="text-sm text-muted-foreground">
-                    {new Date(post.meta.date).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </time>
-                  {post.meta.description && (
-                    <p className="mt-2 text-muted-foreground">
-                      {post.meta.description}
-                    </p>
-                  )}
-                </Link>
-              </li>
+                <p className="font-mono text-xs text-muted-foreground">
+                  {String(index + 1).padStart(2, "0")} · {new Date(post.meta.date).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+                </p>
+                <h2 className="mt-5 font-serif text-3xl leading-tight tracking-tight group-hover:underline group-hover:underline-offset-4">{post.meta.title}</h2>
+                {post.meta.description && <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-muted-foreground">{post.meta.description}</p>}
+              </Link>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </div>
