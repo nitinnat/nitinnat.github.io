@@ -211,3 +211,11 @@
   fill: currentColor;
   letter-spacing: 0.04em;
 }
+
+.viz-muted {
+  color: var(--muted-foreground);
+}
+
+.dark .viz-text {
+  font-weight: 500;
+}

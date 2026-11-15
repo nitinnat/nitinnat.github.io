@@ -103,7 +103,7 @@ export function TimelineEntryCard({ entry, index, variant = "work" }: TimelineEn
         )}
 
         {entry.visual ? (
-          <ProjectVisual name={entry.visual} className="relative z-10 m-3 mb-0 md:mb-3 md:mr-0 md:w-56 md:flex-shrink-0" />
+          <ProjectVisual name={entry.visual} className="relative z-10 m-3 mb-0 md:mb-3 md:mr-0 md:w-64 md:flex-shrink-0" />
         ) : entry.image && (
           <figure className="md:flex md:flex-col md:w-56 md:flex-shrink-0 relative z-10">
             <img

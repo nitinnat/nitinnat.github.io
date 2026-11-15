@@ -717,3 +717,9 @@ Load Photos → Load Metadata → Merge Metadata with Photos
 - Fix: hover photos are requested on first `pointerenter`; nothing on About besides fonts and JS gates `load` now. Verified: 0 photo requests at load, request on hover, visuals' clock running.
 - Dark mode is now the default theme (`defaultTheme="dark"`); stored preferences still win.
 - Follow-up (not in this PR): the homepage hero is a 3 MB PNG (`/assets/photos/001.png`), also preloaded when the homepage route is prefetched.
+
+## 2026-11-15: Dark-mode Legibility and Theme Toggle
+
+- Visual labels were dimmed with fixed opacity (0.5–0.7) and rendered ~7.5px on screen; in dark mode they read as faint grey on near-black. Labels now use a theme-aware `.viz-muted` (`--muted-foreground`), base label size is 9 (small labels 7, loss readouts 6.5), dark-mode label weight is 500, and card thumbnails are `md:w-64`. "jobs healthy" shortened to "healthy" to fit.
+- Theme toggle: icon derived from the `dark` class via CSS (Sun in dark, Moon in light) and clicks use `resolvedTheme`. The old code keyed off `theme`, which is `"system"` for visitors with that stored value, showing a Moon while dark; it also had a setState-in-effect mount check (lint error) that is now gone.
+- Dev environment gotcha: `npm run build` writes into the same `.next` as the dev server and leaves its Turbopack CSS cache stale (served CSS predates later `globals.css` edits). After a local production build, run `docker exec <dev> rm -rf /app/.next/dev` and restart the dev container.

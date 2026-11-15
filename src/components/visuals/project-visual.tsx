@@ -51,7 +51,7 @@ export function ProjectVisual({ name, className }: { name: VisualName; className
 
   return (
     <figure className={cn("viz technical-grid m-0 overflow-hidden rounded-md border border-border/70 bg-card", className)}>
-      <svg ref={svgRef} viewBox="0 0 240 150" role="img" aria-label={label} fontSize={8} className="block h-auto w-full font-mono">
+      <svg ref={svgRef} viewBox="0 0 240 150" role="img" aria-label={label} fontSize={9} className="block h-auto w-full font-mono">
         <Cycle.Provider value={cycle}>
           <Scene />
         </Cycle.Provider>
