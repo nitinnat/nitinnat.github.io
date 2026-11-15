@@ -6,6 +6,7 @@ import type { PhotoItem } from "@/components/photography/photo-gallery";
 export interface GeoPhoto {
   id: string;
   src: string;
+  thumb: string;
   alt: string;
   lat: number;
   lng: number;
@@ -54,26 +55,44 @@ function folderName(src: string) {
   return folder.replace(/^\d+_/, "").replace(/([a-z])([A-Z])/g, "$1 $2");
 }
 
-async function readGeo(photo: PhotoItem): Promise<GeoPhoto | null> {
+type GeoReading = Omit<GeoPhoto, "lat" | "lng"> & { lat?: number; lng?: number };
+
+async function readGeo(photo: PhotoItem): Promise<GeoReading | null> {
   const src = photo.full ?? photo.thumb;
-  if (!src?.startsWith("/assets/photos/")) return null;
-  const file = path.join(PHOTO_ROOT, decodeURI(src).slice("/assets/photos/".length));
-  const header = await readHeader(file).catch(() => null);
+  if (!photo.source || !src) return null;
+  const header = await readHeader(path.join(PHOTO_ROOT, photo.source)).catch(() => null);
   if (!header) return null;
   const [gps, exif] = await Promise.all([
     exifr.gps(header).catch(() => undefined),
     exifr.parse(header, ["DateTimeOriginal"]).catch(() => undefined),
   ]);
-  if (typeof gps?.latitude !== "number" || typeof gps?.longitude !== "number") return null;
+  const hasGps = typeof gps?.latitude === "number" && typeof gps?.longitude === "number";
   return {
     id: photo.id,
     src,
+    thumb: photo.thumb ?? src,
     alt: photo.alt ?? "Landscape photograph",
-    lat: round(gps.latitude),
-    lng: round(gps.longitude),
+    lat: hasGps ? round(gps.latitude) : undefined,
+    lng: hasGps ? round(gps.longitude) : undefined,
     takenAt: exif?.DateTimeOriginal instanceof Date ? exif.DateTimeOriginal.toISOString() : null,
     location: photo.location,
   };
+}
+
+// Photos without GPS take the mean position of geotagged photos sharing their location tag.
+function placeByLocation(readings: GeoReading[]): GeoPhoto[] {
+  const tagged = new Map<string, GeoPhoto[]>();
+  const located = readings.filter((r): r is GeoPhoto => r.lat !== undefined && r.lng !== undefined);
+  located.forEach((photo) => {
+    if (photo.location) tagged.set(photo.location, [...(tagged.get(photo.location) ?? []), photo]);
+  });
+  const inferred = readings.flatMap((reading) => {
+    const peers = reading.lat === undefined && reading.location ? tagged.get(reading.location) : undefined;
+    if (!peers) return [];
+    const mean = (key: "lat" | "lng") => round(peers.reduce((sum, p) => sum + p[key], 0) / peers.length);
+    return [{ ...reading, lat: mean("lat"), lng: mean("lng") }];
+  });
+  return [...located, ...inferred];
 }
 
 function mostCommon(values: string[]) {
@@ -84,9 +103,8 @@ function mostCommon(values: string[]) {
 
 // Groups geotagged photos into places (within PLACE_RADIUS_KM), ordered by when they were taken.
 export async function buildPlaces(photos: PhotoItem[]): Promise<Place[]> {
-  const geo = (await Promise.all(photos.map(readGeo)))
-    .filter((photo) => photo !== null)
-    .sort((a, b) => (a.takenAt ?? "").localeCompare(b.takenAt ?? ""));
+  const readings = (await Promise.all(photos.map(readGeo))).filter((photo) => photo !== null);
+  const geo = placeByLocation(readings).sort((a, b) => (a.takenAt ?? "").localeCompare(b.takenAt ?? ""));
 
   const places: Place[] = [];
   for (const photo of geo) {

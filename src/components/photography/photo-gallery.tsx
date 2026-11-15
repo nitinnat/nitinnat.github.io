@@ -36,6 +36,8 @@ export interface PhotoItem {
   id: string;
   thumb?: string;
   full?: string;
+  // Path under content/assets/photos, used to read EXIF from the original at build time.
+  source?: string;
   width?: number;
   height?: number;
   alt?: string;

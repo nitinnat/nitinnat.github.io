@@ -3,6 +3,8 @@ const path = require("path");
 
 const sourceDir = path.join(process.cwd(), "content/assets");
 const targetDir = path.join(process.cwd(), "public/assets");
+// Photos are published by optimize-photos.js.
+const photosDir = path.join(sourceDir, "photos");
 
 function copyRecursive(src, dest) {
   if (!fs.existsSync(src)) {
@@ -19,6 +21,7 @@ function copyRecursive(src, dest) {
   for (const entry of entries) {
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
+    if (srcPath === photosDir) continue;
 
     if (entry.isDirectory()) {
       copyRecursive(srcPath, destPath);
@@ -29,4 +32,4 @@ function copyRecursive(src, dest) {
 }
 
 copyRecursive(sourceDir, targetDir);
-console.log("Assets copied successfully from content/assets to public/assets");
+console.log("Assets (except photos) copied successfully from content/assets to public/assets");

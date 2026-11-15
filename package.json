@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/generate-timeline.js && node scripts/generate-skills.js && node scripts/convert-heic.js && node scripts/copy-assets.js",
-    "build": "npm run prebuild && node scripts/build-with-admin-exclusion.js",
+    "prebuild": "node scripts/generate-timeline.js && node scripts/generate-skills.js && node scripts/convert-heic.js && node scripts/copy-assets.js && node scripts/optimize-photos.js",
+    "build": "node scripts/build-with-admin-exclusion.js",
     "start": "next start",
     "lint": "eslint",
     "sync-photos": "node scripts/auto-tag-photos.js"
@@ -37,6 +37,7 @@
     "react-dom": "19.2.3",
     "react-icons": "^5.5.0",
     "rehype-pretty-code": "^0.14.1",
+    "sharp": "^0.35.5",
     "shiki": "^3.20.0",
     "tailwind-merge": "^3.4.0",
     "topojson-client": "^3.1.0",

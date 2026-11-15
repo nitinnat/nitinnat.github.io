@@ -8,6 +8,7 @@ export async function POST() {
   try {
     const autoTagScriptPath = path.join(process.cwd(), "scripts/auto-tag-photos.js");
     const copyAssetsScriptPath = path.join(process.cwd(), "scripts/copy-assets.js");
+    const optimizePhotosScriptPath = path.join(process.cwd(), "scripts/optimize-photos.js");
 
     // Run auto-tag script
     const autoTagOutput = execSync(`node "${autoTagScriptPath}"`, {
@@ -16,7 +17,7 @@ export async function POST() {
     });
 
     // Copy assets to public folder for dev mode
-    const copyAssetsOutput = execSync(`node "${copyAssetsScriptPath}"`, {
+    const copyAssetsOutput = execSync(`node "${copyAssetsScriptPath}" && node "${optimizePhotosScriptPath}"`, {
       encoding: "utf8",
       cwd: process.cwd(),
     });

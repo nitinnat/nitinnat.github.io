@@ -9,6 +9,7 @@ import { ClusteredGallery } from "@/components/photography/clustered-gallery";
 import { PhotoMapSection } from "@/components/photography/map/photo-map-section";
 import { PhotoProtection } from "@/components/photography/photo-protection";
 import { buildPlaces } from "@/lib/photo-geo";
+import { photoUrls } from "@/lib/photo-assets";
 import {
   loadPhotoMetadata,
   mergeMetadataIntoPhotos,
@@ -81,11 +82,9 @@ function findHeroFromAssets(): PhotoItem | null {
 
   for (const entry of entries) {
     if (entry.isFile() && isImageFile(entry.name) && isHeroImage(entry.name)) {
-      const imageUrl = encodeURI(`/assets/photos/${entry.name}`);
       return {
         id: "hero-001",
-        full: imageUrl,
-        thumb: imageUrl,
+        ...photoUrls(entry.name),
         alt: buildAltText(null, entry.name),
       };
     }
@@ -99,12 +98,9 @@ function findHeroFromAssets(): PhotoItem | null {
 
       for (const file of files) {
         if (!isHeroImage(file.name)) continue;
-        const relativePath = `${entry.name}/${file.name}`;
-        const imageUrl = encodeURI(`/assets/photos/${relativePath}`);
         return {
           id: "hero-001",
-          full: imageUrl,
-          thumb: imageUrl,
+          ...photoUrls(`${entry.name}/${file.name}`),
           alt: buildAltText(entry.name, file.name),
           tags: [entry.name],
         };
@@ -146,12 +142,11 @@ export function getGalleryFromAssets(): PhotoItem[] {
         if (stats.size === 0) continue;
 
         const relativePath = `${folderName}/${file.name}`;
-        const imageUrl = encodeURI(`/assets/photos/${relativePath}`);
         const slug = toSlug(`${folderName}-${file.name}`);
         items.push({
           id: slug || `${folderName}-${file.name}`,
-          full: imageUrl,
-          thumb: imageUrl,
+          ...photoUrls(relativePath),
+          source: relativePath,
           alt: buildAltText(folderName, file.name),
           tags: [folderName],
         });
@@ -162,12 +157,11 @@ export function getGalleryFromAssets(): PhotoItem[] {
       const stats = fs.statSync(filePath);
       if (stats.size === 0) continue;
 
-      const imageUrl = encodeURI(`/assets/photos/${entry.name}`);
       const slug = toSlug(entry.name);
       items.push({
         id: slug || entry.name,
-        full: imageUrl,
-        thumb: imageUrl,
+        ...photoUrls(entry.name),
+        source: entry.name,
         alt: buildAltText(null, entry.name),
       });
     }
@@ -287,7 +281,7 @@ export default async function PhotographyPage() {
     heroByName?.thumb ||
     heroFallback?.full ||
     heroFallback?.thumb ||
-    "https://nitinnataraj.com/assets/photos/001.png";
+    "/assets/photos/001.jpg";
   const heroAltText =
     heroFromAssets?.alt || heroByName?.alt || heroFallback?.alt;
 
