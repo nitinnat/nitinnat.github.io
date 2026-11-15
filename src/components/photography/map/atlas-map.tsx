@@ -20,6 +20,7 @@ import {
   pathFor,
   placeDates,
   project,
+  projection,
   usePhotoLightbox,
   useHydrology,
   useTerrainBands,
@@ -41,8 +42,8 @@ type Bounds = [[number, number], [number, number]];
 type Point = { x: number; y: number };
 
 const EARTH_KM = 6371;
-// Beyond this, the "nearest" photos aren't meaningfully nearby, so none are suggested.
-const NEARBY_KM = 1000;
+// Photos are only suggested when this close to the point under the cursor.
+const NEARBY_KM = 100;
 const MAX_ZOOM = 48;
 const TOWN_ZOOM = 2;
 const MAX_ROAD_KM = 1500;
@@ -288,10 +289,11 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
       setBloom({ key: region.properties.name, anchor: project(largest(inside)), photos, caption: `${region.properties.name} · ${photos.length} photos` });
       return;
     }
-    const centre = geoCentroid(region);
-    const nearest = places.reduce((a, b) => (geoDistance(centre, [b.lng, b.lat]) < geoDistance(centre, [a.lng, a.lat]) ? b : a));
-    const km = Math.round(geoDistance(centre, [nearest.lng, nearest.lat]) * EARTH_KM);
     const box = containerRef.current!.getBoundingClientRect();
+    const [mapX, mapY] = settled.invert([(event.clientX - box.left) / pixel, (event.clientY - box.top) / pixel]);
+    const cursor = projection.invert?.([mapX, mapY]) ?? geoCentroid(region);
+    const nearest = places.reduce((a, b) => (geoDistance(cursor, [b.lng, b.lat]) < geoDistance(cursor, [a.lng, a.lat]) ? b : a));
+    const km = Math.round(geoDistance(cursor, [nearest.lng, nearest.lat]) * EARTH_KM);
     const nearby = km <= NEARBY_KM;
     setBloom({
       key: region.properties.name,
