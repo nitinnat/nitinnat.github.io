@@ -723,3 +723,18 @@ Load Photos → Load Metadata → Merge Metadata with Photos
 - Visual labels were dimmed with fixed opacity (0.5–0.7) and rendered ~7.5px on screen; in dark mode they read as faint grey on near-black. Labels now use a theme-aware `.viz-muted` (`--muted-foreground`), base label size is 9 (small labels 7, loss readouts 6.5), dark-mode label weight is 500, and card thumbnails are `md:w-64`. "jobs healthy" shortened to "healthy" to fit.
 - Theme toggle: icon derived from the `dark` class via CSS (Sun in dark, Moon in light) and clicks use `resolvedTheme`. The old code keyed off `theme`, which is `"system"` for visitors with that stored value, showing a Moon while dark; it also had a setState-in-effect mount check (lint error) that is now gone.
 - Dev environment gotcha: `npm run build` writes into the same `.next` as the dev server and leaves its Turbopack CSS cache stale (served CSS predates later `globals.css` edits). After a local production build, run `docker exec <dev> rm -rf /app/.next/dev` and restart the dev container.
+
+## 2026-11-15: Scroll Wayfinding and Transitions
+
+**Status:** Local branch `feature/scroll-motion-variants` (stacked on PR #30's branch); not pushed yet.
+
+- Previewed three directions from the scroll research (Wayfinding, Continuity, Narrative) behind a temporary dev-only switcher; the user picked pieces from each. The switcher and unused variants were removed.
+- Shipped (all gated on `@supports (animation-timeline: view())` and `prefers-reduced-motion: no-preference`; without support the page is today's static version):
+  - About: timeline connector fills via `view(block 49.5% 50%)` (a 1% band at viewport centre) and nodes fill as they cross it.
+  - About: "More" card morphs into its `<dialog>` and back via a same-document View Transition (`src/lib/view-transition.ts`); the shared `role-card` name is cleared after each transition so cards never collide.
+  - Writing: 2px reading-progress bar (`scroll(root)`) and a wide-screen "On this page" list (posts with 3+ `##` headings, parsed server-side) with the active section tracked by a rAF-throttled scroll listener.
+  - Photography: sticky trip headings under the filter bar; hero drifts/darkens and its title fades over the `exit` range.
+- Dropped after review: photo-to-lightbox morph (little perceived difference, needed to intercept the lightbox's close triggers) and the sticky "role stage" on About.
+- Gotchas: `overflow: hidden` makes an element a scroll container and silently deactivates a child's `view()` timeline (use `overflow: clip`); IntersectionObserver misses headings skipped by a jump scroll; rendering (and rAF) is suppressed during a View Transition's DOM update.
+- For local Photography previews, 2 photos per location were mirrored from the live site into git-ignored `content/assets/photos` and copied to `public/assets` (excluded via `.git/info/exclude`).
+- Verified: production build; Playwright checks for rail fill progress, dialog morph open/close with focus return, reading progress and active section, hero fade, sticky headings, normal lightbox, no page errors.

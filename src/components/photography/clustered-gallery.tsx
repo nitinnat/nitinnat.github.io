@@ -86,7 +86,7 @@ export function ClusteredGallery({ clusters }: ClusteredGalleryProps) {
             key={cluster.id}
           >
             {/* Section Header */}
-            <div className="mb-6">
+            <div className="cluster-header mb-6">
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
                 {cluster.name}
               </h2>

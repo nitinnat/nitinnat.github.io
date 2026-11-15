@@ -219,3 +219,113 @@
 .dark .viz-text {
   font-weight: 500;
 }
+
+/* Scroll-linked wayfinding and transitions. Hidden or static without support or with reduced motion. */
+.reading-progress,
+.timeline-line-fill {
+  display: none;
+}
+
+.cluster-header {
+  position: sticky;
+  top: 5rem;
+  z-index: 5;
+  margin-inline: -1rem;
+  padding: 0.75rem 1rem;
+  background: color-mix(in oklab, var(--background) 92%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reading-progress {
+      display: block;
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 60;
+      height: 2px;
+      background: var(--color-cyan-700);
+      transform-origin: left;
+      animation: grow-x linear both;
+      animation-timeline: scroll(root);
+    }
+
+    .timeline-line-fill {
+      display: block;
+      position: absolute;
+      inset: 0;
+      background: var(--color-cyan-700);
+      transform-origin: top;
+      animation: grow-y linear both;
+      /* A 1% band at the viewport centre: the fill tracks the reading line. */
+      animation-timeline: view(block 49.5% 50%);
+    }
+
+    .dark .reading-progress,
+    .dark .timeline-line-fill {
+      background: var(--color-cyan-300);
+    }
+
+    .timeline-node {
+      animation: timeline-node linear both;
+      animation-timeline: view(block 49.5% 50%);
+      animation-range: cover 0% cover 2%;
+    }
+
+    .photo-hero {
+      view-timeline: --hero block;
+    }
+
+    .hero-media {
+      animation: hero-drift linear both;
+      animation-timeline: --hero;
+      animation-range: exit 0% exit 100%;
+    }
+
+    .hero-shade {
+      animation: hero-shade linear both;
+      animation-timeline: --hero;
+      animation-range: exit 0% exit 100%;
+    }
+
+    .hero-copy {
+      animation: hero-copy linear both;
+      animation-timeline: --hero;
+      animation-range: exit 0% exit 60%;
+    }
+  }
+}
+
+@keyframes grow-x {
+  from { transform: scaleX(0); }
+}
+
+@keyframes grow-y {
+  from { transform: scaleY(0); }
+}
+
+@keyframes timeline-node {
+  to { transform: scale(2.3); }
+}
+
+@keyframes hero-drift {
+  to { transform: translateY(22%) scale(1.06); }
+}
+
+@keyframes hero-shade {
+  to { opacity: 0.65; }
+}
+
+@keyframes hero-copy {
+  to { opacity: 0; transform: translateY(-2rem); }
+}
+
+::view-transition-group(role-card) {
+  animation-duration: 320ms;
+  animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 200ms;
+}

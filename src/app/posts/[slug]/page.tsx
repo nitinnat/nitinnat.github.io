@@ -4,6 +4,21 @@ import { compileMDX } from "@/lib/mdx";
 import { Mermaid } from "@/components/mdx/mermaid";
 import { CodeBlock } from "@/components/mdx/code-block";
 import Link from "next/link";
+import { PostOutline } from "@/components/post-outline";
+
+function extractHeadings(markdown: string) {
+  return markdown
+    .replace(/```[\s\S]*?```/g, "")
+    .split("\n")
+    .filter((line) => line.startsWith("## "))
+    .map((line) =>
+      line
+        .slice(3)
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+        .replace(/[`*_]/g, "")
+        .trim(),
+    );
+}
 
 interface PostPageProps {
   params: Promise<{ slug: string }>;
@@ -39,6 +54,8 @@ export default async function PostPage({ params }: PostPageProps) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <div className="reading-progress" aria-hidden="true" />
+      <PostOutline headings={extractHeadings(post.content)} />
       <article className="prose prose-neutral mx-auto max-w-3xl px-5 py-12 prose-headings:font-serif prose-headings:tracking-tight dark:prose-invert md:px-8 md:py-20">
         <header className="mb-8 not-prose">
           <Link href="/blog" className="mb-10 inline-block font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-foreground">← Back to writing</Link>
