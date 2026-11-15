@@ -115,34 +115,47 @@ export function useHydrology() {
   return water;
 }
 
-export interface ClimateRegions {
-  deserts: string[];
-  isDesert: (x: number, y: number) => boolean;
-  isTundra: (x: number, y: number) => boolean;
+export type ClimateGroup = "D" | "S" | "P" | "T" | "V" | "M" | "B" | "N" | "I";
+
+export interface Climate {
+  climateAt: (lng: number, lat: number) => ClimateGroup | undefined;
+  tints: { group: ClimateGroup; d: string }[];
 }
 
-// Deserts and tundra from scripts/generate-climate-regions.js (Natural Earth): a smoothed outline
-// to paint, plus point tests in map coordinates for choosing which symbols belong where.
-export function useClimateRegions() {
-  const [regions, setRegions] = useState<ClimateRegions | null>(null);
+const isClimateGroup = (char: string): char is ClimateGroup => "DSPTVMBNI".includes(char);
+
+// Köppen–Geiger climate groups from scripts/generate-climate-grid.js: a lookup for choosing which
+// symbols belong where, plus smoothed outlines to tint the land. The 0.5° grid's coastline differs
+// from the map's, so a coastal point with no climate takes the nearest one within a cell or two.
+export function useClimate() {
+  const [climate, setClimate] = useState<Climate | null>(null);
 
   useEffect(() => {
     let active = true;
-    import("@/data/climate-regions.json").then(({ default: data }) => {
+    import("@/data/climate-grid.json").then(({ default: data }) => {
       if (!active) return;
-      // Regions overlap (the Sahara contains its ergs), so each polygon is kept separate: merging
-      // them under an even-odd fill would punch holes wherever two overlap.
-      const outlines = (polygons: number[][][][]) =>
-        polygons.map((rings) => rings.map((ring) => smoothRing(ring.map(toMap))).join(""));
-      const context = document.createElement("canvas").getContext("2d")!;
-      const contains = (paths: Path2D[], x: number, y: number) => paths.some((path) => context.isPointInPath(path, x, y, "evenodd"));
-      const deserts = outlines(data.deserts);
-      const desertPaths = deserts.map((d) => new Path2D(d));
-      const tundraPaths = outlines(data.tundra).map((d) => new Path2D(d));
-      setRegions({
-        deserts,
-        isDesert: (x, y) => contains(desertPaths, x, y),
-        isTundra: (x, y) => contains(tundraPaths, x, y),
+      const cells = data.rows.map((row) => row.replace(/(\D)(\d+)/g, (_, char: string, count: string) => char.repeat(Number(count))));
+      const cols = 360 / data.step;
+      const cell = (row: number, col: number) => cells[row]?.[(col + cols) % cols] ?? "";
+      const climateAt = (lng: number, lat: number) => {
+        const row = Math.floor((data.lat - lat) / data.step);
+        const col = Math.floor((lng - data.lng) / data.step);
+        for (let reach = 0; reach <= 2; reach += 1) {
+          for (let dr = -reach; dr <= reach; dr += 1) {
+            for (let dc = -reach; dc <= reach; dc += 1) {
+              const char = cell(row + dr, col + dc);
+              if (isClimateGroup(char)) return char;
+            }
+          }
+        }
+      };
+      setClimate({
+        climateAt,
+        tints: Object.entries(data.tints).flatMap(([group, rings]) =>
+          isClimateGroup(group)
+            ? [{ group, d: rings.map((ring) => smoothRing(Array.from({ length: ring.length / 2 }, (_, i) => toMap([ring[2 * i], ring[2 * i + 1]])))).join("") }]
+            : [],
+        ),
       });
     });
     return () => {
@@ -150,7 +163,7 @@ export function useClimateRegions() {
     };
   }, []);
 
-  return regions;
+  return climate;
 }
 
 const isGreenland = (ring: number[][]) => ring.every(([lng, lat]) => lat > 58 && lng > -75 && lng < -10);

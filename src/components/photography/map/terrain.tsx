@@ -202,6 +202,19 @@ export function Hill({ variant = 0 }: { variant?: number }) {
   );
 }
 
+export function DryHill({ seed = 0 }: { seed?: number }) {
+  return (
+    <g className="gm-dry">
+      <Hill variant={seed % 3} />
+    </g>
+  );
+}
+
+// Open grassland: mostly gentle hills, with the occasional small copse.
+export function Meadow({ seed = 0 }: { seed?: number }) {
+  return seed % 4 === 0 ? <Forest seed={seed} size={0.7} /> : <Hill variant={seed % 3} />;
+}
+
 const FOREST_SLOTS: Point[] = [[-9, -6], [1, -7], [10, -5], [-14, -1], [-4, -2], [6, -1], [14, 1], [-8, 3], [3, 4]];
 
 export function Forest({ seed = 0, size = 1 }: { seed?: number; size?: number }) {
@@ -301,6 +314,101 @@ export function Dunes({ seed = 0 }: { seed?: number }) {
     <g transform={`scale(${flip} 1)`}>
       {dune(-7, -2, 20, 7)}
       {dune(6, 1, 24, 8)}
+    </g>
+  );
+}
+
+const seeded = (seed: number, i: number, salt: number) => Math.sin((seed + 1) * 12.9898 + i * 78.233 + salt) * 0.5;
+
+function Palm({ x, y, lean }: { x: number; y: number; lean: number }) {
+  const [cx, cy] = [x + lean, y - 21];
+  return (
+    <g>
+      <path d={`M${x} ${y} Q${x + lean * 0.2} ${y - 11} ${cx} ${cy}`} fill="none" className="gm-trunk-stroke" strokeWidth={2.2} strokeLinecap="round" />
+      {[-160, -115, -65, -20, 30, 150].map((angle) => {
+        const rad = (angle * Math.PI) / 180;
+        const tx = cx + Math.cos(rad) * 9;
+        const ty = cy + Math.sin(rad) * 5 + 3;
+        const mx = (cx + tx) / 2;
+        const my = (cy + ty) / 2 - 2.5;
+        return (
+          <path
+            key={angle}
+            d={`M${cx} ${cy} Q${mx.toFixed(1)} ${(my - 2).toFixed(1)} ${tx.toFixed(1)} ${ty.toFixed(1)} Q${mx.toFixed(1)} ${(my + 1.8).toFixed(1)} ${cx} ${cy} Z`}
+            className="gm-tree gm-tree-edge"
+            strokeWidth={0.6}
+          />
+        );
+      })}
+    </g>
+  );
+}
+
+export function Jungle({ seed = 0 }: { seed?: number }) {
+  return (
+    <g className="gm-jungle">
+      <Palm x={seed % 2 ? 7 : -6} y={-3} lean={seed % 2 ? 3 : -3} />
+      <Forest seed={seed + 4} />
+    </g>
+  );
+}
+
+const ACACIA_SLOTS: Point[] = [[-9, -1], [7, -3], [1, 3]];
+
+export function Acacia({ seed = 0 }: { seed?: number }) {
+  const trees = ACACIA_SLOTS.slice(0, 1 + (seed % 3))
+    .map(([x, y], i) => ({ x: x + seeded(seed, i, 1) * 4, y, w: 8 + seeded(seed, i, 2) * 2, h: 9 + seeded(seed, i, 3) * 2 }))
+    .sort((a, b) => a.y - b.y);
+  return (
+    <g className="gm-acacia">
+      <ellipse cx={0} cy={2} rx={16} ry={4.5} className="gm-savanna-floor" />
+      {trees.map(({ x, y, w, h }) => (
+        <g key={x}>
+          <path d={`M${x} ${y} V${y - h * 0.55} L${x - w * 0.35} ${y - h} M${x} ${y - h * 0.55} L${x + w * 0.4} ${y - h}`} fill="none" className="gm-trunk-stroke" strokeWidth={1.3} strokeLinecap="round" />
+          <path d={`M${x - w} ${y - h + 1} Q${x - w * 0.9} ${y - h - 3.6} ${x} ${y - h - 3.8} Q${x + w * 0.9} ${y - h - 3.6} ${x + w} ${y - h + 1} Z`} className="gm-acacia-shade gm-tree-edge" strokeWidth={0.7} strokeLinejoin="round" />
+          <path d={`M${x - w * 0.82} ${y - h - 0.2} Q${x - w * 0.7} ${y - h - 3.4} ${x - w * 0.05} ${y - h - 3.5} Q${x + w * 0.5} ${y - h - 3.3} ${x + w * 0.55} ${y - h - 0.8} Z`} className="gm-acacia-lit" />
+        </g>
+      ))}
+    </g>
+  );
+}
+
+const PINE_SLOTS: Point[] = [[-8, -5], [2, -6], [10, -4], [-13, 0], [-3, -1], [7, 0], [-7, 4], [3, 4]];
+
+export function Pines({ seed = 0 }: { seed?: number }) {
+  const count = 4 + (seed % 4);
+  const trees = PINE_SLOTS.filter((_, i) => (i * 5 + seed * 3) % 8 < count)
+    .map(([x, y], i) => ({ x: x + seeded(seed, i, 1) * 2, y, h: 13 + seeded(seed, i, 2) * 5 }))
+    .sort((a, b) => a.y - b.y);
+  return (
+    <g className="gm-pines">
+      <ellipse cx={0} cy={2} rx={17} ry={5} className="gm-forest-floor" />
+      {trees.map(({ x, y, h }) => (
+        <g key={`${x}-${y}`}>
+          <rect x={x - 0.8} y={y - 2.5} width={1.6} height={2.5} className="gm-trunk" />
+          {[0, 1].map((tier) => {
+            const base = y - 2 - tier * h * 0.36;
+            const top = base - h * 0.62;
+            const half = 4.6 - tier * 1.2;
+            return (
+              <g key={tier}>
+                <path d={`M${x - half} ${base} L${x} ${top} L${x + half} ${base} Z`} className="gm-pine gm-pine-edge" strokeWidth={0.7} strokeLinejoin="round" />
+                <path d={`M${x} ${top} L${x + half} ${base} L${x + 0.6} ${base} Z`} className="gm-pine-shade" />
+              </g>
+            );
+          })}
+        </g>
+      ))}
+    </g>
+  );
+}
+
+export function Tufts({ seed = 0 }: { seed?: number }) {
+  return (
+    <g className="gm-tufts">
+      {[[-7, 0], [4, -2], [9, 2]].slice(0, 2 + (seed % 2)).map(([x, y]) => (
+        <path key={x} d={`M${x - 2.5} ${y - 3} Q${x - 1} ${y - 1} ${x} ${y} Q${x} ${y - 2.5} ${x + 0.4} ${y - 4.5} M${x} ${y} Q${x + 1} ${y - 1.5} ${x + 2.6} ${y - 3}`} fill="none" className="gm-tuft" strokeWidth={1.1} strokeLinecap="round" />
+      ))}
     </g>
   );
 }

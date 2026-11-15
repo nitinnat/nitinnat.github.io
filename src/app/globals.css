@@ -395,9 +395,17 @@
 .gm-lake { fill: #a6d3e4; }
 .gm-river-edge { stroke: #79b4cf; }
 .gm-river { stroke: #b5dcea; }
-/* Deserts: sandy wash, dunes, and red-brown rock instead of lavender ranges. */
-.gm-desert { fill: #ead39b; opacity: 0.85; }
-.gm-desert path { fill: inherit; }
+/* Köppen climate tints over the land; translucent so region hover tints still show through. */
+.gm-climate { opacity: 0.7; }
+.gm-climate-D { fill: #ecd59f; }
+.gm-climate-S { fill: #d3d395; }
+.gm-climate-P { fill: #c4d68f; }
+.gm-climate-V { fill: #c8d784; }
+.gm-climate-T { fill: #7fb865; }
+.gm-climate-B { fill: #9cc49a; }
+.gm-climate-N { fill: #bccab0; }
+.gm-climate-I { fill: #f4f6f4; opacity: 0.95; }
+/* Deserts: dunes, and red-brown rock instead of lavender ranges. */
 .gm-dune-lit { fill: #e8c987; }
 .gm-dune-shade { fill: #cfa868; }
 .gm-dune-edge { stroke: #b48a52; }
@@ -406,6 +414,23 @@
 .gm-arid .gm-mtn-shade { fill: #9e6143; }
 .gm-arid .gm-mtn-edge { stroke: #864f36; }
 .gm-arid .gm-mtn-highlight { stroke: #e7bb92; }
+/* Steppe hills, savanna acacias, jungle, boreal pines and tundra tufts. */
+.gm-dry .gm-hill-lit { fill: #d2cd8e; }
+.gm-dry .gm-hill-shade { fill: #b9b071; }
+.gm-dry .gm-hill-edge { stroke: #978f55; }
+.gm-dry .gm-hill-highlight { stroke: #ebe7b8; }
+.gm-trunk-stroke { stroke: #7a5a3a; }
+.gm-savanna-floor { fill: #9a8a3d; fill-opacity: 0.16; }
+.gm-acacia-shade { fill: #6f9443; }
+.gm-acacia-lit { fill: #97b85a; }
+.gm-jungle .gm-tree { fill: #3f8a43; }
+.gm-jungle .gm-tree-shade { fill: #2a6533; }
+.gm-jungle .gm-tree-light { fill: #6aae55; }
+.gm-jungle .gm-tree-edge { stroke: #1f4d27; }
+.gm-pine { fill: #4f8a52; }
+.gm-pine-shade { fill: #33663c; }
+.gm-pine-edge { stroke: #24502e; }
+.gm-tuft { stroke: #7f9670; }
 /* Elevation washes, lowland to alpine; translucent so region hover tints still show through. */
 .gm-band-0 { fill: #9fc574; opacity: 0.55; }
 .gm-band-1 { fill: #bccb83; opacity: 0.75; }

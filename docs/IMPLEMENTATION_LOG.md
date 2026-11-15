@@ -778,3 +778,31 @@ Load Photos → Load Metadata → Merge Metadata with Photos
   - The `.gm-ocean` fill on `<svg>` leaked into children; removed.
 - **Gotcha:** the Turbopack dev CSS cache went stale repeatedly after `globals.css` edits and after production builds. Fix: `docker exec kind_kowalevski rm -rf /app/.next/dev` and restart the container.
 - **Attribution to add before shipping:** Natural Earth (public domain, credit customary) and AWS Terrain Tiles (sources such as SRTM/ETOPO1 ask for attribution).
+
+## 2026-11-15: Köppen–Geiger Climate on the Atlas Map
+
+**Status:** Local on `feature/photo-map-variants`, not pushed.
+
+- **Why:** Natural Earth named-desert polygons left gaps, so forests grew in Australia's interior, the Sahel and the Central Asian steppe. Symbols and land tints now come from the Köppen–Geiger classification instead.
+- **Data:** Kottek, M., Grieser, J., Beck, C., Rudolf, B., and Rubel, F. (2006). World Map of the Köppen-Geiger climate classification updated. Meteorol. Z., 15, 259-263 (0.5° grid, 1951–2000). The source ASCII file is unzipped into git-excluded `.cache/koeppen/`.
+- **`scripts/generate-climate-grid.js`** writes `src/data/climate-grid.json` (~82 KB):
+  - Run-length-encoded 0.5° rows from 84°N to 60°S, one character per group: D desert, S steppe, P prairie, T tropical rainforest/monsoon, V savanna, M temperate/continental, B boreal, N tundra, I ice, `.` ocean.
+  - Precomputed tint outlines per group (d3-contour on a 3×3-blurred mask, Douglas–Peucker). Coastal cells are spread 3 cells into the sea first, then the map clips the tints to the coastline.
+- **Prairie (P):** Köppen has no grassland class. Northern Kazakhstan, the Ukrainian steppe, the Great Plains and the Pampas are Dfb, Dfa or Cfa, so they still grew forests. Temperate cells within 6 cells (3°) of a dry cell become prairie: mostly hills, with an occasional small copse.
+- **Client:** `useClimate()` in `map-shared.tsx` decodes the grid and exposes `climateAt(lng, lat)`. A coastal point with no climate takes the nearest group within 2 cells. It also returns projected and smoothed tint paths. The old `useClimateRegions`, `climate-regions.json`, its generator script and `isTreeless` are removed.
+- **Symbols** (classified once, in `climateAware`):
+  - D: dunes, red-rock peaks, no hills.
+  - S: dry hills (`DryHill`, `.gm-dry`).
+  - P: `Meadow`.
+  - V: sparse `Acacia`.
+  - T: `Jungle` (deeper greens plus a palm).
+  - M: forests.
+  - B: `Pines`.
+  - N: sparse `Tufts`.
+  - I: bare.
+  - Peaks keep the latitude snowline (never in D), and are always snowy in I.
+- **Tints:** `.gm-climate-*` at 70% opacity, under the elevation washes. The green lowland wash (`gm-band-0`) now sits under the tints, because it was greening Saharan plateaus.
+- **Verified:** Playwright counted symbols inside each zoomed country's path.
+  - No forests in Algeria, Niger, Chad, Saudi Arabia or Australia's interior.
+  - Jungle and acacias in Brazil, acacias in Kenya, pines in Canada and Siberia.
+  - No snow on Saharan peaks; snow in Nepal and Colorado.

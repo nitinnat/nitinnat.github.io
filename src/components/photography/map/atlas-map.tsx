@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type PointerEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { geoCentroid, geoContains, geoDistance } from "d3-geo";
 import { select } from "d3-selection";
@@ -22,13 +22,14 @@ import {
   project,
   projection,
   usePhotoLightbox,
-  useClimateRegions,
+  useClimate,
   useHydrology,
   useTerrainBands,
   useVisitedRegions,
   useWorldShapes,
+  type ClimateGroup,
 } from "./map-shared";
-import { Dunes, Forest, Hill, Mountain, Town, selectSpaced, usePeaks } from "./terrain";
+import { Acacia, DryHill, Dunes, Forest, Hill, Jungle, Meadow, Mountain, Pines, Town, Tufts, selectSpaced, usePeaks } from "./terrain";
 import { landmarks } from "./landmarks";
 
 interface Bloom {
@@ -54,10 +55,35 @@ const SOUTHERN_LIMIT_Y = project({ lat: -56, lng: 0 })[1];
 // Sampled peak elevations average ~10 km of terrain and read 15–25% low, hence the correction.
 const isSnowy = (lat: number, elevation: number) => elevation * 1.15 >= 5000 - 60 * Math.max(0, Math.abs(lat) - 15);
 
-// No forests beyond the Arctic treeline or on Greenland's ice.
-const isTreeless = ([lng, lat]: [number, number]) => lat > 66 || (lat > 59 && lng > -75 && lng < -10);
+const GROUND_ART = {
+  dunes: Dunes,
+  steppe: DryHill,
+  meadow: Meadow,
+  acacia: Acacia,
+  jungle: Jungle,
+  trees: Forest,
+  pines: Pines,
+  tufts: Tufts,
+};
 
-// Deterministic jitter so the scattered forests stay put between renders.
+function Ground({ kind, seed }: { kind: keyof typeof GROUND_ART; seed: number }) {
+  const Art = GROUND_ART[kind];
+  return <Art seed={seed} />;
+}
+
+// What grows on open ground in each climate, and on what share of it (the rest stays bare).
+const GROUND: Partial<Record<ClimateGroup, { kind: keyof typeof GROUND_ART; share: number }>> = {
+  D: { kind: "dunes", share: 1 },
+  S: { kind: "steppe", share: 0.5 },
+  P: { kind: "meadow", share: 0.45 },
+  V: { kind: "acacia", share: 0.5 },
+  T: { kind: "jungle", share: 1 },
+  M: { kind: "trees", share: 1 },
+  B: { kind: "pines", share: 1 },
+  N: { kind: "tufts", share: 0.35 },
+};
+
+// Deterministic jitter so the scattered terrain stays put between renders.
 const jitter = (a: number, b: number) => {
   const n = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453;
   return n - Math.floor(n);
@@ -68,7 +94,8 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
   const peaks = usePeaks();
   const bands = useTerrainBands();
   const water = useHydrology();
-  const climate = useClimateRegions();
+  const climate = useClimate();
+  const clipId = useId();
   const visited = useVisitedRegions(places, shapes);
   const lightbox = usePhotoLightbox();
 
@@ -210,8 +237,8 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
     };
   }, [peaks]);
 
-  // Forest spots: a jittered grid of map points that fall on land (native path hit-testing).
-  const forests = useMemo(() => {
+  // Ground spots: a jittered grid of map points that fall on land (native path hit-testing).
+  const groundSpots = useMemo(() => {
     if (!coastline) return [];
     const context = document.createElement("canvas").getContext("2d")!;
     const land = new Path2D(coastline);
@@ -220,8 +247,7 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
       for (let x = 0; x < MAP_WIDTH; x += 5) {
         const px = x + jitter(x, y) * 4;
         const py = y + jitter(y, x) * 4;
-        const lngLat = projection.invert?.([px, py]);
-        if (lngLat && !isTreeless(lngLat) && context.isPointInPath(land, px, py)) points.push({ id: points.length, x: px, y: py });
+        if (context.isPointInPath(land, px, py)) points.push({ id: points.length, x: px, y: py });
       }
     }
     return points.sort((a, b) => jitter(a.x, a.y) - jitter(b.x, b.y));
@@ -236,19 +262,31 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
     }));
 
   // Terrain keeps a constant on-screen spacing, so more of it appears as you zoom in.
-  // Climate decides what grows where: dunes instead of forests or green hills in deserts, no
-  // forests on tundra, red rock for desert ranges. Classified once, not on every zoom.
+  // Köppen climate decides what grows where: dunes in deserts, dry hills on the steppe, grassy
+  // prairie with the odd copse, acacias
+  // on the savanna, jungle, pines in the boreal north, tufts on tundra and bare ice. Classified
+  // once, not on every zoom.
   const climateAware = useMemo(() => {
-    const inDesert = (p: Point) => climate?.isDesert(p.x, p.y) ?? false;
-    const inTundra = (p: Point) => climate?.isTundra(p.x, p.y) ?? false;
-    return {
-      peaks: highPeaks.map((peak) => ({ ...peak, arid: inDesert(peak) })),
-      hills: lowPeaks.filter((peak) => !inDesert(peak)),
-      ground: forests
-        .filter((spot) => !inTundra(spot))
-        .map((spot) => ({ ...spot, kind: inDesert(spot) ? ("dunes" as const) : ("trees" as const) })),
+    if (!climate) return { peaks: [], hills: [], ground: [] };
+    const climateOf = ({ x, y }: Point) => {
+      const lngLat = projection.invert?.([x, y]);
+      return lngLat && climate.climateAt(...lngLat);
     };
-  }, [highPeaks, lowPeaks, forests, climate]);
+    return {
+      peaks: highPeaks.map((peak) => {
+        const group = climateOf(peak);
+        return { ...peak, arid: group === "D", snowy: group === "I" || (group !== "D" && isSnowy(peak.lat, peak.elevation)) };
+      }),
+      hills: lowPeaks.flatMap((peak) => {
+        const group = climateOf(peak);
+        return group === "D" || group === "I" ? [] : [{ ...peak, dry: group === "S" }];
+      }),
+      ground: groundSpots.map((spot) => {
+        const growth = GROUND[climateOf(spot) ?? "I"];
+        return { ...spot, kind: growth && jitter(spot.y, spot.x * 3) < growth.share ? growth.kind : null };
+      }),
+    };
+  }, [highPeaks, lowPeaks, groundSpots, climate]);
 
   const terrain = useMemo(() => {
     if (pixel === 0) return [];
@@ -262,9 +300,9 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
     const hills = close ? selectSpaced(climateAware.hills, bounds, spacing(40), [...occupied, ...mountains], 80) : [];
     const ground = close ? selectSpaced(climateAware.ground, bounds, spacing(32), [...occupied, ...mountains, ...hills], 110) : [];
     return [
-      ...mountains.map((peak) => ({ ...peak, kind: "mountain" as const, snowy: isSnowy(peak.lat, peak.elevation) })),
-      ...hills.map((peak) => ({ ...peak, kind: "hill" as const, snowy: false, arid: false })),
-      ...ground.map((spot) => ({ ...spot, elevation: 0, snowy: false, arid: false })),
+      ...mountains.map((peak) => ({ ...peak, kind: "mountain" as const })),
+      ...hills.map((peak) => ({ ...peak, kind: "hill" as const })),
+      ...ground.flatMap(({ kind, ...spot }) => (kind ? [{ ...spot, kind }] : [])),
     ].sort((a, b) => a.y - b.y);
   }, [climateAware, landmarkPoints, placePoints, settled, k, pixel]);
 
@@ -399,18 +437,23 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
             <path d={coastline} className="gm-lake pointer-events-none" />
             {shapes.countries.filter((c) => c.properties.name !== "United States of America").map((c) => region(c, visited.countries.has(c.properties.name), true))}
             {shapes.states.map((s) => region(s, visited.states.has(s.properties.name), k >= 3))}
-            <g className="pointer-events-none" aria-hidden="true">
-              {bands.map(({ level, d }, index) => (
-                <path key={level} d={d} fillRule="evenodd" className={`gm-band-${index}`} />
-              ))}
-            </g>
+            {/* The lowland wash is green, so it sits under the climate tints rather than greening deserts. */}
+            {bands[0] && <path d={bands[0].d} fillRule="evenodd" className="gm-band-0 pointer-events-none" aria-hidden="true" />}
             {climate && (
-              <g className="gm-desert pointer-events-none" aria-hidden="true">
-                {climate.deserts.map((d, index) => (
-                  <path key={index} d={d} fillRule="evenodd" />
+              <g className="gm-climate pointer-events-none" clipPath={`url(#${clipId})`} aria-hidden="true">
+                <clipPath id={clipId}>
+                  <path d={coastline} />
+                </clipPath>
+                {climate.tints.map(({ group, d }) => (
+                  <path key={group} d={d} fillRule="evenodd" className={`gm-climate-${group}`} />
                 ))}
               </g>
             )}
+            <g className="pointer-events-none" aria-hidden="true">
+              {bands.slice(1).map(({ level, d }, index) => (
+                <path key={level} d={d} fillRule="evenodd" className={`gm-band-${index + 1}`} />
+              ))}
+            </g>
             <g className="pointer-events-none" aria-hidden="true">
               <path d={water.lakes} fillRule="evenodd" className="gm-lake gm-foam" strokeWidth={1} vectorEffect="non-scaling-stroke" />
               {water.rivers
@@ -445,12 +488,10 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
                           <g className={item.arid ? "gm-arid" : undefined}>
                             <Mountain elevation={item.elevation} size={k >= TOWN_ZOOM ? 1 : 0.6} variant={item.id % 3} snowy={item.snowy} />
                           </g>
-                        ) : item.kind === "trees" ? (
-                          <Forest seed={item.id} />
-                        ) : item.kind === "dunes" ? (
-                          <Dunes seed={item.id} />
+                        ) : item.kind === "hill" ? (
+                          item.dry ? <DryHill seed={item.id} /> : <Hill variant={item.id % 3} />
                         ) : (
-                          <Hill variant={item.id % 3} />
+                          <Ground kind={item.kind} seed={item.id} />
                         )}
                       </g>
                     </g>
