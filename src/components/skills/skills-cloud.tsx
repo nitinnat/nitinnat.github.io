@@ -1,78 +1,8 @@
 "use client";
 
 import { skillsData, skillCategories } from "@/data/skills-data";
+import { skillIcons } from "./skill-icons";
 import { cn } from "@/lib/utils";
-
-// Import icons from react-icons
-import {
-  SiPython,
-  SiTypescript,
-  SiTensorflow,
-  SiOpencv,
-  SiApachespark,
-  SiGit,
-  SiDocker,
-  SiPostgresql,
-  SiMongodb,
-  SiRedis,
-  SiKubernetes,
-  SiLinux,
-  SiTableau,
-  SiHtml5,
-  SiCss3,
-} from "react-icons/si";
-
-import {
-  FaDatabase,
-  FaNetworkWired,
-  FaBrain,
-  FaCube,
-  FaCogs,
-  FaTerminal,
-  FaChartBar,
-} from "react-icons/fa";
-
-import { Code, Zap, BookOpen } from "lucide-react";
-
-const skillIconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  // Backend
-  python: SiPython,
-  sql: FaDatabase,
-  "c-": FaCogs,
-  java: FaDatabase,
-
-  // ML & GenAI
-  "llms-genai-systems": FaBrain,
-  "machine-learning": FaBrain,
-  "langchain-langgraph": FaNetworkWired,
-  "rag-and-vector-databases": FaNetworkWired,
-  "time-series-forecasting": FaChartBar,
-  "tensorflow-pytorch": SiTensorflow,
-  "computer-vision": SiOpencv,
-  nlp: BookOpen,
-
-  // Tools & Infra
-  pyspark: SiApachespark,
-  git: SiGit,
-  docker: SiDocker,
-  postgresql: SiPostgresql,
-  mongodb: SiMongodb,
-  redis: SiRedis,
-  kubernetes: SiKubernetes,
-  hadoop: FaCube,
-  databricks: FaCube,
-  splunk: FaNetworkWired,
-  "jupyter-jupyterhub": Code,
-  jenkins: FaCogs,
-  airflow: Zap,
-  linux: SiLinux,
-  tableau: SiTableau,
-
-  // Frontend
-  typescript: SiTypescript,
-  html: SiHtml5,
-  css: SiCss3,
-};
 
 const categoryColors: Record<string, { border: string; borderMuted: string; text: string; textMuted: string; bg: string }> = {
   frontend: { border: "border-l-blue-500", borderMuted: "border-l-slate-300", text: "text-blue-400", textMuted: "text-slate-400", bg: "hover:bg-blue-500/10" },
@@ -91,13 +21,13 @@ export function SkillsSection() {
       acc[skill.category].push(skill);
       return acc;
     },
-    {} as Record<string, typeof skillsData>
+    {} as Record<string, (typeof skillsData)[number][]>
   );
 
   return (
     <div className="space-y-8 my-12">
       <p className="mb-6 text-xs text-muted-foreground">
-        <span className="font-medium">Legend:</span> Skills marked with <span className="font-semibold">*</span> are skills I haven't actively worked with in a while.
+        <span className="font-medium">Legend:</span> Skills marked with <span className="font-semibold">*</span> are skills I haven&apos;t actively worked with in a while.
       </p>
       {Object.entries(groupedSkills).map(([category, skills]) => {
         const colors = categoryColors[category] || categoryColors.tools;
@@ -115,7 +45,7 @@ export function SkillsSection() {
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               {skills.map((skill) => {
-                const Icon = skillIconMap[skill.id] || FaCogs;
+                const Icon = skillIcons[skill.id];
                 const isHighProficiency = skill.proficiency >= 3;
                 const skillBorder = isHighProficiency ? colors.border : colors.borderMuted;
                 const skillText = isHighProficiency ? colors.text : colors.textMuted;

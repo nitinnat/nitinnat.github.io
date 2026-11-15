@@ -51,7 +51,7 @@ export function AutoMLForecast() {
     <>
       <path d="M16 20 V128 H226" fill="none" stroke="currentColor" strokeOpacity={0.25} />
       <path d="M140 24 V128" stroke="currentColor" strokeOpacity={0.25} strokeDasharray="2 3" />
-      <text x={140} y={20} textAnchor="middle" className="viz-text" opacity={0.6}>now</text>
+      <text x={140} y={20} textAnchor="middle" className="viz-text viz-muted">now</text>
       <Layer>
         <Draw d={history} at={[0.2, 2.2]} />
         {rejected.map((d) => (
@@ -67,8 +67,8 @@ export function AutoMLForecast() {
         </path>
         {models.map(({ name, width }, i) => (
           <g key={name}>
-            <text x={24} y={30 + i * 9} className="viz-text" opacity={0.7}>{name}</text>
-            <rect x={54} y={25 + i * 9} height={4} rx={1} width={0} className={i === 0 ? "viz-a" : undefined} fill="currentColor" fillOpacity={i === 0 ? 0.9 : 0.3}>
+            <text x={24} y={31 + i * 10} className="viz-text viz-muted">{name}</text>
+            <rect x={54} y={26 + i * 10} height={4} rx={1} width={0} className={i === 0 ? "viz-a" : undefined} fill="currentColor" fillOpacity={i === 0 ? 0.9 : 0.3}>
               <A attr="width" at={[2.6 + i * 0.08, 3.4 + i * 0.08]} values={[0, width]} />
             </rect>
           </g>
@@ -86,7 +86,7 @@ export function DataPlatform() {
   ];
   return (
     <>
-      <text x={34} y={22} textAnchor="middle" className="viz-text" opacity={0.6}>stores</text>
+      <text x={34} y={22} textAnchor="middle" className="viz-text viz-muted">stores</text>
       {Array.from({ length: 5 }, (_, col) => (
         <g key={col}>
           <A attr="opacity" at={[0.4 + col * 0.15, 0.7 + col * 0.15, 1.2 + col * 0.15, 3.4 + col * 0.15, 3.7 + col * 0.15, 4.2 + col * 0.15]} values={[0.35, 1, 0.35, 0.35, 1, 0.35]} />
@@ -96,7 +96,7 @@ export function DataPlatform() {
         </g>
       ))}
       <rect x={92} y={26} width={56} height={92} rx={4} fill="none" stroke="currentColor" strokeOpacity={0.3} />
-      <text x={120} y={22} textAnchor="middle" className="viz-text" opacity={0.6}>spark cluster</text>
+      <text x={120} y={22} textAnchor="middle" className="viz-text viz-muted">spark cluster</text>
       {nodeY.map((y, i) => (
         <g key={y} opacity={i < 3 ? 1 : 0}>
           {i >= 3 && <A attr="opacity" at={[2.8 + (i - 3) * 0.4, 3.3 + (i - 3) * 0.4, 7.2, 7.6]} values={[0, 1, 1, 0]} />}
@@ -111,7 +111,7 @@ export function DataPlatform() {
       </text>
       <path d="M148 56 H164" stroke="currentColor" strokeOpacity={0.25} strokeDasharray="2 3" />
       <Box x={164} y={26} w={64} h={60} />
-      <text x={170} y={36} className="viz-text" opacity={0.6}>monitor</text>
+      <text x={170} y={36} className="viz-text viz-muted">monitor</text>
       <Box x={164} y={94} w={64} h={24} hot={[[5, 7.2]]} hotClass="viz-b" />
       <Layer>
         {flows.map(([node, at]) => (
@@ -119,7 +119,7 @@ export function DataPlatform() {
         ))}
         <Draw d="M170 72 L178 66 L186 70 L194 52 L202 60 L210 48 L222 54" at={[1, 3]} className="viz-a" />
         <text x={196} y={108.5} textAnchor="middle" className="viz-text viz-b" opacity={0}>
-          jobs healthy
+          healthy
           <Show at={[5.1, 7]} />
         </text>
       </Layer>
@@ -133,7 +133,7 @@ export function Chatbot() {
     <>
       <rect x={12} y={14} width={118} height={122} rx={4} fill="none" stroke="currentColor" strokeOpacity={0.3} />
       <path d="M12 28 H130" stroke="currentColor" strokeOpacity={0.2} />
-      <text x={20} y={24} className="viz-text" opacity={0.6}>support chat</text>
+      <text x={20} y={24} className="viz-text viz-muted">support chat</text>
       {stages.map((label, i) => (
         <Box key={label} x={146} y={18 + i * 30} w={82} h={18} label={label} hot={[[0.9 + i * 0.5, 1.4 + i * 0.5]]} />
       ))}
@@ -180,7 +180,7 @@ export function KPIDashboard() {
       {tiles.map(({ label }, i) => (
         <g key={label}>
           <Box x={12 + i * 76} y={14} w={64} h={30} />
-          <text x={18 + i * 76} y={23} className="viz-text" opacity={0.6}>{label}</text>
+          <text x={18 + i * 76} y={23} className="viz-text viz-muted">{label}</text>
         </g>
       ))}
       <path d="M12 132 H140" stroke="currentColor" strokeOpacity={0.25} />

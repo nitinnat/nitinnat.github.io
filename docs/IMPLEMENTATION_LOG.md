@@ -698,3 +698,28 @@ Load Photos → Load Metadata → Merge Metadata with Photos
 - Abstracts collapse behind a native `<details>` "Read abstract" toggle (`Abstract` MDX component in the About page).
 - Fixed visual labels ignoring per-label `fontSize`: the default size moved from the `.viz-text` class to the `<svg>` attribute so element attributes take precedence.
 - Production build re-run in a throwaway Node 22 container: passed, all public routes static.
+
+## 2026-11-15: Skill ID Consistency
+
+- Root cause: three skill vocabularies had drifted — IDs generated from `content/skills.md`, timeline `Skills:` lines, and two hand-written icon maps. Unmatched timeline IDs were silently dropped (GenAI role showed 1 of 5), and the badge map fell back to a Python logo for any unknown ID (Java, Tableau, Hadoop, Databricks, Splunk, JupyterHub).
+- `generate-skills.js` now emits `skillsData` `as const` plus a `SkillId` union, and throws on malformed lines (`OpenLens - 3` had been silently skipped; fixed to `| 3`).
+- Single icon map `src/components/skills/skill-icons.ts` typed `Record<SkillId, IconType>`, shared by the Skills section and timeline badges; removed both old maps and the Python fallback.
+- `TimelineEntry.skills` is `SkillId[]`, so an unknown ID in `about.mdx` now fails type-check/build (verified with a probe).
+- Remapped timeline IDs to canonical ones. Dropped IDs with no entry in `skills.md`: FastAPI, agentic-ai, CI/CD, OpenCV (covered by Computer Vision), analytics, MATLAB. `distributed-systems` → Machine Learning; IISc gained Machine Learning (k-NN/SVM work).
+- Production build passes.
+
+## 2026-11-15: Visuals Frozen on First Visit; Dark Default
+
+**Status:** PR open on `fix/dark-default-smil-start` (PR #29 merged before the skill-ID commit landed, so that commit is cherry-picked here).
+
+- Symptom: on a first visit to the deployed About page the project visuals sat still until a tab switch.
+- Root cause: an inline SVG's SMIL clock starts at the window `load` event. Verified with a local harness: before `load`, `unpauseAnimations()`, `setCurrentTime()`, and re-inserting the SVG all leave the clock at 0. The education cards set their hover-only photos as inline `background-image`, so 1.45 MB (`buffalo_tagline.jpg` 1.27 MB) downloaded eagerly and held the load event; cold-cache `load` fired exactly when that photo finished.
+- Fix: hover photos are requested on first `pointerenter`; nothing on About besides fonts and JS gates `load` now. Verified: 0 photo requests at load, request on hover, visuals' clock running.
+- Dark mode is now the default theme (`defaultTheme="dark"`); stored preferences still win.
+- Follow-up (not in this PR): the homepage hero is a 3 MB PNG (`/assets/photos/001.png`), also preloaded when the homepage route is prefetched.
+
+## 2026-11-15: Dark-mode Legibility and Theme Toggle
+
+- Visual labels were dimmed with fixed opacity (0.5–0.7) and rendered ~7.5px on screen; in dark mode they read as faint grey on near-black. Labels now use a theme-aware `.viz-muted` (`--muted-foreground`), base label size is 9 (small labels 7, loss readouts 6.5), dark-mode label weight is 500, and card thumbnails are `md:w-64`. "jobs healthy" shortened to "healthy" to fit.
+- Theme toggle: icon derived from the `dark` class via CSS (Sun in dark, Moon in light) and clicks use `resolvedTheme`. The old code keyed off `theme`, which is `"system"` for visitors with that stored value, showing a Moon while dark; it also had a setState-in-effect mount check (lint error) that is now gone.
+- Dev environment gotcha: `npm run build` writes into the same `.next` as the dev server and leaves its Turbopack CSS cache stale (served CSS predates later `globals.css` edits). After a local production build, run `docker exec <dev> rm -rf /app/.next/dev` and restart the dev container.

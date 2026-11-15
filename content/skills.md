@@ -24,7 +24,7 @@
 - MongoDB | 4
 - Redis | 4
 - Kubernetes / ArgoCD | 3
-- OpenLens - 3
+- OpenLens | 3
 - Hadoop | 2
 - Databricks | 3
 - Splunk | 3

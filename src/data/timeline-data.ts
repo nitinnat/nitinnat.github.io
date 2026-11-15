@@ -13,7 +13,7 @@ export const professionalTimeline: TimelineEntry[] = [
       alt: "GenAI Agentic Workflow",
       caption: "Illustrative diagram only; does not reflect actual implementation.",
     },
-    skills: ["python", "fastapi", "llms", "rag-systems", "agentic-ai"],
+    skills: ["python", "llms-genai-systems", "rag-and-vector-databases"],
     visual: "genai-agent",
     type: "work"
   },
@@ -29,7 +29,7 @@ export const professionalTimeline: TimelineEntry[] = [
       alt: "AutoML Time Series Forecasting",
       caption: "Illustrative diagram only; does not reflect actual implementation.",
     },
-    skills: ["python", "tensorflow", "pyspark", "kubernetes", "time-series-forecasting"],
+    skills: ["python", "tensorflow-pytorch", "pyspark", "kubernetes-argocd", "time-series-forecasting"],
     visual: "automl-forecast",
     type: "work"
   },
@@ -40,7 +40,7 @@ export const professionalTimeline: TimelineEntry[] = [
     dateRange: "August 2019 - April 2022",
     description: "Worked on scalability, optimization, and monitoring for a large retail forecasting system deployed across 10,000 stores.",
     expandedContent: "Built and maintained big-data/ML platform pieces in a production environment: PySpark + Hadoop workflows, operational monitoring, and tooling that improved reliability and developer experience. Also developed REST APIs and CI/CD pipelines to support horizontal scaling of Hadoop cluster nodes, and integrated/customized JupyterHub (including plugins and Git integration) to improve the data science workflow.",
-    skills: ["python", "pyspark", "hadoop", "databricks", "splunk", "jupyterhub", "cicd"],
+    skills: ["python", "pyspark", "hadoop", "databricks", "splunk", "jupyter-jupyterhub"],
     visual: "data-platform",
     type: "work"
   },
@@ -56,7 +56,7 @@ export const professionalTimeline: TimelineEntry[] = [
       alt: "Cursor Tracking System",
       caption: "Illustrative diagram only; does not reflect actual implementation.",
     },
-    skills: ["python", "computer-vision", "opencv", "tensorflow"],
+    skills: ["python", "computer-vision", "tensorflow-pytorch"],
     visual: "cursor-tracking",
     type: "research"
   },
@@ -72,7 +72,7 @@ export const professionalTimeline: TimelineEntry[] = [
       alt: "Distributed Learning",
       caption: "Illustrative diagram only; does not reflect actual implementation.",
     },
-    skills: ["python", "java", "distributed-systems", "nlp"],
+    skills: ["python", "java", "machine-learning", "nlp"],
     visual: "gossip-svm",
     type: "research"
   },
@@ -115,7 +115,7 @@ export const professionalTimeline: TimelineEntry[] = [
     dateRange: "June 2015 - July 2016",
     description: "Analytics, KPI reporting, and Tableau-based dashboards for distributed teams.",
     expandedContent: "Managed reporting and analytics for a cross-geo team, consolidated KPIs across multiple datasets/schemas, built interactive Tableau dashboards, partnered with leadership on KPI definitions, and handled Tableau access administration.",
-    skills: ["sql", "tableau", "analytics"],
+    skills: ["sql", "tableau"],
     visual: "kpi-dashboard",
     type: "work"
   },
@@ -126,7 +126,7 @@ export const professionalTimeline: TimelineEntry[] = [
     dateRange: "May 2014 - July 2014",
     description: "Classical CV feature extraction + supervised learning for offline OCR (Dr. Rathna G. N.).",
     expandedContent: "Compared feature extraction methods (e.g., PCA, LBP) and supervised learning approaches (e.g., k-NN, one-vs-all SVM), and built MATLAB tooling (including a GUI) to support experiments and visualization.",
-    skills: ["computer-vision", "matlab"],
+    skills: ["computer-vision", "machine-learning"],
     visual: "ocr-features",
     type: "research"
   }

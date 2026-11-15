@@ -1,4 +1,5 @@
 import type { VisualName } from "@/components/visuals/project-visual";
+import type { SkillId } from "@/data/skills-data";
 
 export interface TimelineEntry {
   id: string;
@@ -16,7 +17,7 @@ export interface TimelineEntry {
     href: string;
     label: string;
   };
-  skills?: string[]; // Skill IDs to display as badges
+  skills?: SkillId[];
   visual?: VisualName;
   backgroundImage?: string; // Background image for education entries on hover
   type: "work" | "education" | "research";

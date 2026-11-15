@@ -25,7 +25,7 @@ export function CursorTracking() {
       {[20, 25, 30].map((cx) => (
         <circle key={cx} cx={cx} cy={19} r={1.3} fill="currentColor" opacity={0.35} />
       ))}
-      <text x={220} y={21} textAnchor="end" className="viz-text" opacity={0.5}>screen recording</text>
+      <text x={220} y={21} textAnchor="end" className="viz-text viz-muted">screen recording</text>
       {Array.from({ length: 8 }, (_, i) => (
         <rect key={i} x={18} y={30 + i * 13} width={8} height={8} rx={1.5} fill="currentColor" opacity={0.15} />
       ))}
@@ -43,7 +43,7 @@ export function CursorTracking() {
         <g className="viz-a">
           <animateMotion {...motion(0.12)} />
           <rect x={-5} y={-5} width={18} height={21} fill="none" stroke="currentColor" strokeDasharray="2 2" />
-          <text x={-5} y={-7.5} className="viz-text" fontSize={6}>cursor 0.97</text>
+          <text x={-5} y={-7.5} className="viz-text" fontSize={7}>cursor 0.97</text>
         </g>
       </Layer>
     </>
@@ -111,7 +111,7 @@ export function HybridTracking() {
   return (
     <>
       <path d="M16 96 H224" stroke="currentColor" strokeOpacity={0.15} strokeDasharray="1 4" />
-      <text x={16} y={137} className="viz-text" opacity={0.6}>drift</text>
+      <text x={16} y={137} className="viz-text viz-muted">drift</text>
       <rect x={46} y={132} width={120} height={4} rx={1} fill="currentColor" opacity={0.08} />
       <Layer>
         <rect x={46} y={132} height={4} rx={1} width={0} className="viz-a" fill="currentColor">
@@ -125,7 +125,7 @@ export function HybridTracking() {
             <g key={s} className="viz-b" opacity={0}>
               <Show at={[s, e]} fade={0.1} />
               <rect x={-10} y={-8} width={20} height={16} fill="none" stroke="currentColor" strokeWidth={1.4} />
-              <text x={-10} y={13} className="viz-text" fontSize={6}>detect</text>
+              <text x={-10} y={13} className="viz-text" fontSize={7}>detect</text>
             </g>
           ))}
         </g>
@@ -133,7 +133,7 @@ export function HybridTracking() {
           <Show at={[0.1, 5.4]} />
           <A attr="transform" transform="translate" at={times} values={xy(tracker)} linear />
           <rect x={-11} y={-9} width={22} height={18} fill="none" stroke="currentColor" strokeDasharray="2 2" />
-          <text x={-11} y={-11.5} className="viz-text" fontSize={6}>track</text>
+          <text x={-11} y={-11.5} className="viz-text" fontSize={7}>track</text>
         </g>
       </Layer>
     </>
@@ -153,7 +153,7 @@ export function OCRFeatures() {
   return (
     <>
       {["glyph", "features", "k-nn"].map((label, i) => (
-        <text key={label} x={[50, 118, 192][i]} y={22} textAnchor="middle" className="viz-text" opacity={0.6}>{label}</text>
+        <text key={label} x={[50, 118, 192][i]} y={22} textAnchor="middle" className="viz-text viz-muted">{label}</text>
       ))}
       <rect x={14} y={30} width={72} height={72} fill="none" stroke="currentColor" strokeOpacity={0.25} />
       <path d="M100 102 H136 M142 66 H152" stroke="currentColor" strokeOpacity={0.25} />
@@ -253,11 +253,11 @@ export function ConsensusMLP() {
           {layers.map((layer, l) =>
             layer.map((ly) => <circle key={`${l}-${ly}`} cx={x + 34 + l * 16} cy={y + ly} r={2} fill="currentColor" />)
           )}
-          <text x={x + 6} y={y + 45} className="viz-text" fontSize={5.5} opacity={0.7}>
+          <text x={x + 6} y={y + 46} className="viz-text viz-muted" fontSize={6.5}>
             loss {(0.8 + peer * 0.04).toFixed(2)}
-            <A attr="opacity" at={[4.4, 4.7, 7.6, 7.9]} values={[0.7, 0, 0, 0.7]} />
+            <A attr="opacity" at={[4.4, 4.7, 7.6, 7.9]} values={[1, 0, 0, 1]} />
           </text>
-          <text x={x + 6} y={y + 45} className="viz-text viz-b" fontSize={5.5} opacity={0}>
+          <text x={x + 6} y={y + 46} className="viz-text viz-b" fontSize={6.5} opacity={0}>
             loss 0.1{peer + 1}
             <Show at={[4.7, 7.3]} />
           </text>
