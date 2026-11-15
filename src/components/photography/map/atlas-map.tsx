@@ -41,6 +41,8 @@ type Bounds = [[number, number], [number, number]];
 type Point = { x: number; y: number };
 
 const EARTH_KM = 6371;
+// Beyond this, the "nearest" photos aren't meaningfully nearby, so none are suggested.
+const NEARBY_KM = 1000;
 const MAX_ZOOM = 48;
 const TOWN_ZOOM = 2;
 const MAX_ROAD_KM = 1500;
@@ -290,11 +292,12 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
     const nearest = places.reduce((a, b) => (geoDistance(centre, [b.lng, b.lat]) < geoDistance(centre, [a.lng, a.lat]) ? b : a));
     const km = Math.round(geoDistance(centre, [nearest.lng, nearest.lat]) * EARTH_KM);
     const box = containerRef.current!.getBoundingClientRect();
+    const nearby = km <= NEARBY_KM;
     setBloom({
       key: region.properties.name,
       anchor: { x: event.clientX - box.left, y: event.clientY - box.top },
-      photos: nearest.photos.slice(0, 3),
-      caption: `Nearest: ${nearest.name} · ${km.toLocaleString()} km`,
+      photos: nearby ? nearest.photos.slice(0, 3) : [],
+      caption: nearby ? `Nearest: ${nearest.name} · ${km.toLocaleString()} km` : `No photos from ${region.properties.name} yet`,
     });
   };
 
