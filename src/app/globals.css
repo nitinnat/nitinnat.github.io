@@ -396,7 +396,9 @@
 .gm-river-edge { stroke: #79b4cf; }
 .gm-river { stroke: #b5dcea; }
 /* Köppen climate tints over the land; translucent so region hover tints still show through. */
-.gm-climate { opacity: 0.7; }
+/* Each climate is three stacked outlines, so its edge fades over about a degree. */
+.gm-climate { opacity: 0.85; }
+.gm-climate path { fill-opacity: 0.45; }
 .gm-climate-D { fill: #ecd59f; }
 .gm-climate-S { fill: #d3d395; }
 .gm-climate-P { fill: #c4d68f; }
@@ -404,7 +406,7 @@
 .gm-climate-T { fill: #7fb865; }
 .gm-climate-B { fill: #9cc49a; }
 .gm-climate-N { fill: #bccab0; }
-.gm-climate-I { fill: #f4f6f4; opacity: 0.95; }
+.gm-climate .gm-climate-I { fill: #f4f6f4; fill-opacity: 0.75; }
 /* Deserts: dunes, and red-brown rock instead of lavender ranges. */
 .gm-dune-lit { fill: #e8c987; }
 .gm-dune-shade { fill: #cfa868; }
@@ -423,6 +425,15 @@
 .gm-savanna-floor { fill: #9a8a3d; fill-opacity: 0.16; }
 .gm-acacia-shade { fill: #6f9443; }
 .gm-acacia-lit { fill: #97b85a; }
+.gm-savanna-grass { stroke: #a2994c; }
+.gm-cerrado-shade { fill: #7f9440; }
+.gm-cerrado-lit { fill: #a7b65c; }
+.gm-cerrado .gm-tree-edge { stroke: #4e5b25; }
+.gm-gum-trunk { stroke: #efe9d8; }
+.gm-gum-edge { stroke: #8d8270; }
+.gm-gum-shade { fill: #6f9d8e; }
+.gm-gum-lit { fill: #9cc2b0; }
+.gm-eucalypt .gm-tree-edge { stroke: #3f6b5d; }
 .gm-jungle .gm-tree { fill: #3f8a43; }
 .gm-jungle .gm-tree-shade { fill: #2a6533; }
 .gm-jungle .gm-tree-light { fill: #6aae55; }

@@ -29,7 +29,7 @@ import {
   useWorldShapes,
   type ClimateGroup,
 } from "./map-shared";
-import { Acacia, DryHill, Dunes, Forest, Hill, Jungle, Meadow, Mountain, Pines, Town, Tufts, selectSpaced, usePeaks } from "./terrain";
+import { Acacia, Cerrado, DryHill, Dunes, Eucalypt, Forest, Hill, Jungle, Meadow, Mountain, Pines, Town, Tufts, selectSpaced, usePeaks } from "./terrain";
 import { landmarks } from "./landmarks";
 
 interface Bloom {
@@ -51,15 +51,23 @@ const TOWN_ZOOM = 2;
 const MAX_ROAD_KM = 1500;
 const SOUTHERN_LIMIT_Y = project({ lat: -56, lng: 0 })[1];
 
-// Permanent snow starts around 5,000 m in the tropics and falls to ~2,000 m near the Arctic.
+const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
+
+// Permanent snow starts around 5,000 m in the tropics and falls to ~2,000 m near the Arctic. Dry
+// surroundings lift it by up to 2,000 m below 35° (to ~6,000 m over the Atacama), fading out by 45°.
 // Sampled peak elevations average ~10 km of terrain and read 15–25% low, hence the correction.
-const isSnowy = (lat: number, elevation: number) => elevation * 1.15 >= 5000 - 60 * Math.max(0, Math.abs(lat) - 15);
+const isSnowy = (lat: number, elevation: number, aridity: number) => {
+  const dryLift = 2000 * clamp01((aridity - 0.25) / 0.4) * clamp01((45 - Math.abs(lat)) / 10);
+  return elevation * 1.15 >= 5000 - 60 * Math.max(0, Math.abs(lat) - 15) + dryLift;
+};
 
 const GROUND_ART = {
   dunes: Dunes,
   steppe: DryHill,
   meadow: Meadow,
   acacia: Acacia,
+  cerrado: Cerrado,
+  eucalypt: Eucalypt,
   jungle: Jungle,
   trees: Forest,
   pines: Pines,
@@ -82,6 +90,11 @@ const GROUND: Partial<Record<ClimateGroup, { kind: keyof typeof GROUND_ART; shar
   B: { kind: "pines", share: 1 },
   N: { kind: "tufts", share: 0.35 },
 };
+
+// Savanna trees by continent: cerrado shrubs in the Americas, eucalypts in Australia and New Guinea,
+// acacias in Africa, Madagascar and South Asia.
+const savannaAt = (lng: number, lat: number): keyof typeof GROUND_ART =>
+  lng < -30 ? "cerrado" : lng > 110 && lat < -5 ? "eucalypt" : "acacia";
 
 // Deterministic jitter so the scattered terrain stays put between renders.
 const jitter = (a: number, b: number) => {
@@ -263,27 +276,28 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
 
   // Terrain keeps a constant on-screen spacing, so more of it appears as you zoom in.
   // Köppen climate decides what grows where: dunes in deserts, dry hills on the steppe, grassy
-  // prairie with the odd copse, acacias
-  // on the savanna, jungle, pines in the boreal north, tufts on tundra and bare ice. Classified
-  // once, not on every zoom.
+  // prairie with the odd copse, regional savanna trees, jungle, pines in the boreal north, tufts on
+  // tundra and bare ice. Classified once, not on every zoom.
   const climateAware = useMemo(() => {
     if (!climate) return { peaks: [], hills: [], ground: [] };
-    const climateOf = ({ x, y }: Point) => {
-      const lngLat = projection.invert?.([x, y]);
-      return lngLat && climate.climateAt(...lngLat);
-    };
+    const lngLatOf = ({ x, y }: Point): [number, number] => projection.invert?.([x, y]) ?? [0, 0];
+    const climateOf = (point: Point) => climate.climateAt(...lngLatOf(point));
     return {
       peaks: highPeaks.map((peak) => {
         const group = climateOf(peak);
-        return { ...peak, arid: group === "D", snowy: group === "I" || (group !== "D" && isSnowy(peak.lat, peak.elevation)) };
+        const snowy = group === "I" || (group !== "D" && isSnowy(peak.lat, peak.elevation, climate.aridityAt(...lngLatOf(peak))));
+        return { ...peak, arid: group === "D", snowy };
       }),
       hills: lowPeaks.flatMap((peak) => {
         const group = climateOf(peak);
         return group === "D" || group === "I" ? [] : [{ ...peak, dry: group === "S" }];
       }),
       ground: groundSpots.map((spot) => {
-        const growth = GROUND[climateOf(spot) ?? "I"];
-        return { ...spot, kind: growth && jitter(spot.y, spot.x * 3) < growth.share ? growth.kind : null };
+        const lngLat = lngLatOf(spot);
+        const group = climate.climateAt(...lngLat) ?? "I";
+        const growth = GROUND[group];
+        if (!growth || jitter(spot.y, spot.x * 3) >= growth.share) return { ...spot, kind: null };
+        return { ...spot, kind: group === "V" ? savannaAt(...lngLat) : growth.kind };
       }),
     };
   }, [highPeaks, lowPeaks, groundSpots, climate]);
@@ -298,7 +312,7 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
     // Spacing below a mountain's width lets dense ranges overlap into one painted mass.
     const mountains = selectSpaced(climateAware.peaks, bounds, spacing(close ? 30 : 22), occupied, close ? 140 : 110);
     const hills = close ? selectSpaced(climateAware.hills, bounds, spacing(40), [...occupied, ...mountains], 80) : [];
-    const ground = close ? selectSpaced(climateAware.ground, bounds, spacing(32), [...occupied, ...mountains, ...hills], 110) : [];
+    const ground = close ? selectSpaced(climateAware.ground, bounds, spacing(32), [...occupied, ...mountains, ...hills], 110, (spot) => spot.kind !== null) : [];
     return [
       ...mountains.map((peak) => ({ ...peak, kind: "mountain" as const })),
       ...hills.map((peak) => ({ ...peak, kind: "hill" as const })),
@@ -356,13 +370,16 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
     const cursor = projection.invert?.([mapX, mapY]) ?? geoCentroid(region);
     const nearest = places.reduce((a, b) => (geoDistance(cursor, [b.lng, b.lat]) < geoDistance(cursor, [a.lng, a.lat]) ? b : a));
     const km = Math.round(geoDistance(cursor, [nearest.lng, nearest.lat]) * EARTH_KM);
-    const nearby = km <= NEARBY_KM;
-    setBloom({
-      key: region.properties.name,
-      anchor: { x: event.clientX - box.left, y: event.clientY - box.top },
-      photos: nearby ? nearest.photos.slice(0, 3) : [],
-      caption: nearby ? `Nearest: ${nearest.name} · ${km.toLocaleString()} km` : `No photos from ${region.properties.name} yet`,
-    });
+    setBloom(
+      km <= NEARBY_KM
+        ? {
+            key: region.properties.name,
+            anchor: { x: event.clientX - box.left, y: event.clientY - box.top },
+            photos: nearest.photos.slice(0, 3),
+            caption: `Nearest: ${nearest.name} · ${km.toLocaleString()} km`,
+          }
+        : null,
+    );
   };
 
   const focusPlace = (place: Place) => {
@@ -444,8 +461,8 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
                 <clipPath id={clipId}>
                   <path d={coastline} />
                 </clipPath>
-                {climate.tints.map(({ group, d }) => (
-                  <path key={group} d={d} fillRule="evenodd" className={`gm-climate-${group}`} />
+                {climate.tints.map(({ group, level, d }) => (
+                  <path key={`${group}${level}`} d={d} fillRule="evenodd" className={`gm-climate-${group}`} />
                 ))}
               </g>
             )}
@@ -605,6 +622,18 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
           </AnimatePresence>
         </div>
       </div>
+      <p className="mt-2 font-mono text-[10px] leading-relaxed tracking-[0.06em] text-muted-foreground/80">
+        Terrain: AWS Terrain Tiles (SRTM, ETOPO1 and others) · Rivers, lakes &amp; coastlines: Natural Earth · Climate: Köppen–Geiger,{" "}
+        <a
+          href="https://doi.org/10.1127/0941-2948/2006/0130"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Kottek, M., Grieser, J., Beck, C., Rudolf, B., and Rubel, F. (2006). World Map of the Köppen-Geiger climate classification updated. Meteorol. Z., 15, 259–263."
+          className="underline decoration-dotted underline-offset-2 hover:text-foreground"
+        >
+          Kottek et al. (2006)
+        </a>
+      </p>
       <PlaceStrip place={selected} onOpen={(photo) => selected && lightbox.open(selected.photos, photo)} />
       {lightbox.element}
     </div>

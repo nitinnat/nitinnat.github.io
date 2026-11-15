@@ -806,3 +806,50 @@ Load Photos → Load Metadata → Merge Metadata with Photos
   - No forests in Algeria, Niger, Chad, Saudi Arabia or Australia's interior.
   - Jungle and acacias in Brazil, acacias in Kenya, pines in Canada and Siberia.
   - No snow on Saharan peaks; snow in Nepal and Colorado.
+
+## 2026-11-15: Photo Publishing Pipeline (EXIF Stripping, Web Sizes, GPS Fallback)
+
+**Status:** Local on `feature/photo-map-variants`, not pushed.
+
+- **`scripts/optimize-photos.js`** (prebuild, after `copy-assets.js`) uses `sharp` to publish every image under `content/assets/photos` to `public/assets/photos`: auto-rotated, converted to sRGB with an embedded sRGB ICC profile, and stripped of all other metadata (GPS, dates, camera make/model/serials).
+  - Display copy: long edge 3,200 px at quality 90 (raised from 2,400 px at q82 so full-screen viewing on Retina/4K stays sharp), at the same path. JPEG and WebP keep their format and extension; other formats (the PNG hero) become `.jpg`.
+  - Thumbnail: long edge 600 px under `thumbs/<same path>`.
+  - The target directory is cleared first, so no original ever reaches `public/`. `copy-assets.js` now skips `photos/`.
+  - Local set: 26 originals, 92 MB → 17.3 MB display + 1.1 MB thumbnails. Hero `001.png` went from 3.07 MB to `001.jpg` at 147 KB.
+- **URL rule** lives in `src/lib/photo-assets.ts` (`photoUrls`), mirroring the script. `PhotoItem` gains `source` (the original's path under `content/assets/photos`).
+- **Gallery** grid uses thumbnails, and the lightbox uses the display size.
+- **Homepage hero** uses the relative path `/assets/photos/001.jpg`, preloaded through `react-dom` `preload` with `fetchPriority: high`. The background image reuses the preloaded file, so it downloads once.
+- **`photo-geo.ts`** reads EXIF from the original (`photo.source`), not the stripped copy. `GeoPhoto` gains `thumb`; the map still uses `src` until it's switched. A photo without GPS takes the rounded mean position of geotagged photos with the same `photos-metadata.json` location string, or is skipped if none share it. Locally nothing changed: the only GPS-less gallery photo has a unique tag. A synthetic check confirmed both the placed and the skipped cases.
+- **Build:**
+  - `npm run build` no longer calls `npm run prebuild` explicitly, because npm already runs the `prebuild` hook, so it ran twice.
+  - CI moved to Node 22 (sharp 0.35 needs ≥20.9). The lockfile carries `@img/sharp-linux-x64`.
+  - The dev auto-tag API also runs `optimize-photos.js`.
+- **Verified:**
+  - exifr: 0 GPS or identifying tags in `public/` and `out/` (52 files); 24 of 26 originals still have GPS.
+  - Playwright: the gallery loads 25 thumbnails (600 px), the lightbox loads the display copies, and the hero loads `001.jpg` once. No 404s or page errors in dev or on the static `out/`.
+  - `tsc` and the production build pass.
+
+## 2026-11-15: Atlas Map Accuracy Pass (Snowline, Savanna, Prairie, Tints, Credits)
+
+**Status:** Local on `feature/photo-map-variants`, not pushed.
+
+- **Dry snowline:** `useClimate()` now exposes `aridityAt(lng, lat)`. It compares dry cells within two cells (D/S count 1, P counts ½) with humid ones (T/V/M/B count double). Tundra and ice are neutral, so an all-cold window (Puna, Tibet) counts as arid. `isSnowy` lifts the latitude snowline by up to 2,000 m with aridity. The full lift applies below 35° and fades to nothing by 45°.
+  - Offline peak counts (all peaks ≥2,500 m, snowy before → after):
+    - Atacama Andes 36→8 of 39; Bolivia 26→4/29; N Argentina 36→13/43; Peru 25→12/37 (Cordillera Blanca, Vilcanota and Vilcabamba stay white).
+    - Iran 9→3/67; Afghanistan 21→7/40 (NE Hindu Kush keeps 5/6).
+    - Unchanged: Nepal/Everest, Alaska, Alps, Cascades, Kilimanjaro, Mt Kenya, Patagonia, Pamir, Karakoram.
+  - The Tibetan interior barely changes (84/89): its sampled peaks really are 5,200–6,400 m.
+- **Savanna by region:** `savannaAt` picks `Cerrado` in the Americas (gnarled shrubby trees and grass tufts), `Eucalypt` in Australia and New Guinea (tall pale trunks, loose blue-green crowns), and `Acacia` elsewhere. The new symbols share a `Canopy` helper that draws every outline before every fill, so overlapping puffs read as one mass.
+- **Prairie:** the generator keeps raw Köppen classes. A temperate cell becomes P when all of these hold:
+  - it is reached from a dry cell within 6 steps,
+  - its class is not maritime (Cfb/Cfc/Csb/Csc/Cwc),
+  - and it is more than 3 cells from the sea.
+  - `GRASSLANDS` boxes add the Pontic steppe, the Pampas/Campos and the eastern Great Plains.
+  - Cell changes:
+    - Spain north of 42.5°N: P26→0. W Washington/Cascades: P29→1. Vic/NSW: P160→80.
+    - Southern Ukraine: P33→179. Pampas: P69→223. Great Plains: P196→322.
+- **Tints:** the masks get two 3×3 blurs. Contours at 0.2/0.5/0.8 are stacked at 45% fill-opacity (group at 85%), so each climate fades over about a degree and stair-steps never show. Tints are still clipped to the coastline, with no filters. `climate-grid.json` is now ~168 KB, lazy-loaded.
+- **Hover:** regions with no photos within 100 km of the cursor no longer show a "No photos from X yet" bloom, just the hover highlight.
+- **`selectSpaced`:** takes an optional `drawn` predicate, so bare ground spots still claim space but don't count toward the limit.
+- **Credits:** a mono line under the Atlas map credits AWS Terrain Tiles, Natural Earth and Köppen–Geiger, linking Kottek et al. (2006) via its DOI and giving the full citation in the title.
+- **Verified:** tsc and eslint pass. Playwright symbol census before/after (`scratchpad/fix.js`), hover checks for Libya, Australia and central/eastern Nevada, and screenshots.

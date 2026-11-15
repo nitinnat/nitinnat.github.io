@@ -119,13 +119,14 @@ export type ClimateGroup = "D" | "S" | "P" | "T" | "V" | "M" | "B" | "N" | "I";
 
 export interface Climate {
   climateAt: (lng: number, lat: number) => ClimateGroup | undefined;
-  tints: { group: ClimateGroup; d: string }[];
+  aridityAt: (lng: number, lat: number) => number;
+  tints: { group: ClimateGroup; level: number; d: string }[];
 }
 
 const isClimateGroup = (char: string): char is ClimateGroup => "DSPTVMBNI".includes(char);
 
 // Köppen–Geiger climate groups from scripts/generate-climate-grid.js: a lookup for choosing which
-// symbols belong where, plus smoothed outlines to tint the land. The 0.5° grid's coastline differs
+// symbols belong where, plus smoothed outlines at three feathering levels to tint the land. The 0.5° grid's coastline differs
 // from the map's, so a coastal point with no climate takes the nearest one within a cell or two.
 export function useClimate() {
   const [climate, setClimate] = useState<Climate | null>(null);
@@ -137,9 +138,9 @@ export function useClimate() {
       const cells = data.rows.map((row) => row.replace(/(\D)(\d+)/g, (_, char: string, count: string) => char.repeat(Number(count))));
       const cols = 360 / data.step;
       const cell = (row: number, col: number) => cells[row]?.[(col + cols) % cols] ?? "";
+      const cellOf = (lng: number, lat: number) => [Math.floor((data.lat - lat) / data.step), Math.floor((lng - data.lng) / data.step)];
       const climateAt = (lng: number, lat: number) => {
-        const row = Math.floor((data.lat - lat) / data.step);
-        const col = Math.floor((lng - data.lng) / data.step);
+        const [row, col] = cellOf(lng, lat);
         for (let reach = 0; reach <= 2; reach += 1) {
           for (let dr = -reach; dr <= reach; dr += 1) {
             for (let dc = -reach; dc <= reach; dc += 1) {
@@ -149,11 +150,32 @@ export function useClimate() {
           }
         }
       };
+      // Dry cells (prairie counting half) against humid ones (counting double) within two cells.
+      // Tundra and ice are neutral, so a window of nothing else, like a high cold plateau, is arid.
+      const aridityAt = (lng: number, lat: number) => {
+        const [row, col] = cellOf(lng, lat);
+        let dry = 0;
+        let humid = 0;
+        for (let dr = -2; dr <= 2; dr += 1) {
+          for (let dc = -2; dc <= 2; dc += 1) {
+            const char = cell(row + dr, col + dc);
+            if (char === "D" || char === "S") dry += 1;
+            else if (char === "P") dry += 0.5;
+            else if (/[TVMB]/.test(char)) humid += 1;
+          }
+        }
+        return dry + humid ? dry / (dry + 2 * humid) : 1;
+      };
       setClimate({
         climateAt,
-        tints: Object.entries(data.tints).flatMap(([group, rings]) =>
+        aridityAt,
+        tints: Object.entries(data.tints).flatMap(([group, levels]) =>
           isClimateGroup(group)
-            ? [{ group, d: rings.map((ring) => smoothRing(Array.from({ length: ring.length / 2 }, (_, i) => toMap([ring[2 * i], ring[2 * i + 1]])))).join("") }]
+            ? levels.map((rings, level) => ({
+                group,
+                level,
+                d: rings.map((ring) => smoothRing(Array.from({ length: ring.length / 2 }, (_, i) => toMap([ring[2 * i], ring[2 * i + 1]])))).join(""),
+              }))
             : [],
         ),
       });
@@ -276,7 +298,7 @@ export function PhotoBloom({ photos, caption, direction = "up", onOpen }: BloomP
             whileHover={{ scale: 1.08, rotate: 0, zIndex: 10 }}
             aria-label={`Open ${photo.alt}`}
           >
-            <img src={photo.src} alt="" draggable={false} decoding="async" className="h-full w-full object-cover" />
+            <img src={photo.thumb} alt="" draggable={false} decoding="async" className="h-full w-full object-cover" />
           </motion.button>
         );
       })}
@@ -352,7 +374,7 @@ export function PlaceStrip({ place, onOpen }: { place: Place | null; onOpen: (ph
                   transition={{ duration: 0.35, ease: EASE_OUT, delay: Math.min(index, 6) * 0.04 }}
                   aria-label={`Open ${photo.alt}`}
                 >
-                  <img src={photo.src} alt="" draggable={false} loading="lazy" className="h-full w-full object-cover" />
+                  <img src={photo.thumb} alt="" draggable={false} loading="lazy" className="h-full w-full object-cover" />
                 </motion.button>
               ))}
             </div>

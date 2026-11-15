@@ -42,13 +42,15 @@ interface Bounds {
 }
 
 // Greedily keeps the highest items in view that are at least `spacing` apart (map units),
-// skipping anything too close to already-occupied points such as landmarks.
+// skipping anything too close to already-occupied points such as landmarks. Items that fail `drawn`
+// still claim their space but don't count towards `limit`.
 export function selectSpaced<T extends { x: number; y: number }>(
   items: T[],
   bounds: Bounds,
   spacing: number,
   occupied: { x: number; y: number }[],
   limit: number,
+  drawn: (item: T) => boolean = () => true,
 ) {
   const grid = new Map<string, { x: number; y: number }[]>();
   const key = (x: number, y: number) => `${Math.floor(x / spacing)},${Math.floor(y / spacing)}`;
@@ -72,12 +74,14 @@ export function selectSpaced<T extends { x: number; y: number }>(
   occupied.forEach(add);
   const chosen: T[] = [];
   const margin = spacing * 2;
+  let count = 0;
   for (const item of items) {
-    if (chosen.length >= limit) break;
+    if (count >= limit) break;
     if (item.x < bounds.x0 - margin || item.x > bounds.x1 + margin || item.y < bounds.y0 - margin || item.y > bounds.y1 + margin) continue;
     if (crowded(item)) continue;
     add(item);
     chosen.push(item);
+    if (drawn(item)) count += 1;
   }
   return chosen;
 }
@@ -369,6 +373,80 @@ export function Acacia({ seed = 0 }: { seed?: number }) {
           <path d={`M${x - w * 0.82} ${y - h - 0.2} Q${x - w * 0.7} ${y - h - 3.4} ${x - w * 0.05} ${y - h - 3.5} Q${x + w * 0.5} ${y - h - 3.3} ${x + w * 0.55} ${y - h - 0.8} Z`} className="gm-acacia-lit" />
         </g>
       ))}
+    </g>
+  );
+}
+
+// Overlapping round puffs, outlined as one mass: every outline first, then every fill on top.
+function Canopy({ puffs, shade, lit }: { puffs: [number, number, number, number][]; shade: string; lit: string }) {
+  return (
+    <g>
+      {puffs.map(([cx, cy, rx, ry]) => <ellipse key={`e${cx}${cy}`} cx={cx} cy={cy} rx={rx} ry={ry} className={`${shade} gm-tree-edge`} strokeWidth={1.4} />)}
+      {puffs.map(([cx, cy, rx, ry]) => <ellipse key={`f${cx}${cy}`} cx={cx} cy={cy} rx={rx} ry={ry} className={shade} />)}
+      {puffs.slice(0, 2).map(([cx, cy, rx, ry]) => <ellipse key={`l${cx}${cy}`} cx={cx - rx * 0.25} cy={cy - ry * 0.3} rx={rx * 0.55} ry={ry * 0.5} className={lit} />)}
+    </g>
+  );
+}
+
+const GRASS_SLOTS: Point[] = [[-12, 2], [11, 1], [-2, 4], [4, -3]];
+
+function Grass({ seed }: { seed: number }) {
+  return (
+    <g>
+      {GRASS_SLOTS.slice(0, 2 + (seed % 3)).map(([x, y]) => (
+        <path key={x} d={`M${x - 2} ${y - 2.6} Q${x - 0.8} ${y - 0.8} ${x} ${y} Q${x} ${y - 2.2} ${x + 0.3} ${y - 3.8} M${x} ${y} Q${x + 0.8} ${y - 1.2} ${x + 2.2} ${y - 2.6}`} fill="none" className="gm-savanna-grass" strokeWidth={1} strokeLinecap="round" />
+      ))}
+    </g>
+  );
+}
+
+const CERRADO_SLOTS: Point[] = [[-7, -1], [6, -2], [0, 3]];
+
+// Brazil's cerrado: low, gnarled shrubby trees in tufted grass.
+export function Cerrado({ seed = 0 }: { seed?: number }) {
+  const trees = CERRADO_SLOTS.slice(0, 1 + (seed % 3))
+    .map(([x, y], i) => ({ x: x + seeded(seed, i, 1) * 3, y, lean: seeded(seed, i, 2) * 6, h: 6.5 + seeded(seed, i, 3) * 2 }))
+    .sort((a, b) => a.y - b.y);
+  return (
+    <g className="gm-cerrado">
+      <ellipse cx={0} cy={2} rx={15} ry={4.2} className="gm-savanna-floor" />
+      <Grass seed={seed} />
+      {trees.map(({ x, y, lean, h }) => {
+        const [tx, ty] = [x + lean, y - h];
+        return (
+          <g key={x}>
+            <path d={`M${x} ${y} C${x - lean * 0.8} ${y - h * 0.35} ${x + lean * 1.3} ${y - h * 0.6} ${tx} ${ty}`} fill="none" className="gm-trunk-stroke" strokeWidth={1.5} strokeLinecap="round" />
+            <path d={`M${x + lean * 0.35} ${y - h * 0.5} Q${x - 2} ${y - h * 0.62} ${x - 3.5 + lean * 0.4} ${y - h * 0.9}`} fill="none" className="gm-trunk-stroke" strokeWidth={1} strokeLinecap="round" />
+            <Canopy puffs={[[tx - 3.2, ty, 3.4, 2.6], [tx + 2.6, ty - 0.4, 3, 2.4], [tx - 0.2, ty - 2, 2.8, 2.2], [tx - 4.4 + lean * 0.4, ty + h * 0.12, 2.2, 1.8]]} shade="gm-cerrado-shade" lit="gm-cerrado-lit" />
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+const GUM_SLOTS: Point[] = [[-6, 0], [7, -2]];
+
+// Northern Australia's savanna: scattered eucalypts, tall pale trunks under loose blue-green crowns.
+export function Eucalypt({ seed = 0 }: { seed?: number }) {
+  const trees = GUM_SLOTS.slice(0, 1 + (seed % 2))
+    .map(([x, y], i) => ({ x: x + seeded(seed, i, 1) * 4, y, bend: seeded(seed, i, 2) * 3, h: 16 + seeded(seed, i, 3) * 4 }))
+    .sort((a, b) => a.y - b.y);
+  return (
+    <g className="gm-eucalypt">
+      <ellipse cx={0} cy={2} rx={14} ry={4} className="gm-savanna-floor" />
+      <Grass seed={seed + 1} />
+      {trees.map(({ x, y, bend, h }) => {
+        const [tx, ty] = [x + bend, y - h];
+        const trunk = `M${x} ${y} Q${x + bend * 0.2} ${y - h * 0.55} ${tx} ${ty + 3} M${x + bend * 0.5} ${y - h * 0.62} L${tx - 3.6} ${ty + 1.5} M${x + bend * 0.7} ${y - h * 0.75} L${tx + 3.4} ${ty + 0.8}`;
+        return (
+          <g key={x}>
+            <path d={trunk} fill="none" className="gm-gum-edge" strokeWidth={2.6} strokeLinecap="round" />
+            <path d={trunk} fill="none" className="gm-gum-trunk" strokeWidth={1.5} strokeLinecap="round" />
+            <Canopy puffs={[[tx - 3.8, ty + 0.6, 3.2, 2.2], [tx + 3.6, ty, 3, 2.1], [tx + 0.2, ty - 2.6, 3.2, 2.2]]} shade="gm-gum-shade" lit="gm-gum-lit" />
+          </g>
+        );
+      })}
     </g>
   );
 }
