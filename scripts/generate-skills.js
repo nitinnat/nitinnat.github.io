@@ -26,19 +26,20 @@ function parseSkillsMarkdown(markdown) {
       currentCategory = categoryMap[categoryName] || null;
     } else if (trimmed.startsWith("- ") && currentCategory) {
       const match = trimmed.match(/^- (.+?)\s*\|\s*(\d)$/);
-      if (match) {
-        const [, name, proficiencyStr] = match;
-        const proficiency = parseInt(proficiencyStr, 10);
+      if (!match) {
+        throw new Error(`Malformed skill line "${trimmed}" (expected "- Name | 1-5")`);
+      }
+      const [, name, proficiencyStr] = match;
+      const proficiency = parseInt(proficiencyStr, 10);
 
-        if (proficiency >= 1 && proficiency <= 5) {
-          const id = name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-          skills.push({
-            id,
-            name,
-            proficiency,
-            category: currentCategory,
-          });
-        }
+      if (proficiency >= 1 && proficiency <= 5) {
+        const id = name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+        skills.push({
+          id,
+          name,
+          proficiency,
+          category: currentCategory,
+        });
       }
     }
   }
@@ -62,9 +63,11 @@ function generateTypeScriptFile(skills) {
 }
 
 // Generated from content/skills.md - do not edit directly
-export const skillsData: Skill[] = [
+export const skillsData = [
 ${skillLines}
-];
+] as const satisfies readonly Skill[];
+
+export type SkillId = (typeof skillsData)[number]["id"];
 
 export const skillCategories = {
   frontend: "Frontend",

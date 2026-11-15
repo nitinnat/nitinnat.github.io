@@ -6,7 +6,7 @@ export interface Skill {
 }
 
 // Generated from content/skills.md - do not edit directly
-export const skillsData: Skill[] = [
+export const skillsData = [
   { id: "python", name: "Python", proficiency: 5, category: "backend" },
   { id: "sql", name: "SQL", proficiency: 4, category: "backend" },
   { id: "c-", name: "C#", proficiency: 2, category: "backend" },
@@ -26,6 +26,7 @@ export const skillsData: Skill[] = [
   { id: "mongodb", name: "MongoDB", proficiency: 4, category: "tools" },
   { id: "redis", name: "Redis", proficiency: 4, category: "tools" },
   { id: "kubernetes-argocd", name: "Kubernetes / ArgoCD", proficiency: 3, category: "tools" },
+  { id: "openlens", name: "OpenLens", proficiency: 3, category: "tools" },
   { id: "hadoop", name: "Hadoop", proficiency: 2, category: "tools" },
   { id: "databricks", name: "Databricks", proficiency: 3, category: "tools" },
   { id: "splunk", name: "Splunk", proficiency: 3, category: "tools" },
@@ -37,7 +38,9 @@ export const skillsData: Skill[] = [
   { id: "typescript", name: "TypeScript", proficiency: 2, category: "frontend" },
   { id: "html", name: "HTML", proficiency: 2, category: "frontend" },
   { id: "css", name: "CSS", proficiency: 2, category: "frontend" },
-];
+] as const satisfies readonly Skill[];
+
+export type SkillId = (typeof skillsData)[number]["id"];
 
 export const skillCategories = {
   frontend: "Frontend",

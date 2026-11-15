@@ -698,3 +698,12 @@ Load Photos → Load Metadata → Merge Metadata with Photos
 - Abstracts collapse behind a native `<details>` "Read abstract" toggle (`Abstract` MDX component in the About page).
 - Fixed visual labels ignoring per-label `fontSize`: the default size moved from the `.viz-text` class to the `<svg>` attribute so element attributes take precedence.
 - Production build re-run in a throwaway Node 22 container: passed, all public routes static.
+
+## 2026-11-15: Skill ID Consistency
+
+- Root cause: three skill vocabularies had drifted — IDs generated from `content/skills.md`, timeline `Skills:` lines, and two hand-written icon maps. Unmatched timeline IDs were silently dropped (GenAI role showed 1 of 5), and the badge map fell back to a Python logo for any unknown ID (Java, Tableau, Hadoop, Databricks, Splunk, JupyterHub).
+- `generate-skills.js` now emits `skillsData` `as const` plus a `SkillId` union, and throws on malformed lines (`OpenLens - 3` had been silently skipped; fixed to `| 3`).
+- Single icon map `src/components/skills/skill-icons.ts` typed `Record<SkillId, IconType>`, shared by the Skills section and timeline badges; removed both old maps and the Python fallback.
+- `TimelineEntry.skills` is `SkillId[]`, so an unknown ID in `about.mdx` now fails type-check/build (verified with a probe).
+- Remapped timeline IDs to canonical ones. Dropped IDs with no entry in `skills.md`: FastAPI, agentic-ai, CI/CD, OpenCV (covered by Computer Vision), analytics, MATLAB. `distributed-systems` → Machine Learning; IISc gained Machine Learning (k-NN/SVM work).
+- Production build passes.
