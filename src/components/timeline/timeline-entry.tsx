@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { useAnimate, useInView, useReducedMotion } from "framer-motion";
 import { ChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { TimelineEntry } from "./timeline-types";
 import { SkillBadges } from "./skill-badges";
 import { ProjectVisual } from "@/components/visuals/project-visual";
+import { withViewTransition } from "@/lib/view-transition";
 
 interface TimelineEntryCardProps {
   entry: TimelineEntry;
@@ -22,6 +24,8 @@ export function TimelineEntryCard({ entry, index, variant = "work" }: TimelineEn
   const reduceMotion = useReducedMotion();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const articleRef = useRef<HTMLElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const [cardRef, animate] = useAnimate<HTMLDivElement>();
   const inView = useInView(cardRef, { once: true, margin: "0px 0px -60px 0px" });
   const deferred = useRef(false);
@@ -47,9 +51,35 @@ export function TimelineEntryCard({ entry, index, variant = "work" }: TimelineEn
     if (!expanded && dialog.open) dialog.close();
   }, [expanded]);
 
+  // The card and the dialog panel briefly share a transition name so the card grows into the
+  // dialog and shrinks back; names are cleared afterwards so cards never collide.
+  const openDialog = () => {
+    const article = articleRef.current!;
+    const panel = panelRef.current!;
+    article.style.viewTransitionName = "role-card";
+    withViewTransition(() => {
+      article.style.viewTransitionName = "";
+      panel.style.viewTransitionName = "role-card";
+      dialogRef.current!.showModal();
+      flushSync(() => setExpanded(true));
+    }).then(() => {
+      panel.style.viewTransitionName = "";
+    });
+  };
+
   const closeDialog = () => {
-    setExpanded(false);
-    triggerRef.current?.focus();
+    const article = articleRef.current!;
+    const panel = panelRef.current!;
+    panel.style.viewTransitionName = "role-card";
+    withViewTransition(() => {
+      panel.style.viewTransitionName = "";
+      article.style.viewTransitionName = "role-card";
+      dialogRef.current!.close();
+      flushSync(() => setExpanded(false));
+    }).then(() => {
+      article.style.viewTransitionName = "";
+      triggerRef.current?.focus();
+    });
   };
 
   return (
@@ -66,23 +96,26 @@ export function TimelineEntryCard({ entry, index, variant = "work" }: TimelineEn
         >
           <div
             className={cn(
-              "w-1.5 h-1.5 rounded-full",
+              "timeline-node w-1.5 h-1.5 rounded-full",
               variant === "education" ? "bg-emerald-500" : "bg-primary"
             )}
           />
         </div>
         <div
           className={cn(
-            "w-0.5 flex-1 mt-2",
+            "relative w-0.5 flex-1 mt-2 overflow-clip",
             variant === "education"
               ? "bg-gradient-to-b from-emerald-500/30 to-transparent"
               : "bg-gradient-to-b from-primary/30 to-transparent"
           )}
-        />
+        >
+          <span className="timeline-line-fill" aria-hidden="true" />
+        </div>
       </div>
 
       {/* Content */}
       <article
+        ref={articleRef}
         className={cn(
           "rounded-md transition-colors duration-300 relative overflow-hidden group",
           "grid grid-cols-1 md:grid-cols-[auto_1fr] gap-3 md:gap-4",
@@ -143,7 +176,7 @@ export function TimelineEntryCard({ entry, index, variant = "work" }: TimelineEn
           {entry.expandedContent && (
             <button
               ref={triggerRef}
-              onClick={() => setExpanded(true)}
+              onClick={openDialog}
               className={cn(
                 "inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80",
                 "transition-colors font-medium"
@@ -184,7 +217,7 @@ export function TimelineEntryCard({ entry, index, variant = "work" }: TimelineEn
           if (event.target === dialogRef.current) closeDialog();
         }}
       >
-        <div className={cn(
+        <div ref={panelRef} className={cn(
           "rounded-lg border bg-card p-4 shadow-2xl md:p-8",
           variant === "education" ? "border-emerald-500/20" : "border-primary/20"
         )}>

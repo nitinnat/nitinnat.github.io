@@ -14,24 +14,25 @@ export function PhotoHero({
   const hasImage = Boolean(imageUrl);
 
   return (
-    <section className="relative w-full h-[60vh] min-h-[320px] max-h-[720px]">
+    <section className="photo-hero relative w-full h-[60vh] min-h-[320px] max-h-[720px] overflow-hidden">
       {hasImage ? (
         <>
           <img
             src={imageUrl}
             alt={imageAlt || ""}
-            className="absolute inset-0 h-full w-full object-cover"
+            className="hero-media absolute inset-0 h-full w-full object-cover"
             loading="eager"
           />
           <div
             className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/60"
             aria-hidden
           />
+          <div className="hero-shade pointer-events-none absolute inset-0 bg-black opacity-0" aria-hidden />
         </>
       ) : (
         <div className="absolute inset-0 bg-muted" aria-hidden />
       )}
-      <div className="relative z-10 flex h-full items-center justify-center px-6 text-center">
+      <div className="hero-copy relative z-10 flex h-full items-center justify-center px-6 text-center">
         <div className={hasImage ? "text-white" : "text-foreground"}>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight">
             {title}
