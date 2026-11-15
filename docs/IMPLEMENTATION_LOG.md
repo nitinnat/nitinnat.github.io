@@ -707,3 +707,13 @@ Load Photos → Load Metadata → Merge Metadata with Photos
 - `TimelineEntry.skills` is `SkillId[]`, so an unknown ID in `about.mdx` now fails type-check/build (verified with a probe).
 - Remapped timeline IDs to canonical ones. Dropped IDs with no entry in `skills.md`: FastAPI, agentic-ai, CI/CD, OpenCV (covered by Computer Vision), analytics, MATLAB. `distributed-systems` → Machine Learning; IISc gained Machine Learning (k-NN/SVM work).
 - Production build passes.
+
+## 2026-11-15: Visuals Frozen on First Visit; Dark Default
+
+**Status:** PR open on `fix/dark-default-smil-start` (PR #29 merged before the skill-ID commit landed, so that commit is cherry-picked here).
+
+- Symptom: on a first visit to the deployed About page the project visuals sat still until a tab switch.
+- Root cause: an inline SVG's SMIL clock starts at the window `load` event. Verified with a local harness: before `load`, `unpauseAnimations()`, `setCurrentTime()`, and re-inserting the SVG all leave the clock at 0. The education cards set their hover-only photos as inline `background-image`, so 1.45 MB (`buffalo_tagline.jpg` 1.27 MB) downloaded eagerly and held the load event; cold-cache `load` fired exactly when that photo finished.
+- Fix: hover photos are requested on first `pointerenter`; nothing on About besides fonts and JS gates `load` now. Verified: 0 photo requests at load, request on hover, visuals' clock running.
+- Dark mode is now the default theme (`defaultTheme="dark"`); stored preferences still win.
+- Follow-up (not in this PR): the homepage hero is a 3 MB PNG (`/assets/photos/001.png`), also preloaded when the homepage route is prefetched.

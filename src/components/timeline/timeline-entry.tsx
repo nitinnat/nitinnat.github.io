@@ -16,6 +16,9 @@ interface TimelineEntryCardProps {
 
 export function TimelineEntryCard({ entry, index, variant = "work" }: TimelineEntryCardProps) {
   const [expanded, setExpanded] = useState(false);
+  // Hover-only photos are fetched on first hover; loading them eagerly delays the window
+  // load event, which is when the project visuals' SVG animation clock starts.
+  const [backgroundRequested, setBackgroundRequested] = useState(false);
   const reduceMotion = useReducedMotion();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -89,14 +92,13 @@ export function TimelineEntryCard({ entry, index, variant = "work" }: TimelineEn
             ? "border border-emerald-500/10 hover:border-emerald-500/20 focus-within:ring-2 focus-within:ring-emerald-500/50"
             : "border border-primary/10 hover:border-primary/20 focus-within:ring-2 focus-within:ring-primary/50"
         )}
+        onPointerEnter={entry.backgroundImage ? () => setBackgroundRequested(true) : undefined}
       >
         {/* Background image layer for education entries */}
         {entry.backgroundImage && (
           <div
             className="absolute inset-0 bg-cover bg-center opacity-0 group-hover:opacity-30 transition-opacity duration-500 pointer-events-none"
-            style={{
-              backgroundImage: `url('${entry.backgroundImage}')`
-            }}
+            style={backgroundRequested ? { backgroundImage: `url('${entry.backgroundImage}')` } : undefined}
           />
         )}
 
