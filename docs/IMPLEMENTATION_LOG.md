@@ -752,3 +752,29 @@ Load Photos → Load Metadata → Merge Metadata with Photos
 - Download deterrence: right-click, drag, and long-press save blocked on photos (page and lightbox). Cannot stop screenshots; real protection needs resized, EXIF-stripped derivatives (not yet built).
 - Gotcha: after `npm install` with the dev server running, Turbopack failed to resolve `d3-geo` from `d3`; clearing `.next/dev` and restarting fixed it.
 - Verified in Chrome (SwiftShader WebGL): 17 places from 24 geotagged local photos; all four variants render and interact in dark and light; context menu blocked on gallery photos; no console errors.
+
+## 2026-11-15: Pokémon-style Illustrated Atlas (Local Preview)
+
+**Status:** Local on `feature/photo-map-variants`, not pushed. Built with two parallel subagents (terrain data, symbol art) plus main-session composition.
+
+- **Look:** one watercolor game-map palette in both themes (`gm-*` classes): blue sea with pale shallows and foam, green land on a raised earthy edge, translucent elevation washes, winding rivers and lakes, painted mountain ranges, rolling hills, round-tree forests, multi-building towns, chunky landmarks, serif town names.
+- **Zoom:** d3-zoom. Pinch or ⌘/Ctrl+scroll zooms; plain scroll keeps scrolling the page with a hint; two fingers on touch; +/−/World buttons; clicking a place or state flies in. A non-passive ctrl+wheel guard on the container stops a pinch that starts over an overlay from zooming the whole page. The live transform is written to the DOM; React only re-renders at zoom end. Symbols counter-scale via `--k`, set only on the symbol layer.
+- **Level of detail:** symbols keep a constant on-screen spacing via `selectSpaced`, so detail increases with zoom.
+  - Mountains (≥2,500 m) overlap into ranges, smaller at world view.
+  - Hills (<2,500 m) and forests (a jittered land grid, hit-tested with `Path2D`/`isPointInPath`) appear from 2× zoom.
+  - Towns replace dots at 2×. Labels collide-check by photo count. Landmarks lift above a town they would cover.
+- **Roads:** a minimum spanning tree over places within 1,500 km, drawn as gentle quadratic curves.
+- **Data (committed, small; regenerate with the scripts):**
+  - `src/data/terrain-peaks.json` (`scripts/generate-terrain.js`)
+  - `src/data/terrain-bands.json` (`scripts/generate-terrain-bands.js`, d3-contour, Douglas–Peucker; drawn smoothed, Greenland ice excluded)
+  - `src/data/hydrology.json` (`scripts/generate-hydrology.js`, Natural Earth 1:50m rivers rank ≤5 and lakes rank ≤1)
+  - Source downloads (AWS Terrain Tiles z4, Natural Earth GeoJSON) were fetched by the user and copied into git-excluded `.cache/`.
+- **Fixes along the way:**
+  - Peaks from the clamp ceiling (corrupt pixels) dropped.
+  - Lake rings collapsed by line simplification (closed ring ends coincide); now simplified as two halves.
+  - Antarctica filtered from the land outline.
+  - Lakes are gaps between countries, so they're painted as water over the raised edge.
+  - The world view no longer suppresses the Rockies (towns reserve space only when drawn).
+  - The `.gm-ocean` fill on `<svg>` leaked into children; removed.
+- **Gotcha:** the Turbopack dev CSS cache went stale repeatedly after `globals.css` edits and after production builds. Fix: `docker exec kind_kowalevski rm -rf /app/.next/dev` and restart the container.
+- **Attribution to add before shipping:** Natural Earth (public domain, credit customary) and AWS Terrain Tiles (sources such as SRTM/ETOPO1 ask for attribution).

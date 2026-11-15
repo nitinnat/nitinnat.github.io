@@ -24,24 +24,37 @@ export function project(place: { lat: number; lng: number }): [number, number] {
 }
 
 export interface WorldShapes {
+  land: Feature<Geometry, { name: string }>[];
   countries: Feature<Geometry, { name: string }>[];
   states: Feature<Geometry, { name: string }>[];
 }
 
 // Map outlines are imported lazily so they never weigh on the page's first load.
+// Antarctica would only be a strip along the bottom edge of the map.
+function withoutAntarctica(land: Feature<Geometry, { name: string }>) {
+  if (land.geometry.type !== "MultiPolygon") return land;
+  const coordinates = land.geometry.coordinates.filter((polygon) => polygon[0].some(([, lat]) => lat > -60));
+  return { ...land, geometry: { ...land.geometry, coordinates } };
+}
+
 export function useWorldShapes() {
   const [shapes, setShapes] = useState<WorldShapes | null>(null);
 
   useEffect(() => {
     let active = true;
-    Promise.all([import("world-atlas/countries-110m.json"), import("us-atlas/states-10m.json")]).then(
-      ([world, us]) => {
+    Promise.all([
+      import("world-atlas/countries-110m.json"),
+      import("world-atlas/land-110m.json"),
+      import("us-atlas/states-10m.json"),
+    ]).then(
+      ([world, land, us]) => {
         if (!active) return;
         const toFeatures = (topology: unknown, key: string) => {
           const typed = topology as Topology<Record<string, GeometryCollection<{ name: string }>>>;
           return feature(typed, typed.objects[key]).features;
         };
         setShapes({
+          land: toFeatures(land.default, "land").map(withoutAntarctica),
           countries: toFeatures(world.default, "countries").filter((c) => c.properties.name !== "Antarctica"),
           states: toFeatures(us.default, "states"),
         });
@@ -53,6 +66,82 @@ export function useWorldShapes() {
   }, []);
 
   return shapes;
+}
+
+type Point = [number, number];
+
+// Rounds a polygon ring into a soft closed curve (quadratic segments through edge midpoints).
+function smoothRing(ring: Point[]) {
+  const points = ring.slice(0, -1);
+  const n = points.length;
+  const mid = (a: Point, b: Point) => `${((a[0] + b[0]) / 2).toFixed(1)} ${((a[1] + b[1]) / 2).toFixed(1)}`;
+  let d = `M${mid(points[n - 1], points[0])}`;
+  points.forEach((point, i) => {
+    d += `Q${point[0].toFixed(1)} ${point[1].toFixed(1)} ${mid(point, points[(i + 1) % n])}`;
+  });
+  return `${d}Z`;
+}
+
+// Rounds an open line into a soft curve through its segment midpoints.
+function smoothLine(line: Point[]) {
+  if (line.length < 3) return `M${line.map((p) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join("L")}`;
+  const mid = (a: Point, b: Point) => `${((a[0] + b[0]) / 2).toFixed(1)} ${((a[1] + b[1]) / 2).toFixed(1)}`;
+  let d = `M${line[0][0].toFixed(1)} ${line[0][1].toFixed(1)}L${mid(line[0], line[1])}`;
+  for (let i = 1; i < line.length - 1; i += 1) d += `Q${line[i][0].toFixed(1)} ${line[i][1].toFixed(1)} ${mid(line[i], line[i + 1])}`;
+  const last = line[line.length - 1];
+  return `${d}L${last[0].toFixed(1)} ${last[1].toFixed(1)}`;
+}
+
+const toMap = ([lng, lat]: number[]): Point => projection([lng, lat]) ?? [0, 0];
+
+// Rivers and lakes from scripts/generate-hydrology.js (Natural Earth), projected and smoothed once.
+export function useHydrology() {
+  const [water, setWater] = useState<{ rivers: { rank: number; d: string }[]; lakes: string }>({ rivers: [], lakes: "" });
+
+  useEffect(() => {
+    let active = true;
+    import("@/data/hydrology.json").then(({ default: data }) => {
+      if (!active) return;
+      setWater({
+        rivers: data.rivers.map(({ rank, lines }) => ({ rank, d: lines.map((line) => smoothLine(line.map(toMap))).join("") })),
+        lakes: data.lakes.flatMap(({ polygons }) => polygons.flat().map((ring) => smoothRing(ring.map(toMap)))).join(""),
+      });
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return water;
+}
+
+const isGreenland = (ring: number[][]) => ring.every(([lng, lat]) => lat > 58 && lng > -75 && lng < -10);
+
+// Elevation bands from scripts/generate-terrain-bands.js, projected and smoothed once.
+export function useTerrainBands() {
+  const [bands, setBands] = useState<{ level: number; d: string }[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    import("@/data/terrain-bands.json").then(({ default: data }) => {
+      if (!active) return;
+      setBands(
+        data.bands.map(({ level, polygons }) => ({
+          level,
+          d: polygons
+            .flatMap((rings) => rings)
+            .filter((ring) => !isGreenland(ring))
+            .map((ring) => smoothRing(ring.map(([lng, lat]) => projection([lng, lat]) ?? [0, 0])))
+            .join(""),
+        })),
+      );
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return bands;
 }
 
 export function formatMonth(iso: string | null) {

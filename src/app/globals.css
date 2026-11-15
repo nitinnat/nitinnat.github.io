@@ -336,3 +336,103 @@
   -webkit-touch-callout: none;
   user-select: none;
 }
+
+/* Illustrated, game-map style photo map. --k (current zoom) is set on the symbol layer while
+   zooming so symbols keep a constant on-screen size. One palette in both themes, like a printed map. */
+.map-counter {
+  transform: scale(calc(1 / var(--k, 1)));
+}
+
+.gm-ocean { fill: #a6d3e4; }
+.gm-shallows { stroke: #cbe7f1; }
+.gm-foam { stroke: #f4fbfd; }
+.gm-land { fill: #b8d68e; }
+.gm-land-visited { fill: #c9e19b; }
+.gm-land-hover { fill: #dbeab0; }
+.gm-border { stroke: #f7f3e3; }
+.gm-route { stroke: #ecdcb2; }
+.gm-route-edge { stroke: #c9b384; }
+.gm-mtn-lit { fill: #c9c0dc; }
+.gm-mtn-mid { fill: #a59ac3; }
+.gm-mtn-shade { fill: #7b6f9f; }
+.gm-mtn-edge { stroke: #655b8a; }
+.gm-mtn-ridge { stroke: #756a8e; }
+.gm-mtn-highlight { stroke: #e2ddef; fill: none; }
+.gm-snow { fill: #fbfbff; }
+.gm-shadow { fill: #3f6b2e; fill-opacity: 0.18; }
+.gm-snow-shade { fill: #d5d1e8; }
+.gm-hill-lit { fill: #a6cd7b; }
+.gm-hill-shade { fill: #88b55f; }
+.gm-hill-edge { stroke: #6f9b4c; }
+.gm-hill-highlight { stroke: #d2e8a8; }
+.gm-tree { fill: #5f9e50; }
+.gm-tree-shade { fill: #3f7a3d; }
+.gm-tree-light { fill: #8fc26c; }
+.gm-tree-edge { stroke: #2e5f30; }
+.gm-forest-floor { fill: #4f7f3d; fill-opacity: 0.16; }
+.gm-trunk { fill: #7a5a3a; }
+.gm-wall { fill: #f6ead0; }
+.gm-wall-shade { fill: #dcc6a0; }
+.gm-roof { fill: #c9583d; }
+.gm-roof-shade { fill: #9a3d2a; }
+.gm-roof-edge { stroke: #7a2f20; fill: none; }
+.gm-roof-brown { fill: #a9693f; }
+.gm-roof-brown-shade { fill: #7a4629; }
+.gm-roof-brown-edge { stroke: #5c341f; fill: none; }
+.gm-roof-slate { fill: #6f879a; }
+.gm-roof-slate-shade { fill: #4e6577; }
+.gm-roof-slate-edge { stroke: #3c4f5e; fill: none; }
+.gm-door { fill: #6e4e35; }
+.gm-ground { fill: #e5d7a6; }
+.gm-ground-edge { stroke: #c7b17e; }
+.gm-water { fill: #93cbe0; }
+.gm-water-line { stroke: #eef8fc; fill: none; }
+.gm-label { fill: #3b2f25; stroke: #fbf6e8; }
+
+/* Raised-land edge for the photo map (composition, separate from the symbol palette). */
+.gm-cliff { fill: #c4a06a; }
+.gm-cliff-shadow { fill: #86b9cc; }
+.gm-lake { fill: #a6d3e4; }
+.gm-river-edge { stroke: #79b4cf; }
+.gm-river { stroke: #b5dcea; }
+/* Elevation washes, lowland to alpine; translucent so region hover tints still show through. */
+.gm-band-0 { fill: #9fc574; opacity: 0.55; }
+.gm-band-1 { fill: #bccb83; opacity: 0.75; }
+.gm-band-2 { fill: #d3c597; opacity: 0.8; }
+.gm-band-3 { fill: #e6ddcc; opacity: 0.85; }
+
+.map-rise {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: map-rise 0.55s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+@keyframes map-rise {
+  from { opacity: 0; transform: translateY(4px) scaleY(0.4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-rise { animation-name: map-fade; }
+}
+
+@keyframes map-fade {
+  from { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .map-falls {
+    animation: map-falls 0.8s linear infinite;
+  }
+
+  .map-float {
+    animation: map-float 4s ease-in-out infinite;
+  }
+}
+
+@keyframes map-falls {
+  to { stroke-dashoffset: -4; }
+}
+
+@keyframes map-float {
+  50% { transform: translateY(-2.5px); }
+}
