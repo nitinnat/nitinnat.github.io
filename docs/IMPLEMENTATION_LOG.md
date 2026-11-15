@@ -738,3 +738,17 @@ Load Photos → Load Metadata → Merge Metadata with Photos
 - Gotchas: `overflow: hidden` makes an element a scroll container and silently deactivates a child's `view()` timeline (use `overflow: clip`); IntersectionObserver misses headings skipped by a jump scroll; rendering (and rAF) is suppressed during a View Transition's DOM update.
 - For local Photography previews, 2 photos per location were mirrored from the live site into git-ignored `content/assets/photos` and copied to `public/assets` (excluded via `.git/info/exclude`).
 - Verified: production build; Playwright checks for rail fill progress, dialog morph open/close with focus return, reading progress and active section, hero fade, sticky headings, normal lightbox, no page errors.
+
+## 2026-11-15: Photo Map Variants (Local Preview)
+
+**Status:** Local preview on `feature/photo-map-variants` (from `main` after PR #31). Not pushed; awaiting the user's pick.
+
+- `src/lib/photo-geo.ts` reads GPS + capture time from each photo's EXIF at build/render time (`exifr`), rounds coordinates to 0.05° (~5 km), and groups photos within 60 km into date-ordered places. Reads the first 256 KB of each file and passes bytes to exifr: exifr's own file loading fails inside Next's server bundle ("Couldn't load fs"), and its `pick` option drops the raw GPS tags that `latitude`/`longitude` are computed from.
+- Map section on Photography with a dev-only switcher between four variants (`src/components/photography/map/`):
+  1. Atlas: flat d3-geo SVG (world-atlas countries + us-atlas states), visited regions tinted; hovering a place/state fans its photos out; regions without photos show the nearest place at the cursor; click zooms (animated `viewBox`) and fills a filmstrip.
+  2. Globe: cobe WebGL dotted globe; DOM pins anchored with CSS anchor positioning to cobe's marker anchors (`--cobe-visible-*` lives on `:root`, absent when behind the globe); hover pauses rotation and fans photos; click turns the globe to the place; drag to spin. Canvas is created imperatively because cobe re-parents it.
+  3. Journey: trips in date order; camera follows each leg, great-circle arc draws, photos bloom at each stop; stop chips to jump.
+  4. Globe → Atlas: globe with journey arcs; choosing a place cross-fades into the Atlas zooming in from the world view.
+- Download deterrence: right-click, drag, and long-press save blocked on photos (page and lightbox). Cannot stop screenshots; real protection needs resized, EXIF-stripped derivatives (not yet built).
+- Gotcha: after `npm install` with the dev server running, Turbopack failed to resolve `d3-geo` from `d3`; clearing `.next/dev` and restarting fixed it.
+- Verified in Chrome (SwiftShader WebGL): 17 places from 24 geotagged local photos; all four variants render and interact in dark and light; context menu blocked on gallery photos; no console errors.

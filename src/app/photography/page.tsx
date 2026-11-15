@@ -6,6 +6,9 @@ import {
   type PhotoItem,
 } from "@/components/photography/photo-gallery";
 import { ClusteredGallery } from "@/components/photography/clustered-gallery";
+import { PhotoMapSection } from "@/components/photography/map/photo-map-section";
+import { PhotoProtection } from "@/components/photography/photo-protection";
+import { buildPlaces } from "@/lib/photo-geo";
 import {
   loadPhotoMetadata,
   mergeMetadataIntoPhotos,
@@ -270,6 +273,7 @@ export default async function PhotographyPage() {
   // Cluster and position photos for Photo Journey
   const clusters = clusterPhotos(galleryWithMetadata);
   const positionedClusters = positionClusters(clusters);
+  const places = await buildPlaces(galleryWithMetadata);
 
   // Keep unsorted gallery for fallback and hero
   const gallery = galleryWithMetadata;
@@ -288,13 +292,15 @@ export default async function PhotographyPage() {
     heroFromAssets?.alt || heroByName?.alt || heroFallback?.alt;
 
   return (
-    <div className="min-h-screen bg-background pb-16 text-foreground">
+    <div data-protected className="min-h-screen bg-background pb-16 text-foreground">
+      <PhotoProtection />
       <PhotoHero
         title="Photography"
         subtitle={heroSubtitle || page.meta.description}
         imageUrl={heroImageUrl}
         imageAlt={heroAltText}
       />
+      <PhotoMapSection places={places} />
       {positionedClusters.length > 0 ? (
         <ClusteredGallery clusters={positionedClusters} />
       ) : (
