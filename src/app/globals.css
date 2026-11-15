@@ -395,6 +395,17 @@
 .gm-lake { fill: #a6d3e4; }
 .gm-river-edge { stroke: #79b4cf; }
 .gm-river { stroke: #b5dcea; }
+/* Deserts: sandy wash, dunes, and red-brown rock instead of lavender ranges. */
+.gm-desert { fill: #ead39b; opacity: 0.85; }
+.gm-desert path { fill: inherit; }
+.gm-dune-lit { fill: #e8c987; }
+.gm-dune-shade { fill: #cfa868; }
+.gm-dune-edge { stroke: #b48a52; }
+.gm-arid .gm-mtn-lit { fill: #d49a6f; }
+.gm-arid .gm-mtn-mid { fill: #bf7f57; }
+.gm-arid .gm-mtn-shade { fill: #9e6143; }
+.gm-arid .gm-mtn-edge { stroke: #864f36; }
+.gm-arid .gm-mtn-highlight { stroke: #e7bb92; }
 /* Elevation washes, lowland to alpine; translucent so region hover tints still show through. */
 .gm-band-0 { fill: #9fc574; opacity: 0.55; }
 .gm-band-1 { fill: #bccb83; opacity: 0.75; }

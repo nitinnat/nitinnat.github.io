@@ -7,6 +7,7 @@ export interface Peak {
   id: number;
   x: number;
   y: number;
+  lat: number;
   elevation: number;
 }
 
@@ -21,7 +22,7 @@ export function usePeaks() {
       setPeaks(
         data.map(([lng, lat, elevation], id) => {
           const [x, y] = project({ lat, lng });
-          return { id, x, y, elevation };
+          return { id, x, y, lat, elevation };
         }),
       );
     });
@@ -136,7 +137,17 @@ const RANGES: { width: number; outline: Point[]; mid: Point[][]; shade: Point[][
 const lerp = (a: Point, b: Point, t: number): Point => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
 const shape = (points: Point[]) => `M${points.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(" L")} Z`;
 
-export function Mountain({ elevation, size = 1, variant = 0 }: { elevation: number; size?: number; variant?: number }) {
+export function Mountain({
+  elevation,
+  size = 1,
+  variant = 0,
+  snowy = true,
+}: {
+  elevation: number;
+  size?: number;
+  variant?: number;
+  snowy?: boolean;
+}) {
   const range = RANGES[variant % RANGES.length];
   const height = Math.min(1, Math.max(0, (elevation - 2500) / 3000));
   const h = (30 + height * 16) * size;
@@ -149,7 +160,7 @@ export function Mountain({ elevation, size = 1, variant = 0 }: { elevation: numb
       <path d={shape(scale(range.outline))} className="gm-mtn-lit gm-mtn-edge" strokeWidth={1.1} strokeLinejoin="round" />
       {range.mid.map((points, i) => <path key={`m${i}`} d={shape(scale(points))} className="gm-mtn-mid" />)}
       {range.shade.map((points, i) => <path key={`s${i}`} d={shape(scale(points))} className="gm-mtn-shade" />)}
-      {range.summits.map((summit, i) => {
+      {snowy && range.summits.map((summit, i) => {
         const [top, left, right, crease] = scale([summit.top, summit.left, summit.right, summit.crease]);
         const l = lerp(top, left, snowline);
         const r = lerp(top, right, snowline);
@@ -274,6 +285,22 @@ export function Town({ size = "small", seed = 0 }: { size?: "small" | "large"; s
       {back.map((house) => <House key={`${house.x}`} {...house} />)}
       {large && <Tower x={2} y={-1} />}
       {houses.filter((house) => house.y >= 0).map((house) => <House key={`${house.x}`} {...house} />)}
+    </g>
+  );
+}
+
+export function Dunes({ seed = 0 }: { seed?: number }) {
+  const dune = (x: number, y: number, w: number, h: number) => (
+    <g key={`${x}-${y}`} transform={`translate(${x} ${y})`}>
+      <path d={`M${-w / 2} 0 Q${-w * 0.1} ${-h * 1.6} ${w / 2} 0 Z`} className="gm-dune-lit gm-dune-edge" strokeWidth={0.8} />
+      <path d={`M${w * 0.02} ${-h * 0.78} Q${w * 0.3} ${-h * 0.5} ${w / 2} 0 L${w * 0.12} 0 Z`} className="gm-dune-shade" />
+    </g>
+  );
+  const flip = seed % 2 === 0 ? 1 : -1;
+  return (
+    <g transform={`scale(${flip} 1)`}>
+      {dune(-7, -2, 20, 7)}
+      {dune(6, 1, 24, 8)}
     </g>
   );
 }

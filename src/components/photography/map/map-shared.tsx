@@ -115,6 +115,44 @@ export function useHydrology() {
   return water;
 }
 
+export interface ClimateRegions {
+  deserts: string[];
+  isDesert: (x: number, y: number) => boolean;
+  isTundra: (x: number, y: number) => boolean;
+}
+
+// Deserts and tundra from scripts/generate-climate-regions.js (Natural Earth): a smoothed outline
+// to paint, plus point tests in map coordinates for choosing which symbols belong where.
+export function useClimateRegions() {
+  const [regions, setRegions] = useState<ClimateRegions | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    import("@/data/climate-regions.json").then(({ default: data }) => {
+      if (!active) return;
+      // Regions overlap (the Sahara contains its ergs), so each polygon is kept separate: merging
+      // them under an even-odd fill would punch holes wherever two overlap.
+      const outlines = (polygons: number[][][][]) =>
+        polygons.map((rings) => rings.map((ring) => smoothRing(ring.map(toMap))).join(""));
+      const context = document.createElement("canvas").getContext("2d")!;
+      const contains = (paths: Path2D[], x: number, y: number) => paths.some((path) => context.isPointInPath(path, x, y, "evenodd"));
+      const deserts = outlines(data.deserts);
+      const desertPaths = deserts.map((d) => new Path2D(d));
+      const tundraPaths = outlines(data.tundra).map((d) => new Path2D(d));
+      setRegions({
+        deserts,
+        isDesert: (x, y) => contains(desertPaths, x, y),
+        isTundra: (x, y) => contains(tundraPaths, x, y),
+      });
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return regions;
+}
+
 const isGreenland = (ring: number[][]) => ring.every(([lng, lat]) => lat > 58 && lng > -75 && lng < -10);
 
 // Elevation bands from scripts/generate-terrain-bands.js, projected and smoothed once.

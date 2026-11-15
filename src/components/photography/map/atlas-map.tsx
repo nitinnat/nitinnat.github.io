@@ -22,12 +22,13 @@ import {
   project,
   projection,
   usePhotoLightbox,
+  useClimateRegions,
   useHydrology,
   useTerrainBands,
   useVisitedRegions,
   useWorldShapes,
 } from "./map-shared";
-import { Forest, Hill, Mountain, Town, selectSpaced, usePeaks } from "./terrain";
+import { Dunes, Forest, Hill, Mountain, Town, selectSpaced, usePeaks } from "./terrain";
 import { landmarks } from "./landmarks";
 
 interface Bloom {
@@ -49,6 +50,13 @@ const TOWN_ZOOM = 2;
 const MAX_ROAD_KM = 1500;
 const SOUTHERN_LIMIT_Y = project({ lat: -56, lng: 0 })[1];
 
+// Permanent snow starts around 5,000 m in the tropics and falls to ~2,000 m near the Arctic.
+// Sampled peak elevations average ~10 km of terrain and read 15–25% low, hence the correction.
+const isSnowy = (lat: number, elevation: number) => elevation * 1.15 >= 5000 - 60 * Math.max(0, Math.abs(lat) - 15);
+
+// No forests beyond the Arctic treeline or on Greenland's ice.
+const isTreeless = ([lng, lat]: [number, number]) => lat > 66 || (lat > 59 && lng > -75 && lng < -10);
+
 // Deterministic jitter so the scattered forests stay put between renders.
 const jitter = (a: number, b: number) => {
   const n = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453;
@@ -60,6 +68,7 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
   const peaks = usePeaks();
   const bands = useTerrainBands();
   const water = useHydrology();
+  const climate = useClimateRegions();
   const visited = useVisitedRegions(places, shapes);
   const lightbox = usePhotoLightbox();
 
@@ -211,7 +220,8 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
       for (let x = 0; x < MAP_WIDTH; x += 5) {
         const px = x + jitter(x, y) * 4;
         const py = y + jitter(y, x) * 4;
-        if (context.isPointInPath(land, px, py)) points.push({ id: points.length, x: px, y: py });
+        const lngLat = projection.invert?.([px, py]);
+        if (lngLat && !isTreeless(lngLat) && context.isPointInPath(land, px, py)) points.push({ id: points.length, x: px, y: py });
       }
     }
     return points.sort((a, b) => jitter(a.x, a.y) - jitter(b.x, b.y));
@@ -226,6 +236,20 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
     }));
 
   // Terrain keeps a constant on-screen spacing, so more of it appears as you zoom in.
+  // Climate decides what grows where: dunes instead of forests or green hills in deserts, no
+  // forests on tundra, red rock for desert ranges. Classified once, not on every zoom.
+  const climateAware = useMemo(() => {
+    const inDesert = (p: Point) => climate?.isDesert(p.x, p.y) ?? false;
+    const inTundra = (p: Point) => climate?.isTundra(p.x, p.y) ?? false;
+    return {
+      peaks: highPeaks.map((peak) => ({ ...peak, arid: inDesert(peak) })),
+      hills: lowPeaks.filter((peak) => !inDesert(peak)),
+      ground: forests
+        .filter((spot) => !inTundra(spot))
+        .map((spot) => ({ ...spot, kind: inDesert(spot) ? ("dunes" as const) : ("trees" as const) })),
+    };
+  }, [highPeaks, lowPeaks, forests, climate]);
+
   const terrain = useMemo(() => {
     if (pixel === 0) return [];
     const spacing = (px: number) => px / (k * pixel);
@@ -234,15 +258,15 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
     // Towns only reserve space once they're drawn as towns.
     const occupied = [...landmarkPoints.filter((l) => k >= l.minZoom), ...(close ? placePoints : [])];
     // Spacing below a mountain's width lets dense ranges overlap into one painted mass.
-    const mountains = selectSpaced(highPeaks, bounds, spacing(close ? 30 : 22), occupied, close ? 140 : 110);
-    const hills = close ? selectSpaced(lowPeaks, bounds, spacing(40), [...occupied, ...mountains], 80) : [];
-    const trees = close ? selectSpaced(forests, bounds, spacing(32), [...occupied, ...mountains, ...hills], 110) : [];
+    const mountains = selectSpaced(climateAware.peaks, bounds, spacing(close ? 30 : 22), occupied, close ? 140 : 110);
+    const hills = close ? selectSpaced(climateAware.hills, bounds, spacing(40), [...occupied, ...mountains], 80) : [];
+    const ground = close ? selectSpaced(climateAware.ground, bounds, spacing(32), [...occupied, ...mountains, ...hills], 110) : [];
     return [
-      ...mountains.map((peak) => ({ ...peak, kind: "mountain" as const })),
-      ...hills.map((peak) => ({ ...peak, kind: "hill" as const })),
-      ...trees.map((spot) => ({ ...spot, elevation: 0, kind: "trees" as const })),
+      ...mountains.map((peak) => ({ ...peak, kind: "mountain" as const, snowy: isSnowy(peak.lat, peak.elevation) })),
+      ...hills.map((peak) => ({ ...peak, kind: "hill" as const, snowy: false, arid: false })),
+      ...ground.map((spot) => ({ ...spot, elevation: 0, snowy: false, arid: false })),
     ].sort((a, b) => a.y - b.y);
-  }, [highPeaks, lowPeaks, forests, landmarkPoints, placePoints, settled, k, pixel]);
+  }, [climateAware, landmarkPoints, placePoints, settled, k, pixel]);
 
   // Town names that would overlap a busier town's name are left out.
   const labelledTowns = useMemo(() => {
@@ -311,8 +335,7 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
 
   const focusRegion = (region: Region) => {
     const inside = placesIn(region);
-    if (inside.length === 0) return;
-    setSelected(largest(inside));
+    if (inside.length > 0) setSelected(largest(inside));
     setBloom(null);
     zoomTo(pathFor.bounds(region), 14);
   };
@@ -381,6 +404,13 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
                 <path key={level} d={d} fillRule="evenodd" className={`gm-band-${index}`} />
               ))}
             </g>
+            {climate && (
+              <g className="gm-desert pointer-events-none" aria-hidden="true">
+                {climate.deserts.map((d, index) => (
+                  <path key={index} d={d} fillRule="evenodd" />
+                ))}
+              </g>
+            )}
             <g className="pointer-events-none" aria-hidden="true">
               <path d={water.lakes} fillRule="evenodd" className="gm-lake gm-foam" strokeWidth={1} vectorEffect="non-scaling-stroke" />
               {water.rivers
@@ -412,9 +442,13 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
                     <g className="map-counter">
                       <g className="map-rise" style={rise(index)}>
                         {item.kind === "mountain" ? (
-                          <Mountain elevation={item.elevation} size={k >= TOWN_ZOOM ? 1 : 0.6} variant={item.id % 3} />
+                          <g className={item.arid ? "gm-arid" : undefined}>
+                            <Mountain elevation={item.elevation} size={k >= TOWN_ZOOM ? 1 : 0.6} variant={item.id % 3} snowy={item.snowy} />
+                          </g>
                         ) : item.kind === "trees" ? (
                           <Forest seed={item.id} />
+                        ) : item.kind === "dunes" ? (
+                          <Dunes seed={item.id} />
                         ) : (
                           <Hill variant={item.id % 3} />
                         )}
