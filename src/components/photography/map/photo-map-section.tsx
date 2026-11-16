@@ -1,12 +1,16 @@
 "use client";
 
-import { Nunito } from "next/font/google";
+import localFont from "next/font/local";
 import { cn } from "@/lib/utils";
 import type { Place } from "@/lib/photo-geo";
 import { AtlasMap } from "./atlas-map";
 
-// The map's rounded game-map face, loaded only with this section.
-const mapFont = Nunito({ subsets: ["latin"], weight: ["700", "800", "900"], variable: "--font-map" });
+// The map's rounded game-map face, self-hosted so builds never depend on Google Fonts.
+const mapFont = localFont({
+  src: "../../../../node_modules/@fontsource-variable/nunito/files/nunito-latin-wght-normal.woff2",
+  weight: "200 1000",
+  variable: "--font-map",
+});
 
 export function PhotoMapSection({ places }: { places: Place[] }) {
   if (places.length === 0) return null;
