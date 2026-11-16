@@ -87,7 +87,7 @@ export function ClusteredGallery({ clusters }: ClusteredGalleryProps) {
           >
             {/* Section Header */}
             <div className="cluster-header mb-6">
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+              <h2 className="mb-2 font-serif text-2xl tracking-tight text-foreground md:text-3xl">
                 {cluster.name}
               </h2>
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">

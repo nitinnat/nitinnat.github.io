@@ -237,7 +237,7 @@ export default async function PhotographyPage() {
   if (!page) {
     return (
       <div className="container mx-auto px-4 py-12 max-w-3xl">
-        <h1 className="text-3xl font-bold text-foreground">Photography</h1>
+        <h1 className="font-serif text-4xl tracking-[-0.04em] text-foreground">Photography</h1>
         <p className="mt-3 text-muted-foreground">
           Create a{" "}
           <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
