@@ -18,8 +18,8 @@ export function PhotoMapSection({ places }: { places: Place[] }) {
   return (
     <section className={cn("container mx-auto max-w-6xl px-4 pb-6 pt-12", mapFont.variable)}>
       <div className="mb-6">
-        <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">Where these were taken</p>
-        <h2 className="mt-2 text-2xl font-semibold text-foreground md:text-3xl">The map</h2>
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">Routes travelled so far</p>
+        <h2 className="mt-3 font-serif text-3xl tracking-tight text-foreground md:text-4xl">Everywhere the camera&apos;s been</h2>
       </div>
       <AtlasMap places={places} />
     </section>
