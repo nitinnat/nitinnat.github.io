@@ -853,3 +853,38 @@ Load Photos → Load Metadata → Merge Metadata with Photos
 - **`selectSpaced`:** takes an optional `drawn` predicate, so bare ground spots still claim space but don't count toward the limit.
 - **Credits:** a mono line under the Atlas map credits AWS Terrain Tiles, Natural Earth and Köppen–Geiger, linking Kottek et al. (2006) via its DOI and giving the full citation in the title.
 - **Verified:** tsc and eslint pass. Playwright symbol census before/after (`scratchpad/fix.js`), hover checks for Libya, Australia and central/eastern Nevada, and screenshots.
+
+## 2026-11-15: Galar-Style Atlas Map
+
+**Status:** Local on `feature/photo-map-variants`, not pushed. `cities.tsx` (`CityModel`, `cityTier`) was built in parallel by another agent.
+
+- **Look (ported from the "Galar Town Map" mockup, plus the cloud frame and landmark plates from the watercolor one):**
+  - Flat lime land with darker green elevation bands; crisp Köppen tints (sand deserts with an edge, khaki steppe over high ground, white ice).
+  - Sea: wave glyphs from a `<pattern>`, a dark teal offshore ring over a pale shallow band, white foam coast, and the raised land edge kept.
+  - Grey highland patches with slate massifs, red-rock mesas or outcrops on desert peaks, and single cones for isolated volcanoes.
+  - Forest blobs filled with biome tree textures, plus humps, dunes and cacti (Americas only), savanna trees and tundra tufts on open ground.
+  - Nunito (`next/font`, scoped to the map section as `--font-map`) on cream name plates.
+- **`scripts/generate-map-features.js` → `src/data/map-features.json` (~92 KB):**
+  - **Highlands:** cells whose highest zoom-4 pixel is ≥2,200 m, minus ice, blurred and contoured, with a 1 deg² minimum area. Each patch carries a `dry` flag and its ≥2,500 m peaks, stored as `[lng, lat, elevation, surrounding mean elevation]`. Peaks outside every patch become isolated volcanoes, at most one per 1.5°.
+  - **Forests:** pine (boreal, montane M above 1,800 m, semi-arid ranges above 2,000 m), broadleaf (M) or jungle (T), below a latitude treeline.
+    - Value noise leaves 40% of forest-climate ground as meadow.
+    - The blurred mask is zeroed within 0.25° of desert or prairie, so no blob spills into them.
+- **Client (`atlas-map.tsx`, `galar.tsx`, `map-shared.tsx` `useMapFeatures`):**
+  - **Stops:** towns within 34 px merge into one stop, shown as a `CityModel` with a count badge.
+  - **Routes:** the MST is kept, numbered in visit order and drawn as metro lines with the elbow on land. Badges are collision-culled with labels, and bridges mark river crossings. Dashed bowed arcs join route groups at world view.
+  - **Cursor and player:** corner brackets mark the selected stop, and the bucket-hat player sits at the latest place with a 2-step bob (disabled for reduced motion).
+  - **Overlays:** a navy header plate (coarse region lookup by view centre and zoom), a cream info panel (visit #, routes, Open photos → lightbox), cream controls, and CSS paper grain plus an SVG cloud frame, all outside the zoom group.
+  - **Region hit targets:** countries and states are invisible hit paths projected once. Only the hovered one is outlined, above the tints, which fixes Libya.
+- **Level of detail:**
+  - Ground spots are a jittered grid at a fixed screen pitch over the current view, with per-view budgets (mountains 32–36, hills 12–24, ground 45–90).
+  - At world view each highland is capped at about one massif per 5,000 px² of patch, so the Andes show 2 instead of a column.
+  - Peaks and hills require land polygons of at least 15,000 km², so Hawaii and other specks get none.
+  - Land, forest and highland are rasterized once into one RGB bitmap (2 px per map unit), so hit tests are pixel reads. `isPointInPath` was ~35 ms per settle.
+  - Symbols keep at least 0.7 screen px per unit (`MIN_SYMBOL_PX`), so phones stay legible. The info panel is hidden below `sm` (the filmstrip covers it).
+- **Snow:** aridity takes `coldIsDry`, so tundra counts as dry on a high plateau (surroundings ≥3,000 m) unless the summit rises more than ~1,500 m above it. The plateau lift is up to 1,500 m more.
+- **Census (all ≥2,500 m peaks, snowy):**
+  - Dry or plateau: Atacama 2/36, Bolivia 4/25, N Argentina 7/39, Iran 3/61, Tibet interior 18/145 (was 84/89 of sampled peaks).
+  - Snowy ranges: Himalaya crest 12/12, Alps 12/16, Alaska 17/17, Cascades 2/2, Kilimanjaro 1/1, Mt Kenya 1/1, Patagonia 2/2.
+  - Forest samples in desert 0 and in prairie 0. In-browser: Kenya 73 and Tanzania 86 acacias per view.
+- **Performance (dev server, Playwright ctrl+wheel pinch + drag, 2× DPR):** frames during live zoom stay at the headless 30 fps cap (p95 33.4 ms, same as idle). Long tasks occur only at gesture end (React settle, 56–127 ms in dev, mostly `jsxDEV`). The production build compiles.
+- **Removed:** admin borders, the dashed-ellipse selection, the old `Town`/`Hill`/`Pines`/`Jungle`/`Meadow` symbols and the World text button.

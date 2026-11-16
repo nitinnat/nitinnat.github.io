@@ -185,40 +185,6 @@ export function Mountain({
   );
 }
 
-const HILLS = [
-  { w: 26, h: 11, peak: 0 },
-  { w: 22, h: 9, peak: 0.12 },
-  { w: 32, h: 13, peak: -0.08 },
-];
-
-export function Hill({ variant = 0 }: { variant?: number }) {
-  const { w, h, peak } = HILLS[variant % HILLS.length];
-  const p = peak * w;
-  return (
-    <g>
-      <path d={`M${-w / 2} 0 C${p - w * 0.32} ${-h * 1.33} ${p + w * 0.32} ${-h * 1.33} ${w / 2} 0`} className="gm-hill-lit gm-hill-edge" strokeWidth={0.9} />
-      <path
-        d={`M${p + w * 0.06} ${-h} C${p + w * 0.26} ${-h * 0.98} ${w * 0.42} ${-h * 0.5} ${w / 2 - 0.4} -0.2 L${p + w * 0.12} -0.2 C${p + w * 0.16} ${-h * 0.4} ${p + w * 0.12} ${-h * 0.75} ${p + w * 0.06} ${-h} Z`}
-        className="gm-hill-shade"
-      />
-      <path d={`M${p - w * 0.3} ${-h * 0.5} Q${p - w * 0.2} ${-h * 0.92} ${p - w * 0.02} ${-h * 0.94}`} className="gm-hill-highlight" fill="none" strokeWidth={1.3} strokeLinecap="round" />
-    </g>
-  );
-}
-
-export function DryHill({ seed = 0 }: { seed?: number }) {
-  return (
-    <g className="gm-dry">
-      <Hill variant={seed % 3} />
-    </g>
-  );
-}
-
-// Open grassland: mostly gentle hills, with the occasional small copse.
-export function Meadow({ seed = 0 }: { seed?: number }) {
-  return seed % 4 === 0 ? <Forest seed={seed} size={0.7} /> : <Hill variant={seed % 3} />;
-}
-
 const FOREST_SLOTS: Point[] = [[-9, -6], [1, -7], [10, -5], [-14, -1], [-4, -2], [6, -1], [14, 1], [-8, 3], [3, 4]];
 
 export function Forest({ seed = 0, size = 1 }: { seed?: number; size?: number }) {
@@ -245,122 +211,12 @@ export function Forest({ seed = 0, size = 1 }: { seed?: number; size?: number })
   );
 }
 
-export function Trees() {
-  return <Forest seed={2} size={0.6} />;
-}
-
-const ROOFS = ["gm-roof", "gm-roof-brown", "gm-roof", "gm-roof-slate", "gm-roof-brown"];
-
-function House({ x, y, w, h, roof }: { x: number; y: number; w: number; h: number; roof: string }) {
-  const top = y - h;
-  const ridge = top - w * 0.42;
-  return (
-    <g>
-      <rect x={x - w / 2} y={top} width={w} height={h} className="gm-wall" />
-      <rect x={x + w * 0.15} y={top} width={w * 0.35} height={h} className="gm-wall-shade" />
-      <path d={`M${x - w / 2 - 1.2} ${top + 0.6} L${x - w / 2 + 1.4} ${ridge} H${x + w / 2 - 1.4} L${x + w / 2 + 1.2} ${top + 0.6} Z`} className={roof} />
-      <path d={`M${x + w * 0.2} ${ridge} H${x + w / 2 - 1.4} L${x + w / 2 + 1.2} ${top + 0.6} H${x + w * 0.3} Z`} className={`${roof}-shade`} />
-      <path d={`M${x - w / 2 - 1.2} ${top + 0.6} H${x + w / 2 + 1.2}`} className={`${roof}-edge`} strokeWidth={1.1} strokeLinecap="round" />
-      <rect x={x - w * 0.3} y={y - 2.8} width={1.8} height={2.8} className="gm-door" />
-      <rect x={x + w * 0.05} y={top + 1.6} width={1.5} height={1.5} className="gm-door" />
-    </g>
-  );
-}
-
-function Tower({ x, y }: { x: number; y: number }) {
-  return (
-    <g>
-      {[0, 1, 2].map((tier) => {
-        const base = y - tier * 6.2;
-        const half = 4 - tier * 0.8;
-        return (
-          <g key={tier}>
-            <rect x={x - half} y={base - 5} width={half * 2} height={5} className="gm-wall" />
-            <rect x={x + half * 0.2} y={base - 5} width={half * 0.8} height={5} className="gm-wall-shade" />
-            <path d={`M${x - half - 2.6} ${base - 4.2} Q${x - half} ${base - 5} ${x - half + 0.8} ${base - 7.2} H${x + half - 0.8} Q${x + half} ${base - 5} ${x + half + 2.6} ${base - 4.2} Z`} className="gm-roof-brown" />
-            <path d={`M${x + half * 0.3} ${base - 7.2} H${x + half - 0.8} Q${x + half} ${base - 5} ${x + half + 2.6} ${base - 4.2} H${x + half * 0.5} Z`} className="gm-roof-brown-shade" />
-          </g>
-        );
-      })}
-      <path d={`M${x} ${y - 19.6} V${y - 24}`} className="gm-roof-brown-edge" strokeWidth={1} strokeLinecap="round" />
-    </g>
-  );
-}
-
-const SMALL_TOWN = [[-7, -3, 8, 6], [5, -4, 9, 6.5], [-2, 2, 10, 7], [9, 2, 7, 5.5]];
-const LARGE_TOWN = [[-11, -4, 8, 6], [12, -3, 9, 6.5], [-5, 2, 10, 7], [7, 3, 9, 6.5], [-15, 3, 7, 5.5], [16, 4, 7, 5], [-1, -6, 7, 5.5]];
-
-export function Town({ size = "small", seed = 0 }: { size?: "small" | "large"; seed?: number }) {
-  const large = size === "large";
-  const houses = (large ? LARGE_TOWN.slice(0, 5 + (seed % 3)) : SMALL_TOWN.slice(0, 3 + (seed % 2)))
-    .map(([x, y, w, h], i) => ({ x, y, w, h, roof: ROOFS[(i + seed) % ROOFS.length] }))
-    .sort((a, b) => a.y - b.y);
-  const back = houses.filter((house) => house.y < 0);
-  return (
-    <g>
-      <ellipse cx={0} cy={1} rx={large ? 22 : 15} ry={large ? 6.5 : 4.8} className="gm-ground gm-ground-edge" strokeWidth={0.8} />
-      {back.map((house) => <House key={`${house.x}`} {...house} />)}
-      {large && <Tower x={2} y={-1} />}
-      {houses.filter((house) => house.y >= 0).map((house) => <House key={`${house.x}`} {...house} />)}
-    </g>
-  );
-}
-
-export function Dunes({ seed = 0 }: { seed?: number }) {
-  const dune = (x: number, y: number, w: number, h: number) => (
-    <g key={`${x}-${y}`} transform={`translate(${x} ${y})`}>
-      <path d={`M${-w / 2} 0 Q${-w * 0.1} ${-h * 1.6} ${w / 2} 0 Z`} className="gm-dune-lit gm-dune-edge" strokeWidth={0.8} />
-      <path d={`M${w * 0.02} ${-h * 0.78} Q${w * 0.3} ${-h * 0.5} ${w / 2} 0 L${w * 0.12} 0 Z`} className="gm-dune-shade" />
-    </g>
-  );
-  const flip = seed % 2 === 0 ? 1 : -1;
-  return (
-    <g transform={`scale(${flip} 1)`}>
-      {dune(-7, -2, 20, 7)}
-      {dune(6, 1, 24, 8)}
-    </g>
-  );
-}
-
 const seeded = (seed: number, i: number, salt: number) => Math.sin((seed + 1) * 12.9898 + i * 78.233 + salt) * 0.5;
-
-function Palm({ x, y, lean }: { x: number; y: number; lean: number }) {
-  const [cx, cy] = [x + lean, y - 21];
-  return (
-    <g>
-      <path d={`M${x} ${y} Q${x + lean * 0.2} ${y - 11} ${cx} ${cy}`} fill="none" className="gm-trunk-stroke" strokeWidth={2.2} strokeLinecap="round" />
-      {[-160, -115, -65, -20, 30, 150].map((angle) => {
-        const rad = (angle * Math.PI) / 180;
-        const tx = cx + Math.cos(rad) * 9;
-        const ty = cy + Math.sin(rad) * 5 + 3;
-        const mx = (cx + tx) / 2;
-        const my = (cy + ty) / 2 - 2.5;
-        return (
-          <path
-            key={angle}
-            d={`M${cx} ${cy} Q${mx.toFixed(1)} ${(my - 2).toFixed(1)} ${tx.toFixed(1)} ${ty.toFixed(1)} Q${mx.toFixed(1)} ${(my + 1.8).toFixed(1)} ${cx} ${cy} Z`}
-            className="gm-tree gm-tree-edge"
-            strokeWidth={0.6}
-          />
-        );
-      })}
-    </g>
-  );
-}
-
-export function Jungle({ seed = 0 }: { seed?: number }) {
-  return (
-    <g className="gm-jungle">
-      <Palm x={seed % 2 ? 7 : -6} y={-3} lean={seed % 2 ? 3 : -3} />
-      <Forest seed={seed + 4} />
-    </g>
-  );
-}
 
 const ACACIA_SLOTS: Point[] = [[-9, -1], [7, -3], [1, 3]];
 
 export function Acacia({ seed = 0 }: { seed?: number }) {
-  const trees = ACACIA_SLOTS.slice(0, 1 + (seed % 3))
+  const trees = ACACIA_SLOTS.slice(0, 2 + (seed % 2))
     .map(([x, y], i) => ({ x: x + seeded(seed, i, 1) * 4, y, w: 8 + seeded(seed, i, 2) * 2, h: 9 + seeded(seed, i, 3) * 2 }))
     .sort((a, b) => a.y - b.y);
   return (
@@ -404,7 +260,7 @@ const CERRADO_SLOTS: Point[] = [[-7, -1], [6, -2], [0, 3]];
 
 // Brazil's cerrado: low, gnarled shrubby trees in tufted grass.
 export function Cerrado({ seed = 0 }: { seed?: number }) {
-  const trees = CERRADO_SLOTS.slice(0, 1 + (seed % 3))
+  const trees = CERRADO_SLOTS.slice(0, 2 + (seed % 2))
     .map(([x, y], i) => ({ x: x + seeded(seed, i, 1) * 3, y, lean: seeded(seed, i, 2) * 6, h: 6.5 + seeded(seed, i, 3) * 2 }))
     .sort((a, b) => a.y - b.y);
   return (
@@ -429,7 +285,7 @@ const GUM_SLOTS: Point[] = [[-6, 0], [7, -2]];
 
 // Northern Australia's savanna: scattered eucalypts, tall pale trunks under loose blue-green crowns.
 export function Eucalypt({ seed = 0 }: { seed?: number }) {
-  const trees = GUM_SLOTS.slice(0, 1 + (seed % 2))
+  const trees = GUM_SLOTS
     .map(([x, y], i) => ({ x: x + seeded(seed, i, 1) * 4, y, bend: seeded(seed, i, 2) * 3, h: 16 + seeded(seed, i, 3) * 4 }))
     .sort((a, b) => a.y - b.y);
   return (
@@ -451,42 +307,110 @@ export function Eucalypt({ seed = 0 }: { seed?: number }) {
   );
 }
 
-const PINE_SLOTS: Point[] = [[-8, -5], [2, -6], [10, -4], [-13, 0], [-3, -1], [7, 0], [-7, 4], [3, 4]];
-
-export function Pines({ seed = 0 }: { seed?: number }) {
-  const count = 4 + (seed % 4);
-  const trees = PINE_SLOTS.filter((_, i) => (i * 5 + seed * 3) % 8 < count)
-    .map(([x, y], i) => ({ x: x + seeded(seed, i, 1) * 2, y, h: 13 + seeded(seed, i, 2) * 5 }))
-    .sort((a, b) => a.y - b.y);
-  return (
-    <g className="gm-pines">
-      <ellipse cx={0} cy={2} rx={17} ry={5} className="gm-forest-floor" />
-      {trees.map(({ x, y, h }) => (
-        <g key={`${x}-${y}`}>
-          <rect x={x - 0.8} y={y - 2.5} width={1.6} height={2.5} className="gm-trunk" />
-          {[0, 1].map((tier) => {
-            const base = y - 2 - tier * h * 0.36;
-            const top = base - h * 0.62;
-            const half = 4.6 - tier * 1.2;
-            return (
-              <g key={tier}>
-                <path d={`M${x - half} ${base} L${x} ${top} L${x + half} ${base} Z`} className="gm-pine gm-pine-edge" strokeWidth={0.7} strokeLinejoin="round" />
-                <path d={`M${x} ${top} L${x + half} ${base} L${x + 0.6} ${base} Z`} className="gm-pine-shade" />
-              </g>
-            );
-          })}
-        </g>
-      ))}
-    </g>
-  );
-}
-
 export function Tufts({ seed = 0 }: { seed?: number }) {
   return (
     <g className="gm-tufts">
       {[[-7, 0], [4, -2], [9, 2]].slice(0, 2 + (seed % 2)).map(([x, y]) => (
         <path key={x} d={`M${x - 2.5} ${y - 3} Q${x - 1} ${y - 1} ${x} ${y} Q${x} ${y - 2.5} ${x + 0.4} ${y - 4.5} M${x} ${y} Q${x + 1} ${y - 1.5} ${x + 2.6} ${y - 3}`} fill="none" className="gm-tuft" strokeWidth={1.1} strokeLinecap="round" />
       ))}
+    </g>
+  );
+}
+
+// Galar-style relief: flat slate peaks with a lit left face and a scalloped snowcap.
+function Peak({ cx, base, w, h, snowy, back = false }: { cx: number; base: number; w: number; h: number; snowy: boolean; back?: boolean }) {
+  const top = base - h;
+  const cap = h * 0.36;
+  return (
+    <g>
+      <path
+        d={`M${cx - w / 2} ${base} L${cx - w * 0.09} ${base - h * 0.94} Q${cx} ${base - h * 1.04} ${cx + w * 0.09} ${base - h * 0.94} L${cx + w / 2} ${base} Z`}
+        className={back ? "gm-peak-back" : "gm-peak"}
+      />
+      <path d={`M${cx + w * 0.02} ${base - h * 0.97} L${cx + w / 2} ${base} L${cx + w * 0.12} ${base} Z`} className={back ? "gm-peak" : "gm-peak-shade"} />
+      {snowy && (
+        <path
+          d={`M${cx - w * 0.09 - cap * 0.3} ${top + cap} L${cx - w * 0.09} ${top + h * 0.06} Q${cx} ${top - h * 0.04} ${cx + w * 0.09} ${top + h * 0.06} L${cx + w * 0.09 + cap * 0.3} ${top + cap} L${cx + cap * 0.2} ${top + cap * 0.72} L${cx} ${top + cap * 1.05} L${cx - cap * 0.22} ${top + cap * 0.7} Z`}
+          className="gm-snow"
+        />
+      )}
+    </g>
+  );
+}
+
+const heightOf = (elevation: number) => Math.min(1, Math.max(0, (elevation - 2500) / 3000));
+
+// A range of overlapping peaks, back to front; `lone` draws a single cone for an isolated volcano.
+export function Massif({ elevation, scale, snowy, flip, lone = false }: { elevation: number; scale: number; snowy: boolean; flip: boolean; lone?: boolean }) {
+  const t = heightOf(elevation);
+  const w = (36 + 34 * t) * scale;
+  const h = (28 + 30 * t) * scale;
+  return (
+    <g transform={flip ? "scale(-1 1)" : undefined}>
+      <ellipse cx={0} cy={h * 0.02} rx={w * (lone ? 0.5 : 0.8)} ry={h * 0.1} className="gm-shadow" />
+      {!lone && (
+        <>
+          <Peak cx={-w * 0.42} base={-h * 0.04} w={w * 0.62} h={h * 0.66} snowy={snowy && t > 0.3} back />
+          <Peak cx={w * 0.4} base={-h * 0.02} w={w * 0.58} h={h * 0.6} snowy={false} back />
+        </>
+      )}
+      <Peak cx={0} base={0} w={lone ? w * 1.1 : w} h={h} snowy={snowy} />
+    </g>
+  );
+}
+
+// Desert relief: a flat-topped mesa or a cluster of rock outcrops, never a pyramid.
+export function Mesa({ seed, scale }: { seed: number; scale: number }) {
+  const w = 34 * scale;
+  const h = 15 * scale;
+  if (seed % 3 === 2) {
+    return (
+      <g>
+        {[[-w * 0.22, h * 0.9, w * 0.36], [w * 0.18, h * 0.65, w * 0.3]].map(([x, rh, rw]) => (
+          <g key={x}>
+            <path d={`M${x - rw / 2} 0 L${x - rw * 0.32} ${-rh} H${x + rw * 0.3} L${x + rw / 2} 0 Z`} className="gm-mesa gm-mesa-edge" strokeWidth={1} strokeLinejoin="round" />
+            <path d={`M${x + rw * 0.08} ${-rh} H${x + rw * 0.3} L${x + rw / 2} 0 H${x + rw * 0.12} Z`} className="gm-mesa-shade" />
+          </g>
+        ))}
+      </g>
+    );
+  }
+  return (
+    <g>
+      <ellipse cx={0} cy={0} rx={w * 0.55} ry={h * 0.16} className="gm-shadow" />
+      <path d={`M${-w / 2} 0 L${-w * 0.32} ${-h} H${w * 0.3} L${w / 2} 0 Z`} className="gm-mesa gm-mesa-edge" strokeWidth={1.1} strokeLinejoin="round" />
+      <path d={`M${w * 0.12} ${-h} H${w * 0.3} L${w / 2} 0 H${w * 0.2} Z`} className="gm-mesa-shade" />
+      <path d={`M${-w * 0.42} ${-h * 0.45} H${w * 0.4}`} className="gm-mesa-band" strokeWidth={1.2} strokeLinecap="round" />
+      <path d={`M${-w * 0.33} ${-h * 0.94} H${w * 0.29}`} className="gm-mesa-top" strokeWidth={1.6} strokeLinecap="round" />
+    </g>
+  );
+}
+
+// A rounded grassy hump, khaki on dry ground.
+export function Hump({ size, dry }: { size: number; dry: boolean }) {
+  return (
+    <g className={dry ? "gm-dry" : undefined}>
+      <path d={`M${-size / 2} 0 C${-size / 2} ${-size * 0.55} ${size / 2} ${-size * 0.55} ${size / 2} 0 Z`} className="gm-hump" />
+      <path d={`M${size * 0.05} ${-size * 0.4} C${size * 0.35} ${-size * 0.36} ${size / 2} ${-size * 0.2} ${size / 2} 0 L${size * 0.15} 0 Z`} className="gm-hump-shade" />
+    </g>
+  );
+}
+
+export function Cactus() {
+  return (
+    <g className="gm-cactus" strokeWidth={1}>
+      <rect x={-2.5} y={-14} width={5} height={14} rx={2.5} />
+      <path d="M-2.5 -6 h-3.5 a2 2 0 0 1 -2 -2 v-4.5 a1.6 1.6 0 0 1 3.2 0 v3.3 h2.3 z" />
+      <path d="M2.5 -8 h3 a1.8 1.8 0 0 0 1.8 -1.8 v-3.6 a1.6 1.6 0 0 0 -3.2 0 v2.2 h-1.6 z" />
+    </g>
+  );
+}
+
+export function Dunes({ seed }: { seed: number }) {
+  return (
+    <g transform={seed % 2 ? "scale(-1 1)" : undefined}>
+      <path d="M-14 0 q5 -6 10 -3 t8 1" className="gm-dune" strokeWidth={2} fill="none" strokeLinecap="round" />
+      <path d="M-2 6 q5 -5 9 -2.5 t7 1" className="gm-dune" strokeWidth={1.7} fill="none" strokeLinecap="round" />
     </g>
   );
 }

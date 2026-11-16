@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Nunito } from "next/font/google";
 import { cn } from "@/lib/utils";
 import type { Place } from "@/lib/photo-geo";
 import { AtlasMap } from "./atlas-map";
@@ -15,6 +16,9 @@ const variants = {
   hybrid: { label: "4 · Globe → Atlas", summary: "Globe with journey arcs; picking a place flies into the flat map.", Map: GlobeAtlasMap },
 };
 
+// The map's rounded game-map face, loaded only with this section.
+const mapFont = Nunito({ subsets: ["latin"], weight: ["700", "800", "900"], variable: "--font-map" });
+
 type Variant = keyof typeof variants;
 const order: Variant[] = ["atlas", "globe", "journey", "hybrid"];
 
@@ -25,7 +29,7 @@ export function PhotoMapSection({ places }: { places: Place[] }) {
   if (places.length === 0) return null;
 
   return (
-    <section className="container mx-auto max-w-6xl px-4 pb-6 pt-12">
+    <section className={cn("container mx-auto max-w-6xl px-4 pb-6 pt-12", mapFont.variable)}>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">Where these were taken</p>

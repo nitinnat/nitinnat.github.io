@@ -95,15 +95,19 @@ function smoothLine(line: Point[]) {
 const toMap = ([lng, lat]: number[]): Point => projection([lng, lat]) ?? [0, 0];
 
 // Rivers and lakes from scripts/generate-hydrology.js (Natural Earth), projected and smoothed once.
+// The projected river lines are kept too, for finding where routes cross them.
 export function useHydrology() {
-  const [water, setWater] = useState<{ rivers: { rank: number; d: string }[]; lakes: string }>({ rivers: [], lakes: "" });
+  const [water, setWater] = useState<{ rivers: { rank: number; d: string; lines: Point[][] }[]; lakes: string }>({ rivers: [], lakes: "" });
 
   useEffect(() => {
     let active = true;
     import("@/data/hydrology.json").then(({ default: data }) => {
       if (!active) return;
       setWater({
-        rivers: data.rivers.map(({ rank, lines }) => ({ rank, d: lines.map((line) => smoothLine(line.map(toMap))).join("") })),
+        rivers: data.rivers.map(({ rank, lines }) => {
+          const projected = lines.map((line) => line.map(toMap));
+          return { rank, d: projected.map(smoothLine).join(""), lines: projected };
+        }),
         lakes: data.lakes.flatMap(({ polygons }) => polygons.flat().map((ring) => smoothRing(ring.map(toMap)))).join(""),
       });
     });
@@ -115,11 +119,77 @@ export function useHydrology() {
   return water;
 }
 
+// Rings are stored flat as [lng, lat, lng, lat, ...].
+const fromFlat = (ring: number[]) => Array.from({ length: ring.length / 2 }, (_, i) => toMap([ring[2 * i], ring[2 * i + 1]]));
+
+const ringArea = (ring: Point[]) =>
+  Math.abs(ring.reduce((sum, [x, y], i) => {
+    const [nx, ny] = ring[(i + 1) % ring.length];
+    return sum + x * ny - nx * y;
+  }, 0)) / 2;
+
+export interface MountainPeak {
+  id: number;
+  x: number;
+  y: number;
+  lng: number;
+  lat: number;
+  elevation: number;
+  // Mean elevation of the surrounding ~1.5°, which tells a high plateau from a lone summit.
+  surrounding: number;
+  // Index of the highland patch the peak stands in, or -1 for an isolated volcano.
+  patch: number;
+}
+
+export type ForestBiome = "pine" | "broadleaf" | "jungle";
+
+export interface MapFeatures {
+  highlands: { d: string; dry: boolean; area: number }[];
+  peaks: MountainPeak[];
+  forests: { biome: ForestBiome; d: string }[];
+}
+
+// Highland patches, their peaks, isolated volcanoes and forest blobs from
+// scripts/generate-map-features.js, projected and smoothed once.
+export function useMapFeatures() {
+  const [features, setFeatures] = useState<MapFeatures | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    import("@/data/map-features.json").then(({ default: data }) => {
+      if (!active) return;
+      const toPeak = ([lng, lat, elevation, surrounding]: number[], patch: number) => {
+        const [x, y] = toMap([lng, lat]);
+        return { x, y, lng, lat, elevation, surrounding, patch };
+      };
+      setFeatures({
+        highlands: data.highlands.map(({ dry, rings }) => {
+          const projected = rings.map(fromFlat);
+          return { dry, area: ringArea(projected[0]), d: projected.map(smoothRing).join("") };
+        }),
+        peaks: [...data.highlands.flatMap(({ peaks }, patch) => peaks.map((peak) => toPeak(peak, patch))), ...data.volcanoes.map((peak) => toPeak(peak, -1))]
+          .sort((a, b) => b.elevation - a.elevation)
+          .map((peak, id) => ({ ...peak, id })),
+        forests: Object.entries(data.forests).flatMap(([biome, polygons]) =>
+          biome === "pine" || biome === "broadleaf" || biome === "jungle"
+            ? [{ biome, d: polygons.flatMap((rings) => rings.map((ring) => smoothRing(fromFlat(ring)))).join("") }]
+            : [],
+        ),
+      });
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return features;
+}
+
 export type ClimateGroup = "D" | "S" | "P" | "T" | "V" | "M" | "B" | "N" | "I";
 
 export interface Climate {
   climateAt: (lng: number, lat: number) => ClimateGroup | undefined;
-  aridityAt: (lng: number, lat: number) => number;
+  aridityAt: (lng: number, lat: number, coldIsDry?: number) => number;
   tints: { group: ClimateGroup; level: number; d: string }[];
 }
 
@@ -151,8 +221,9 @@ export function useClimate() {
         }
       };
       // Dry cells (prairie counting half) against humid ones (counting double) within two cells.
-      // Tundra and ice are neutral, so a window of nothing else, like a high cold plateau, is arid.
-      const aridityAt = (lng: number, lat: number) => {
+      // Tundra and ice are neutral, so a window of nothing else is arid; on a high plateau tundra
+      // counts as dry by `coldIsDry` (0–1), outweighing the odd boreal cell.
+      const aridityAt = (lng: number, lat: number, coldIsDry = 0) => {
         const [row, col] = cellOf(lng, lat);
         let dry = 0;
         let humid = 0;
@@ -161,6 +232,7 @@ export function useClimate() {
             const char = cell(row + dr, col + dc);
             if (char === "D" || char === "S") dry += 1;
             else if (char === "P") dry += 0.5;
+            else if (char === "N") dry += coldIsDry;
             else if (/[TVMB]/.test(char)) humid += 1;
           }
         }
@@ -174,7 +246,7 @@ export function useClimate() {
             ? levels.map((rings, level) => ({
                 group,
                 level,
-                d: rings.map((ring) => smoothRing(Array.from({ length: ring.length / 2 }, (_, i) => toMap([ring[2 * i], ring[2 * i + 1]])))).join(""),
+                d: rings.map((ring) => smoothRing(fromFlat(ring))).join(""),
               }))
             : [],
         ),

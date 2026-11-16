@@ -337,116 +337,140 @@
   user-select: none;
 }
 
-/* Illustrated, game-map style photo map. --k (current zoom) is set on the symbol layer while
+/* Illustrated, Galar-style photo map. --k (current zoom) is set on the symbol layer while
    zooming so symbols keep a constant on-screen size. One palette in both themes, like a printed map. */
 .map-counter {
   transform: scale(calc(1 / var(--k, 1)));
 }
 
-.gm-ocean { fill: #a6d3e4; }
-.gm-shallows { stroke: #cbe7f1; }
-.gm-foam { stroke: #f4fbfd; }
-.gm-land { fill: #b8d68e; }
-.gm-land-visited { fill: #c9e19b; }
-.gm-land-hover { fill: #dbeab0; }
-.gm-border { stroke: #f7f3e3; }
-.gm-route { stroke: #ecdcb2; }
-.gm-route-edge { stroke: #c9b384; }
-.gm-mtn-lit { fill: #c9c0dc; }
-.gm-mtn-mid { fill: #a59ac3; }
-.gm-mtn-shade { fill: #7b6f9f; }
-.gm-mtn-edge { stroke: #655b8a; }
-.gm-mtn-ridge { stroke: #756a8e; }
-.gm-mtn-highlight { stroke: #e2ddef; fill: none; }
-.gm-snow { fill: #fbfbff; }
-.gm-shadow { fill: #3f6b2e; fill-opacity: 0.18; }
-.gm-snow-shade { fill: #d5d1e8; }
-.gm-hill-lit { fill: #a6cd7b; }
-.gm-hill-shade { fill: #88b55f; }
-.gm-hill-edge { stroke: #6f9b4c; }
-.gm-hill-highlight { stroke: #d2e8a8; }
-.gm-tree { fill: #5f9e50; }
-.gm-tree-shade { fill: #3f7a3d; }
-.gm-tree-light { fill: #8fc26c; }
-.gm-tree-edge { stroke: #2e5f30; }
-.gm-forest-floor { fill: #4f7f3d; fill-opacity: 0.16; }
+.gm-sea { background: #5ec3d3; }
+.gm-wave { stroke: #fff; opacity: 0.35; }
+.gm-sea-ring { stroke: #3a97ad; }
+.gm-sea-stroke { stroke: #5ec3d3; }
+.gm-shallows { stroke: #7fd2dd; }
+.gm-foam { stroke: #fbfffe; }
+.gm-land { fill: #b3dc62; }
+.gm-cliff { fill: #7aa83c; }
+.gm-lake { fill: #5ec3d3; stroke: #2e8fa7; }
+.gm-river-edge { stroke: #2e8fa7; }
+.gm-river { stroke: #47b9cf; }
+.gm-region-hover { fill: #fffbe8; fill-opacity: 0.38; stroke: #2b3250; }
+/* Height as darker greens; dry and high ground reads khaki where the steppe tint lies over it. */
+.gm-band-1 { fill: #9fd057; }
+.gm-band-2 { fill: #86bf4c; }
+/* Köppen climate tints, flat with crisp edges. */
+.gm-climate-D { fill: #f0cf6e; stroke: #d9ae4c; }
+.gm-climate-S { fill: #d6df7a; fill-opacity: 0.85; }
+.gm-climate-P { fill: #c4e070; fill-opacity: 0.7; }
+.gm-climate-V { fill: #cfdc6c; fill-opacity: 0.75; }
+.gm-climate-T { fill: #8fcf55; fill-opacity: 0.55; }
+.gm-climate-B { fill: #9ccf6e; fill-opacity: 0.5; }
+.gm-climate-N { fill: #cbd8b4; fill-opacity: 0.9; }
+.gm-climate-I { fill: #eef4fb; stroke: #cfdbea; }
+.gm-highland { fill: #c4c9d8; stroke: #a7aec3; }
+.gm-highland-dry { fill: #d8c49a; stroke: #bba272; }
+/* Forest blobs: a flat canopy colour under a tree texture. */
+.gm-forest { stroke: #3f8c3c; }
+.gm-forest-broadleaf { fill: #58a948; }
+.gm-forest-pine { fill: #4c9a4c; stroke: #2f7a3e; }
+.gm-forest-jungle { fill: #3f9a3f; stroke: #2a7232; }
+.gm-tree { fill: #3b8a3f; }
+.gm-tree-shade { fill: #2f7234; }
+.gm-tree-light { fill: #6cbf55; stroke: #6cbf55; }
+.gm-tree-edge { stroke: #24572a; }
+.gm-forest-floor { fill: #2f6a2c; fill-opacity: 0.16; }
 .gm-trunk { fill: #7a5a3a; }
-.gm-wall { fill: #f6ead0; }
-.gm-wall-shade { fill: #dcc6a0; }
-.gm-roof { fill: #c9583d; }
-.gm-roof-shade { fill: #9a3d2a; }
-.gm-roof-edge { stroke: #7a2f20; fill: none; }
-.gm-roof-brown { fill: #a9693f; }
-.gm-roof-brown-shade { fill: #7a4629; }
-.gm-roof-brown-edge { stroke: #5c341f; fill: none; }
-.gm-roof-slate { fill: #6f879a; }
-.gm-roof-slate-shade { fill: #4e6577; }
-.gm-roof-slate-edge { stroke: #3c4f5e; fill: none; }
-.gm-door { fill: #6e4e35; }
-.gm-ground { fill: #e5d7a6; }
-.gm-ground-edge { stroke: #c7b17e; }
-.gm-water { fill: #93cbe0; }
-.gm-water-line { stroke: #eef8fc; fill: none; }
-.gm-label { fill: #3b2f25; stroke: #fbf6e8; }
-
-/* Raised-land edge for the photo map (composition, separate from the symbol palette). */
-.gm-cliff { fill: #c4a06a; }
-.gm-cliff-shadow { fill: #86b9cc; }
-.gm-lake { fill: #a6d3e4; }
-.gm-river-edge { stroke: #79b4cf; }
-.gm-river { stroke: #b5dcea; }
-/* Köppen climate tints over the land; translucent so region hover tints still show through. */
-/* Each climate is three stacked outlines, so its edge fades over about a degree. */
-.gm-climate { opacity: 0.85; }
-.gm-climate path { fill-opacity: 0.45; }
-.gm-climate-D { fill: #ecd59f; }
-.gm-climate-S { fill: #d3d395; }
-.gm-climate-P { fill: #c4d68f; }
-.gm-climate-V { fill: #c8d784; }
-.gm-climate-T { fill: #7fb865; }
-.gm-climate-B { fill: #9cc49a; }
-.gm-climate-N { fill: #bccab0; }
-.gm-climate .gm-climate-I { fill: #f4f6f4; fill-opacity: 0.75; }
-/* Deserts: dunes, and red-brown rock instead of lavender ranges. */
-.gm-dune-lit { fill: #e8c987; }
-.gm-dune-shade { fill: #cfa868; }
-.gm-dune-edge { stroke: #b48a52; }
-.gm-arid .gm-mtn-lit { fill: #d49a6f; }
-.gm-arid .gm-mtn-mid { fill: #bf7f57; }
-.gm-arid .gm-mtn-shade { fill: #9e6143; }
-.gm-arid .gm-mtn-edge { stroke: #864f36; }
-.gm-arid .gm-mtn-highlight { stroke: #e7bb92; }
-/* Steppe hills, savanna acacias, jungle, boreal pines and tundra tufts. */
-.gm-dry .gm-hill-lit { fill: #d2cd8e; }
-.gm-dry .gm-hill-shade { fill: #b9b071; }
-.gm-dry .gm-hill-edge { stroke: #978f55; }
-.gm-dry .gm-hill-highlight { stroke: #ebe7b8; }
+.gm-pine { fill: #2f7a3e; }
+.gm-pine-shade { fill: #24623a; }
+.gm-jungle-tree { fill: #2c7f35; }
+.gm-jungle-light { fill: #5cb04a; }
+/* Relief: slate peaks, red-rock mesas, grassy humps. */
+.gm-peak { fill: #7e8fbd; }
+.gm-peak-shade { fill: #62719c; }
+.gm-peak-back { fill: #9aa8cf; }
+.gm-snow { fill: #fff; }
+.gm-snow-shade { fill: #dfe4f2; }
+.gm-shadow { fill: #2f5a2a; fill-opacity: 0.16; }
+.gm-mtn-lit { fill: #9aa8cf; }
+.gm-mtn-mid { fill: #7e8fbd; }
+.gm-mtn-shade { fill: #62719c; }
+.gm-mtn-edge { stroke: #4f5b85; }
+.gm-mtn-highlight { stroke: #c9d1ea; fill: none; }
+.gm-mesa { fill: #e08a4d; }
+.gm-mesa-shade { fill: #b8653a; }
+.gm-mesa-edge { stroke: #8a4a26; }
+.gm-mesa-band { stroke: #c7713f; }
+.gm-mesa-top { stroke: #f0b07a; }
+.gm-hump { fill: #97cb52; }
+.gm-hump-shade { fill: #7db84a; fill-opacity: 0.75; }
+.gm-dry .gm-hump { fill: #c9c56a; }
+.gm-dry .gm-hump-shade { fill: #aea752; }
+.gm-dune { stroke: #d9ae4c; }
+.gm-cactus { fill: #8bb24a; stroke: #6a8d36; }
+/* Savanna trees and tundra tufts. */
 .gm-trunk-stroke { stroke: #7a5a3a; }
 .gm-savanna-floor { fill: #9a8a3d; fill-opacity: 0.16; }
-.gm-acacia-shade { fill: #6f9443; }
-.gm-acacia-lit { fill: #97b85a; }
+.gm-acacia-shade { fill: #5f9a3e; }
+.gm-acacia-lit { fill: #8cc152; }
 .gm-savanna-grass { stroke: #a2994c; }
-.gm-cerrado-shade { fill: #7f9440; }
-.gm-cerrado-lit { fill: #a7b65c; }
+.gm-cerrado-shade { fill: #6f9a3a; }
+.gm-cerrado-lit { fill: #a2c05a; }
 .gm-cerrado .gm-tree-edge { stroke: #4e5b25; }
 .gm-gum-trunk { stroke: #efe9d8; }
 .gm-gum-edge { stroke: #8d8270; }
 .gm-gum-shade { fill: #6f9d8e; }
 .gm-gum-lit { fill: #9cc2b0; }
 .gm-eucalypt .gm-tree-edge { stroke: #3f6b5d; }
-.gm-jungle .gm-tree { fill: #3f8a43; }
-.gm-jungle .gm-tree-shade { fill: #2a6533; }
-.gm-jungle .gm-tree-light { fill: #6aae55; }
-.gm-jungle .gm-tree-edge { stroke: #1f4d27; }
-.gm-pine { fill: #4f8a52; }
-.gm-pine-shade { fill: #33663c; }
-.gm-pine-edge { stroke: #24502e; }
 .gm-tuft { stroke: #7f9670; }
-/* Elevation washes, lowland to alpine; translucent so region hover tints still show through. */
-.gm-band-0 { fill: #9fc574; opacity: 0.55; }
-.gm-band-1 { fill: #bccb83; opacity: 0.75; }
-.gm-band-2 { fill: #d3c597; opacity: 0.8; }
-.gm-band-3 { fill: #e6ddcc; opacity: 0.85; }
+/* Landmark water. */
+.gm-water { fill: #5ec3d3; }
+.gm-water-line { stroke: #eefbfd; fill: none; }
+/* Routes, badges, bridges, plates, the cursor and the player. */
+.gm-route { stroke: #ec4452; }
+.gm-route-edge { stroke: #8e2333; }
+.gm-hop-halo { stroke: #fff; stroke-opacity: 0.9; }
+.gm-badge { fill: #fff; stroke: #8e2333; }
+.gm-badge-ring { stroke: #ec4452; }
+.gm-badge-text { fill: #ec4452; }
+.gm-bridge { fill: #c58a4f; stroke: #6b4423; }
+.gm-bridge-rail { stroke: #8a5a30; }
+.gm-plate { fill: #fbf5e2; stroke: #2b3250; }
+.gm-plate-text { fill: #2b3250; }
+.gm-ribbon { fill: #f7ecd2; stroke: #8b6b45; }
+.gm-count { fill: #ec4452; stroke: #8e2333; }
+.gm-count-text { fill: #fff; }
+.gm-cursor { stroke: #ff3b4e; }
+.gm-cursor-halo { stroke: #fff; }
+.gm-player-shadow { fill: #000; fill-opacity: 0.18; }
+.gm-player-pin { fill: #fff; stroke: #2b3250; }
+.gm-player-skin { fill: #ffd9b8; stroke: #2b3250; }
+.gm-player-hat { fill: #f2b632; stroke: #2b3250; }
+.gm-player-band { stroke: #d3901c; }
+.gm-player-sprout { fill: #63c35a; stroke: #2b3250; }
+.gm-player-ink { fill: #2b3250; }
+.gm-player-cheek { fill: #f59a8f; fill-opacity: 0.8; }
+.gm-player-mouth { stroke: #2b3250; }
+/* Static overlays outside the zoom transform: paper grain and a soft cloud frame. */
+.gm-grain {
+  opacity: 0.3;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0.25 0 0 0 0 0.2 0 0 0 0 0.12 0 0 0 0.55 -0.12'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.gm-cloud { fill: #fff; }
+.gm-cloud-shadow { fill: #c4d6e6; }
+.gm-cloud-shade { fill: #e6eef6; }
+
+.gm-bob {
+  animation: gm-bob 0.9s steps(1) infinite;
+}
+
+@keyframes gm-bob {
+  50% { transform: translateY(-2.5px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gm-bob { animation: none; }
+}
 
 .map-rise {
   transform-box: fill-box;
