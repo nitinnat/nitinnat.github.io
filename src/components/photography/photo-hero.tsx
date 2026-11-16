@@ -34,15 +34,15 @@ export function PhotoHero({
       )}
       <div className="hero-copy relative z-10 flex h-full items-center justify-center px-6 text-center">
         <div className={hasImage ? "text-white" : "text-foreground"}>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight">
+          <h1 className="font-serif text-5xl leading-[0.95] tracking-[-0.04em] sm:text-6xl md:text-7xl">
             {title}
           </h1>
           {subtitle ? (
             <p
               className={
                 hasImage
-                  ? "mt-4 text-sm sm:text-base text-white/80"
-                  : "mt-4 text-sm sm:text-base text-muted-foreground"
+                  ? "mt-4 font-serif text-xl leading-relaxed text-white/80"
+                  : "mt-4 font-serif text-xl leading-relaxed text-muted-foreground"
               }
             >
               {subtitle}

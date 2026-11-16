@@ -901,3 +901,14 @@ Load Photos → Load Metadata → Merge Metadata with Photos
 - **Kept:** all `src/data` map files, their generator scripts and the `gm-*`/`map-*` CSS are used by the Atlas. The flagged `gm-band-*`, `gm-climate-*` and `gm-forest-*` classes are built from template strings.
 - **Gotcha:** `next build` sometimes fails with "next/font/google queries have exactly one entry". Google Fonts intermittently returns `fonts.gstatic.com/l/font?kit=…&skey=…` URLs, and the Next 16.1.1 Turbopack font loader can't parse them. Fixed by self-hosting Nunito: `@fontsource-variable/nunito` plus `next/font/local` (variable weight 200–1000) in `photo-map-section.tsx`. The production build passes without contacting Google Fonts for the map face.
 - **Verified:** tsc and eslint (pre-existing issues only), and the production build. Playwright on `/photography/` checked that there is no switcher, the zoom buttons work, clicking Nevada zooms to it, hovering a place fans out its photos, and both the info panel's "Open photos" and the gallery thumbnails open the lightbox. The credits render, there is no overflow at 390 px, and there are no page errors or 404s.
+
+## 2026-11-15: Typography Unified on the Writing Page System
+
+**Status:** Local on `feature/unify-typography`, not pushed.
+
+- **Goal:** Home, About and Photography used sans and mono display type while Writing used serif. Every page now follows the Writing system; colours are unchanged.
+- **System:** eyebrows `font-mono text-xs uppercase tracking-[0.2em]`; page titles `font-serif` with `tracking-[-0.04em]`; section, card and role titles `font-serif tracking-tight`; ledes `font-serif text-xl leading-relaxed`; body copy stays Geist sans.
+- **Applied:** home hero, ledes and cards; About hero, MDX headings (`prose-headings:font-serif`), skill category titles, timeline role titles and the "More" dialog; Photography hero, fallback title and cluster headings.
+- **Gotcha:** the timeline dialog is rendered inside the About `prose` article, so prose heading styles overrode its own classes. The dialog panel is now `not-prose`.
+- **Left alone:** nav and brand, buttons, badges, the SVG project visuals (mono diagram labels), the unused `skills-bars`, `skills-grid`, `dynamic-tagline` and `photo-journey` components, and `photography/map/` (its "The map" heading is still sans).
+- **Verified:** tsc and eslint (pre-existing warnings only). Playwright in dark mode at 1440 and 390 px on `/`, `/about`, `/photography` and `/blog` showed no horizontal overflow and no console errors.

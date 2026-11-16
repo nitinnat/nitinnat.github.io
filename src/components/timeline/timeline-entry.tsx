@@ -158,7 +158,7 @@ export function TimelineEntryCard({ entry, index, variant = "work" }: TimelineEn
           {/* Compact header */}
           <header className="mb-2">
             <div className="flex items-baseline gap-2 flex-wrap">
-              <h3 className="font-semibold text-sm md:text-base text-foreground">{entry.title}</h3>
+              <h3 className="font-serif text-base font-medium tracking-tight text-foreground md:text-lg">{entry.title}</h3>
               <p className="text-muted-foreground text-xs">
                 {entry.company}
               </p>
@@ -218,7 +218,7 @@ export function TimelineEntryCard({ entry, index, variant = "work" }: TimelineEn
         }}
       >
         <div ref={panelRef} className={cn(
-          "rounded-lg border bg-card p-4 shadow-2xl md:p-8",
+          "not-prose rounded-lg border bg-card p-4 shadow-2xl md:p-8",
           variant === "education" ? "border-emerald-500/20" : "border-primary/20"
         )}>
                 {/* Close button */}
@@ -235,14 +235,14 @@ export function TimelineEntryCard({ entry, index, variant = "work" }: TimelineEn
 
                 {/* Modal header */}
                 <div className="mb-6 pr-2">
-                  <h2 id={`timeline-dialog-${variant}-${index}`} className="text-lg md:text-2xl font-bold text-foreground mb-1">{entry.title}</h2>
+                  <h2 id={`timeline-dialog-${variant}-${index}`} className="mb-1 font-serif text-2xl tracking-tight text-foreground md:text-3xl">{entry.title}</h2>
                   <p className="text-muted-foreground text-xs md:text-sm">{entry.company} • {entry.dateRange}</p>
                   {entry.skills && <SkillBadges skillIds={entry.skills} className="mt-3" />}
                 </div>
 
                 {/* Main description */}
                 <div className="mb-6">
-                  <h3 className="text-sm font-semibold text-foreground mb-2 uppercase tracking-wide">Overview</h3>
+                  <h3 className="mb-2 font-mono text-xs uppercase tracking-[0.2em] text-foreground">Overview</h3>
                   <p className="text-sm md:text-base text-foreground/80 leading-relaxed">
                     {entry.description}
                   </p>
@@ -250,7 +250,7 @@ export function TimelineEntryCard({ entry, index, variant = "work" }: TimelineEn
 
                 {/* Expanded content */}
                 <div className="mb-6">
-                  <h3 className="text-sm font-semibold text-foreground mb-2 uppercase tracking-wide">Details</h3>
+                  <h3 className="mb-2 font-mono text-xs uppercase tracking-[0.2em] text-foreground">Details</h3>
                   <p className="text-sm md:text-base text-foreground/70 leading-relaxed whitespace-pre-wrap">
                     {entry.expandedContent}
                   </p>

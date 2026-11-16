@@ -36,7 +36,7 @@ export function SkillsSection() {
           <div key={category}>
             <h3
               className={cn(
-                "text-lg font-semibold mb-6 pb-2 border-l-4 pl-3",
+                "font-serif text-xl tracking-tight mb-6 pb-2 border-l-4 pl-3",
                 colors.border,
                 colors.text
               )}

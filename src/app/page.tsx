@@ -20,11 +20,11 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/25 to-background" />
         <div className="relative mx-auto flex min-h-[72vh] max-w-6xl flex-col justify-end px-5 py-16 md:px-10 md:py-24">
-          <p className="mb-5 font-mono text-xs uppercase tracking-[0.22em] text-white/70">Engineering · Writing · Seeing</p>
-          <h1 className="max-w-5xl text-5xl font-semibold leading-[0.95] tracking-[-0.05em] text-white sm:text-7xl md:text-8xl">
+          <p className="mb-5 font-mono text-xs uppercase tracking-[0.2em] text-white/70">Engineering · Writing · Seeing</p>
+          <h1 className="max-w-5xl font-serif text-5xl leading-[0.95] tracking-[-0.04em] text-white sm:text-7xl md:text-8xl">
             Building dependable AI systems. Documenting what I learn.
           </h1>
-          <p className="mt-7 max-w-2xl text-base leading-relaxed text-white/75 md:text-lg">
+          <p className="mt-7 max-w-2xl font-serif text-xl leading-relaxed text-white/75">
             I’m Nitin, a senior software engineer working on agentic AI, retrieval, memory, and the infrastructure that turns ambitious demos into reliable products.
           </p>
         </div>
@@ -33,20 +33,20 @@ export default function HomePage() {
       <section className="mx-auto grid max-w-6xl gap-4 px-5 py-16 md:grid-cols-3 md:px-10 md:py-24">
         <Link href="/about" className="group rounded-2xl border border-border bg-card/60 p-6 hover:bg-card">
           <Cpu className="size-5 text-cyan-700 dark:text-cyan-300" aria-hidden="true" />
-          <p className="mt-10 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Engineering</p>
-          <h2 className="mt-3 text-2xl tracking-tight">How I build and where I’ve worked.</h2>
+          <p className="mt-10 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">Engineering</p>
+          <h2 className="mt-3 font-serif text-2xl tracking-tight">How I build and where I’ve worked.</h2>
           <ArrowRight className="mt-8 size-5 transition-transform group-hover:translate-x-1" aria-hidden="true" />
         </Link>
         <Link href="/blog" className="group rounded-2xl border border-border bg-card/60 p-6 hover:bg-card">
           <ArrowUpRight className="size-5 text-emerald-700 dark:text-emerald-300" aria-hidden="true" />
-          <p className="mt-10 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Writing</p>
-          <h2 className="mt-3 text-2xl tracking-tight">Notes on production AI and software systems.</h2>
+          <p className="mt-10 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">Writing</p>
+          <h2 className="mt-3 font-serif text-2xl tracking-tight">Notes on production AI and software systems.</h2>
           <ArrowRight className="mt-8 size-5 transition-transform group-hover:translate-x-1" aria-hidden="true" />
         </Link>
         <Link href="/photography" className="group rounded-2xl border border-border bg-card/60 p-6 hover:bg-card">
           <Camera className="size-5 text-amber-700 dark:text-amber-200" aria-hidden="true" />
-          <p className="mt-10 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">Photography</p>
-          <h2 className="mt-3 text-2xl tracking-tight">Landscapes, travel, and quiet observations.</h2>
+          <p className="mt-10 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">Photography</p>
+          <h2 className="mt-3 font-serif text-2xl tracking-tight">Landscapes, travel, and quiet observations.</h2>
           <ArrowRight className="mt-8 size-5 transition-transform group-hover:translate-x-1" aria-hidden="true" />
         </Link>
       </section>
