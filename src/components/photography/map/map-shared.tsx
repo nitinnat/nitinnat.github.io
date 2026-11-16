@@ -1,0 +1,439 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { geoEqualEarth, geoPath } from "d3-geo";
+import { feature } from "topojson-client";
+import type { Feature, Geometry } from "geojson";
+import type { GeometryCollection, Topology } from "topojson-specification";
+import type { GeoPhoto, Place } from "@/lib/photo-geo";
+import { PhotoLightbox } from "../photo-lightbox";
+
+export const MAP_WIDTH = 960;
+export const MAP_HEIGHT = 500;
+export const EASE_OUT = [0.23, 1, 0.32, 1] as const;
+
+export const projection = geoEqualEarth().fitExtent(
+  [[8, 8], [MAP_WIDTH - 8, MAP_HEIGHT - 8]],
+  { type: "Sphere" },
+);
+export const pathFor = geoPath(projection);
+
+export function project(place: { lat: number; lng: number }): [number, number] {
+  return projection([place.lng, place.lat]) ?? [0, 0];
+}
+
+export type Region = Feature<Geometry, { name: string }>;
+
+export interface WorldShapes {
+  land: Region[];
+  countries: Region[];
+  states: Region[];
+}
+
+// Map outlines are imported lazily so they never weigh on the page's first load.
+// Antarctica would only be a strip along the bottom edge of the map.
+function withoutAntarctica(land: Region) {
+  if (land.geometry.type !== "MultiPolygon") return land;
+  const coordinates = land.geometry.coordinates.filter((polygon) => polygon[0].some(([, lat]) => lat > -60));
+  return { ...land, geometry: { ...land.geometry, coordinates } };
+}
+
+export function useWorldShapes() {
+  const [shapes, setShapes] = useState<WorldShapes | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([
+      import("world-atlas/countries-110m.json"),
+      import("world-atlas/land-110m.json"),
+      import("us-atlas/states-10m.json"),
+    ]).then(
+      ([world, land, us]) => {
+        if (!active) return;
+        const toFeatures = (topology: unknown, key: string) => {
+          const typed = topology as Topology<Record<string, GeometryCollection<{ name: string }>>>;
+          return feature(typed, typed.objects[key]).features;
+        };
+        setShapes({
+          land: toFeatures(land.default, "land").map(withoutAntarctica),
+          countries: toFeatures(world.default, "countries").filter((c) => c.properties.name !== "Antarctica"),
+          states: toFeatures(us.default, "states"),
+        });
+      },
+    );
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return shapes;
+}
+
+type Point = [number, number];
+
+// Rounds a polygon ring into a soft closed curve (quadratic segments through edge midpoints).
+function smoothRing(ring: Point[]) {
+  const points = ring.slice(0, -1);
+  const n = points.length;
+  const mid = (a: Point, b: Point) => `${((a[0] + b[0]) / 2).toFixed(1)} ${((a[1] + b[1]) / 2).toFixed(1)}`;
+  let d = `M${mid(points[n - 1], points[0])}`;
+  points.forEach((point, i) => {
+    d += `Q${point[0].toFixed(1)} ${point[1].toFixed(1)} ${mid(point, points[(i + 1) % n])}`;
+  });
+  return `${d}Z`;
+}
+
+// Rounds an open line into a soft curve through its segment midpoints.
+function smoothLine(line: Point[]) {
+  if (line.length < 3) return `M${line.map((p) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join("L")}`;
+  const mid = (a: Point, b: Point) => `${((a[0] + b[0]) / 2).toFixed(1)} ${((a[1] + b[1]) / 2).toFixed(1)}`;
+  let d = `M${line[0][0].toFixed(1)} ${line[0][1].toFixed(1)}L${mid(line[0], line[1])}`;
+  for (let i = 1; i < line.length - 1; i += 1) d += `Q${line[i][0].toFixed(1)} ${line[i][1].toFixed(1)} ${mid(line[i], line[i + 1])}`;
+  const last = line[line.length - 1];
+  return `${d}L${last[0].toFixed(1)} ${last[1].toFixed(1)}`;
+}
+
+const toMap = ([lng, lat]: number[]): Point => projection([lng, lat]) ?? [0, 0];
+
+// Rivers and lakes from scripts/generate-hydrology.js (Natural Earth), projected and smoothed once.
+// The projected river lines are kept too, for finding where routes cross them.
+export function useHydrology() {
+  const [water, setWater] = useState<{ rivers: { rank: number; d: string; lines: Point[][] }[]; lakes: string }>({ rivers: [], lakes: "" });
+
+  useEffect(() => {
+    let active = true;
+    import("@/data/hydrology.json").then(({ default: data }) => {
+      if (!active) return;
+      setWater({
+        rivers: data.rivers.map(({ rank, lines }) => {
+          const projected = lines.map((line) => line.map(toMap));
+          return { rank, d: projected.map(smoothLine).join(""), lines: projected };
+        }),
+        lakes: data.lakes.flatMap(({ polygons }) => polygons.flat().map((ring) => smoothRing(ring.map(toMap)))).join(""),
+      });
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return water;
+}
+
+// Rings are stored flat as [lng, lat, lng, lat, ...].
+const fromFlat = (ring: number[]) => Array.from({ length: ring.length / 2 }, (_, i) => toMap([ring[2 * i], ring[2 * i + 1]]));
+
+const ringArea = (ring: Point[]) =>
+  Math.abs(ring.reduce((sum, [x, y], i) => {
+    const [nx, ny] = ring[(i + 1) % ring.length];
+    return sum + x * ny - nx * y;
+  }, 0)) / 2;
+
+export interface MountainPeak {
+  id: number;
+  x: number;
+  y: number;
+  lng: number;
+  lat: number;
+  elevation: number;
+  // Mean elevation of the surrounding ~1.5°, which tells a high plateau from a lone summit.
+  surrounding: number;
+  // Index of the highland patch the peak stands in, or -1 for an isolated volcano.
+  patch: number;
+}
+
+export type ForestBiome = "pine" | "broadleaf" | "jungle";
+
+export interface MapFeatures {
+  highlands: { d: string; dry: boolean; area: number }[];
+  peaks: MountainPeak[];
+  forests: { biome: ForestBiome; d: string }[];
+}
+
+// Highland patches, their peaks, isolated volcanoes and forest blobs from
+// scripts/generate-map-features.js, projected and smoothed once.
+export function useMapFeatures() {
+  const [features, setFeatures] = useState<MapFeatures | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    import("@/data/map-features.json").then(({ default: data }) => {
+      if (!active) return;
+      const toPeak = ([lng, lat, elevation, surrounding]: number[], patch: number) => {
+        const [x, y] = toMap([lng, lat]);
+        return { x, y, lng, lat, elevation, surrounding, patch };
+      };
+      setFeatures({
+        highlands: data.highlands.map(({ dry, rings }) => {
+          const projected = rings.map(fromFlat);
+          return { dry, area: ringArea(projected[0]), d: projected.map(smoothRing).join("") };
+        }),
+        peaks: [...data.highlands.flatMap(({ peaks }, patch) => peaks.map((peak) => toPeak(peak, patch))), ...data.volcanoes.map((peak) => toPeak(peak, -1))]
+          .sort((a, b) => b.elevation - a.elevation)
+          .map((peak, id) => ({ ...peak, id })),
+        forests: Object.entries(data.forests).flatMap(([biome, polygons]) =>
+          biome === "pine" || biome === "broadleaf" || biome === "jungle"
+            ? [{ biome, d: polygons.flatMap((rings) => rings.map((ring) => smoothRing(fromFlat(ring)))).join("") }]
+            : [],
+        ),
+      });
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return features;
+}
+
+export type ClimateGroup = "D" | "S" | "P" | "T" | "V" | "M" | "B" | "N" | "I";
+
+export interface Climate {
+  climateAt: (lng: number, lat: number) => ClimateGroup | undefined;
+  aridityAt: (lng: number, lat: number, coldIsDry?: number) => number;
+  tints: { group: ClimateGroup; level: number; d: string }[];
+}
+
+const isClimateGroup = (char: string): char is ClimateGroup => "DSPTVMBNI".includes(char);
+
+// Köppen–Geiger climate groups from scripts/generate-climate-grid.js: a lookup for choosing which
+// symbols belong where, plus smoothed outlines at three feathering levels to tint the land. The 0.5° grid's coastline differs
+// from the map's, so a coastal point with no climate takes the nearest one within a cell or two.
+export function useClimate() {
+  const [climate, setClimate] = useState<Climate | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    import("@/data/climate-grid.json").then(({ default: data }) => {
+      if (!active) return;
+      const cells = data.rows.map((row) => row.replace(/(\D)(\d+)/g, (_, char: string, count: string) => char.repeat(Number(count))));
+      const cols = 360 / data.step;
+      const cell = (row: number, col: number) => cells[row]?.[(col + cols) % cols] ?? "";
+      const cellOf = (lng: number, lat: number) => [Math.floor((data.lat - lat) / data.step), Math.floor((lng - data.lng) / data.step)];
+      const climateAt = (lng: number, lat: number) => {
+        const [row, col] = cellOf(lng, lat);
+        for (let reach = 0; reach <= 2; reach += 1) {
+          for (let dr = -reach; dr <= reach; dr += 1) {
+            for (let dc = -reach; dc <= reach; dc += 1) {
+              const char = cell(row + dr, col + dc);
+              if (isClimateGroup(char)) return char;
+            }
+          }
+        }
+      };
+      // Dry cells (prairie counting half) against humid ones (counting double) within two cells.
+      // Tundra and ice are neutral, so a window of nothing else is arid; on a high plateau tundra
+      // counts as dry by `coldIsDry` (0–1), outweighing the odd boreal cell.
+      const aridityAt = (lng: number, lat: number, coldIsDry = 0) => {
+        const [row, col] = cellOf(lng, lat);
+        let dry = 0;
+        let humid = 0;
+        for (let dr = -2; dr <= 2; dr += 1) {
+          for (let dc = -2; dc <= 2; dc += 1) {
+            const char = cell(row + dr, col + dc);
+            if (char === "D" || char === "S") dry += 1;
+            else if (char === "P") dry += 0.5;
+            else if (char === "N") dry += coldIsDry;
+            else if (/[TVMB]/.test(char)) humid += 1;
+          }
+        }
+        return dry + humid ? dry / (dry + 2 * humid) : 1;
+      };
+      setClimate({
+        climateAt,
+        aridityAt,
+        tints: Object.entries(data.tints).flatMap(([group, levels]) =>
+          isClimateGroup(group)
+            ? levels.map((rings, level) => ({
+                group,
+                level,
+                d: rings.map((ring) => smoothRing(fromFlat(ring))).join(""),
+              }))
+            : [],
+        ),
+      });
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return climate;
+}
+
+const isGreenland = (ring: number[][]) => ring.every(([lng, lat]) => lat > 58 && lng > -75 && lng < -10);
+
+// Elevation bands from scripts/generate-terrain-bands.js, projected and smoothed once.
+export function useTerrainBands() {
+  const [bands, setBands] = useState<{ level: number; d: string }[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    import("@/data/terrain-bands.json").then(({ default: data }) => {
+      if (!active) return;
+      setBands(
+        data.bands.map(({ level, polygons }) => ({
+          level,
+          d: polygons
+            .flatMap((rings) => rings)
+            .filter((ring) => !isGreenland(ring))
+            .map((ring) => smoothRing(ring.map(([lng, lat]) => projection([lng, lat]) ?? [0, 0])))
+            .join(""),
+        })),
+      );
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return bands;
+}
+
+function formatMonth(iso: string | null) {
+  return iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "";
+}
+
+export function placeDates(place: Place) {
+  const start = formatMonth(place.start);
+  const end = formatMonth(place.end);
+  return start === end ? start : `${start} – ${end}`;
+}
+
+interface BloomProps {
+  photos: GeoPhoto[];
+  caption?: string;
+  direction?: "up" | "down";
+  onOpen: (photo: GeoPhoto) => void;
+}
+
+// Thumbnails fan out from the anchor point (the parent positions this at the place).
+export function PhotoBloom({ photos, caption, direction = "up", onOpen }: BloomProps) {
+  const shown = photos.slice(0, 5);
+  const spread = shown.length === 1 ? 0 : 120;
+  const radius = 118;
+
+  return (
+    <div className="pointer-events-none absolute left-0 top-0 z-30">
+      <svg className="absolute overflow-visible" width="1" height="1" aria-hidden="true">
+        {shown.map((photo, index) => {
+          const { dx, dy } = fanOffset(index, shown.length, spread, radius, direction);
+          return (
+            <motion.line
+              key={photo.id}
+              x1={0}
+              y1={0}
+              x2={dx}
+              y2={dy}
+              className="stroke-cyan-700/60 dark:stroke-cyan-300/60"
+              strokeWidth={1}
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              exit={{ opacity: 0, transition: { duration: 0.12 } }}
+              transition={{ duration: 0.35, ease: EASE_OUT, delay: index * 0.035 }}
+            />
+          );
+        })}
+      </svg>
+      {shown.map((photo, index) => {
+        const { dx, dy, tilt } = fanOffset(index, shown.length, spread, radius, direction);
+        return (
+          <motion.button
+            key={photo.id}
+            type="button"
+            onClick={() => onOpen(photo)}
+            className="pointer-events-auto absolute -ml-12 -mt-9 h-[72px] w-24 overflow-hidden rounded-md border border-white/70 bg-muted shadow-xl ring-1 ring-black/10"
+            initial={{ opacity: 0, scale: 0.5, x: 0, y: 0, rotate: 0 }}
+            animate={{ opacity: 1, scale: 1, x: dx, y: dy, rotate: tilt }}
+            exit={{ opacity: 0, scale: 0.6, x: 0, y: 0, transition: { duration: 0.16, ease: EASE_OUT } }}
+            transition={{ type: "spring", duration: 0.5, bounce: 0.25, delay: index * 0.035 }}
+            whileHover={{ scale: 1.08, rotate: 0, zIndex: 10 }}
+            aria-label={`Open ${photo.alt}`}
+          >
+            <img src={photo.thumb} alt="" draggable={false} decoding="async" className="h-full w-full object-cover" />
+          </motion.button>
+        );
+      })}
+      {caption && (
+        <motion.p
+          className="absolute -translate-x-1/2 whitespace-nowrap rounded-full bg-background/90 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-foreground shadow-md backdrop-blur"
+          style={{ top: direction === "up" ? 14 : -40 }}
+          initial={{ opacity: 0, y: direction === "up" ? -4 : 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, transition: { duration: 0.12 } }}
+          transition={{ duration: 0.25, ease: EASE_OUT, delay: 0.1 }}
+        >
+          {caption}
+        </motion.p>
+      )}
+    </div>
+  );
+}
+
+function fanOffset(index: number, count: number, spread: number, radius: number, direction: "up" | "down") {
+  const start = -90 - spread / 2;
+  const angle = count === 1 ? -90 : start + (spread / (count - 1)) * index;
+  const radians = ((direction === "up" ? angle : -angle) * Math.PI) / 180;
+  return {
+    dx: Math.cos(radians) * radius,
+    dy: Math.sin(radians) * radius,
+    tilt: (index - (count - 1) / 2) * 4,
+  };
+}
+
+export function usePhotoLightbox() {
+  const [state, setState] = useState<{ photos: GeoPhoto[]; index: number } | null>(null);
+  const element = state && (
+    <PhotoLightbox
+      slides={state.photos.map((photo) => ({ src: photo.src, alt: photo.alt, description: photo.location }))}
+      index={state.index}
+      onClose={() => setState(null)}
+    />
+  );
+  return {
+    open: (photos: GeoPhoto[], photo: GeoPhoto) => setState({ photos, index: Math.max(0, photos.indexOf(photo)) }),
+    element,
+  };
+}
+
+export function PlaceStrip({ place, onOpen }: { place: Place | null; onOpen: (photo: GeoPhoto) => void }) {
+  return (
+    <div className="mt-6 min-h-[11rem]">
+      <AnimatePresence mode="popLayout" initial={false}>
+        {place && (
+          <motion.div
+            key={place.id}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: EASE_OUT }}
+          >
+            <div className="mb-3 flex flex-wrap items-baseline gap-x-3">
+              <h3 className="text-xl font-semibold text-foreground">{place.name}</h3>
+              <span className="font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">
+                {placeDates(place)} · {place.photos.length} {place.photos.length === 1 ? "photo" : "photos"}
+              </span>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-2 [scrollbar-width:thin]">
+              {place.photos.map((photo, index) => (
+                <motion.button
+                  key={photo.id}
+                  type="button"
+                  onClick={() => onOpen(photo)}
+                  className="h-32 w-44 shrink-0 overflow-hidden rounded-md bg-muted"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, ease: EASE_OUT, delay: Math.min(index, 6) * 0.04 }}
+                  aria-label={`Open ${photo.alt}`}
+                >
+                  <img src={photo.thumb} alt="" draggable={false} loading="lazy" className="h-full w-full object-cover" />
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

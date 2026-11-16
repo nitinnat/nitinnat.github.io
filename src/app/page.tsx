@@ -1,9 +1,13 @@
 import { ArrowRight, ArrowUpRight, Camera, Cpu } from "lucide-react";
 import Link from "next/link";
+import { preload } from "react-dom";
 import { getAllPosts } from "@/lib/content";
+
+const HERO_IMAGE = "/assets/photos/001.jpg";
 
 export default function HomePage() {
   const posts = getAllPosts();
+  preload(HERO_IMAGE, { as: "image", fetchPriority: "high" });
 
   return (
     <div className="bg-background text-foreground">
@@ -12,7 +16,7 @@ export default function HomePage() {
           role="img"
           aria-label="Nitin Nataraj looking across a mountain landscape at sunset"
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url(https://nitinnataraj.com/assets/photos/001.png)" }}
+          style={{ backgroundImage: `url(${HERO_IMAGE})` }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/25 to-background" />
         <div className="relative mx-auto flex min-h-[72vh] max-w-6xl flex-col justify-end px-5 py-16 md:px-10 md:py-24">

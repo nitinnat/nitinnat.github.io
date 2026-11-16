@@ -738,3 +738,166 @@ Load Photos → Load Metadata → Merge Metadata with Photos
 - Gotchas: `overflow: hidden` makes an element a scroll container and silently deactivates a child's `view()` timeline (use `overflow: clip`); IntersectionObserver misses headings skipped by a jump scroll; rendering (and rAF) is suppressed during a View Transition's DOM update.
 - For local Photography previews, 2 photos per location were mirrored from the live site into git-ignored `content/assets/photos` and copied to `public/assets` (excluded via `.git/info/exclude`).
 - Verified: production build; Playwright checks for rail fill progress, dialog morph open/close with focus return, reading progress and active section, hero fade, sticky headings, normal lightbox, no page errors.
+
+## 2026-11-15: Photo Map Variants (Local Preview)
+
+**Status:** Local preview on `feature/photo-map-variants` (from `main` after PR #31). Superseded: the Atlas was picked and the other variants and the switcher were removed (see "Atlas Chosen" below).
+
+- `src/lib/photo-geo.ts` reads GPS + capture time from each photo's EXIF at build/render time (`exifr`), rounds coordinates to 0.05° (~5 km), and groups photos within 60 km into date-ordered places. Reads the first 256 KB of each file and passes bytes to exifr: exifr's own file loading fails inside Next's server bundle ("Couldn't load fs"), and its `pick` option drops the raw GPS tags that `latitude`/`longitude` are computed from.
+- Map section on Photography with a dev-only switcher between four variants (`src/components/photography/map/`):
+  1. Atlas: flat d3-geo SVG (world-atlas countries + us-atlas states), visited regions tinted; hovering a place/state fans its photos out; regions without photos show the nearest place at the cursor; click zooms (animated `viewBox`) and fills a filmstrip.
+  2. Globe: cobe WebGL dotted globe; DOM pins anchored with CSS anchor positioning to cobe's marker anchors (`--cobe-visible-*` lives on `:root`, absent when behind the globe); hover pauses rotation and fans photos; click turns the globe to the place; drag to spin. Canvas is created imperatively because cobe re-parents it.
+  3. Journey: trips in date order; camera follows each leg, great-circle arc draws, photos bloom at each stop; stop chips to jump.
+  4. Globe → Atlas: globe with journey arcs; choosing a place cross-fades into the Atlas zooming in from the world view.
+- Download deterrence: right-click, drag, and long-press save blocked on photos (page and lightbox). Cannot stop screenshots; real protection needs resized, EXIF-stripped derivatives (not yet built).
+- Gotcha: after `npm install` with the dev server running, Turbopack failed to resolve `d3-geo` from `d3`; clearing `.next/dev` and restarting fixed it.
+- Verified in Chrome (SwiftShader WebGL): 17 places from 24 geotagged local photos; all four variants render and interact in dark and light; context menu blocked on gallery photos; no console errors.
+
+## 2026-11-15: Pokémon-style Illustrated Atlas (Local Preview)
+
+**Status:** Local on `feature/photo-map-variants`, not pushed. Built with two parallel subagents (terrain data, symbol art) plus main-session composition.
+
+- **Look:** one watercolor game-map palette in both themes (`gm-*` classes): blue sea with pale shallows and foam, green land on a raised earthy edge, translucent elevation washes, winding rivers and lakes, painted mountain ranges, rolling hills, round-tree forests, multi-building towns, chunky landmarks, serif town names.
+- **Zoom:** d3-zoom. Pinch or ⌘/Ctrl+scroll zooms; plain scroll keeps scrolling the page with a hint; two fingers on touch; +/−/World buttons; clicking a place or state flies in. A non-passive ctrl+wheel guard on the container stops a pinch that starts over an overlay from zooming the whole page. The live transform is written to the DOM; React only re-renders at zoom end. Symbols counter-scale via `--k`, set only on the symbol layer.
+- **Level of detail:** symbols keep a constant on-screen spacing via `selectSpaced`, so detail increases with zoom.
+  - Mountains (≥2,500 m) overlap into ranges, smaller at world view.
+  - Hills (<2,500 m) and forests (a jittered land grid, hit-tested with `Path2D`/`isPointInPath`) appear from 2× zoom.
+  - Towns replace dots at 2×. Labels collide-check by photo count. Landmarks lift above a town they would cover.
+- **Roads:** a minimum spanning tree over places within 1,500 km, drawn as gentle quadratic curves.
+- **Data (committed, small; regenerate with the scripts):**
+  - `src/data/terrain-peaks.json` (`scripts/generate-terrain.js`)
+  - `src/data/terrain-bands.json` (`scripts/generate-terrain-bands.js`, d3-contour, Douglas–Peucker; drawn smoothed, Greenland ice excluded)
+  - `src/data/hydrology.json` (`scripts/generate-hydrology.js`, Natural Earth 1:50m rivers rank ≤5 and lakes rank ≤1)
+  - Source downloads (AWS Terrain Tiles z4, Natural Earth GeoJSON) were fetched by the user and copied into git-excluded `.cache/`.
+- **Fixes along the way:**
+  - Peaks from the clamp ceiling (corrupt pixels) dropped.
+  - Lake rings collapsed by line simplification (closed ring ends coincide); now simplified as two halves.
+  - Antarctica filtered from the land outline.
+  - Lakes are gaps between countries, so they're painted as water over the raised edge.
+  - The world view no longer suppresses the Rockies (towns reserve space only when drawn).
+  - The `.gm-ocean` fill on `<svg>` leaked into children; removed.
+- **Gotcha:** the Turbopack dev CSS cache went stale repeatedly after `globals.css` edits and after production builds. Fix: `docker exec kind_kowalevski rm -rf /app/.next/dev` and restart the container.
+- **Attribution to add before shipping:** Natural Earth (public domain, credit customary) and AWS Terrain Tiles (sources such as SRTM/ETOPO1 ask for attribution).
+
+## 2026-11-15: Köppen–Geiger Climate on the Atlas Map
+
+**Status:** Local on `feature/photo-map-variants`, not pushed.
+
+- **Why:** Natural Earth named-desert polygons left gaps, so forests grew in Australia's interior, the Sahel and the Central Asian steppe. Symbols and land tints now come from the Köppen–Geiger classification instead.
+- **Data:** Kottek, M., Grieser, J., Beck, C., Rudolf, B., and Rubel, F. (2006). World Map of the Köppen-Geiger climate classification updated. Meteorol. Z., 15, 259-263 (0.5° grid, 1951–2000). The source ASCII file is unzipped into git-excluded `.cache/koeppen/`.
+- **`scripts/generate-climate-grid.js`** writes `src/data/climate-grid.json` (~82 KB):
+  - Run-length-encoded 0.5° rows from 84°N to 60°S, one character per group: D desert, S steppe, P prairie, T tropical rainforest/monsoon, V savanna, M temperate/continental, B boreal, N tundra, I ice, `.` ocean.
+  - Precomputed tint outlines per group (d3-contour on a 3×3-blurred mask, Douglas–Peucker). Coastal cells are spread 3 cells into the sea first, then the map clips the tints to the coastline.
+- **Prairie (P):** Köppen has no grassland class. Northern Kazakhstan, the Ukrainian steppe, the Great Plains and the Pampas are Dfb, Dfa or Cfa, so they still grew forests. Temperate cells within 6 cells (3°) of a dry cell become prairie: mostly hills, with an occasional small copse.
+- **Client:** `useClimate()` in `map-shared.tsx` decodes the grid and exposes `climateAt(lng, lat)`. A coastal point with no climate takes the nearest group within 2 cells. It also returns projected and smoothed tint paths. The old `useClimateRegions`, `climate-regions.json`, its generator script and `isTreeless` are removed.
+- **Symbols** (classified once, in `climateAware`):
+  - D: dunes, red-rock peaks, no hills.
+  - S: dry hills (`DryHill`, `.gm-dry`).
+  - P: `Meadow`.
+  - V: sparse `Acacia`.
+  - T: `Jungle` (deeper greens plus a palm).
+  - M: forests.
+  - B: `Pines`.
+  - N: sparse `Tufts`.
+  - I: bare.
+  - Peaks keep the latitude snowline (never in D), and are always snowy in I.
+- **Tints:** `.gm-climate-*` at 70% opacity, under the elevation washes. The green lowland wash (`gm-band-0`) now sits under the tints, because it was greening Saharan plateaus.
+- **Verified:** Playwright counted symbols inside each zoomed country's path.
+  - No forests in Algeria, Niger, Chad, Saudi Arabia or Australia's interior.
+  - Jungle and acacias in Brazil, acacias in Kenya, pines in Canada and Siberia.
+  - No snow on Saharan peaks; snow in Nepal and Colorado.
+
+## 2026-11-15: Photo Publishing Pipeline (EXIF Stripping, Web Sizes, GPS Fallback)
+
+**Status:** Local on `feature/photo-map-variants`, not pushed.
+
+- **`scripts/optimize-photos.js`** (prebuild, after `copy-assets.js`) uses `sharp` to publish every image under `content/assets/photos` to `public/assets/photos`: auto-rotated, converted to sRGB with an embedded sRGB ICC profile, and stripped of all other metadata (GPS, dates, camera make/model/serials).
+  - Display copy: long edge 3,200 px at quality 90 (raised from 2,400 px at q82 so full-screen viewing on Retina/4K stays sharp), at the same path. JPEG and WebP keep their format and extension; other formats (the PNG hero) become `.jpg`.
+  - Thumbnail: long edge 600 px under `thumbs/<same path>`.
+  - The target directory is cleared first, so no original ever reaches `public/`. `copy-assets.js` now skips `photos/`.
+  - Local set: 26 originals, 92 MB → 17.3 MB display + 1.1 MB thumbnails. Hero `001.png` went from 3.07 MB to `001.jpg` at 147 KB.
+- **URL rule** lives in `src/lib/photo-assets.ts` (`photoUrls`), mirroring the script. `PhotoItem` gains `source` (the original's path under `content/assets/photos`).
+- **Gallery** grid uses thumbnails, and the lightbox uses the display size.
+- **Homepage hero** uses the relative path `/assets/photos/001.jpg`, preloaded through `react-dom` `preload` with `fetchPriority: high`. The background image reuses the preloaded file, so it downloads once.
+- **`photo-geo.ts`** reads EXIF from the original (`photo.source`), not the stripped copy. `GeoPhoto` gains `thumb`; the map still uses `src` until it's switched. A photo without GPS takes the rounded mean position of geotagged photos with the same `photos-metadata.json` location string, or is skipped if none share it. Locally nothing changed: the only GPS-less gallery photo has a unique tag. A synthetic check confirmed both the placed and the skipped cases.
+- **Build:**
+  - `npm run build` no longer calls `npm run prebuild` explicitly, because npm already runs the `prebuild` hook, so it ran twice.
+  - CI moved to Node 22 (sharp 0.35 needs ≥20.9). The lockfile carries `@img/sharp-linux-x64`.
+  - The dev auto-tag API also runs `optimize-photos.js`.
+- **Verified:**
+  - exifr: 0 GPS or identifying tags in `public/` and `out/` (52 files); 24 of 26 originals still have GPS.
+  - Playwright: the gallery loads 25 thumbnails (600 px), the lightbox loads the display copies, and the hero loads `001.jpg` once. No 404s or page errors in dev or on the static `out/`.
+  - `tsc` and the production build pass.
+
+## 2026-11-15: Atlas Map Accuracy Pass (Snowline, Savanna, Prairie, Tints, Credits)
+
+**Status:** Local on `feature/photo-map-variants`, not pushed.
+
+- **Dry snowline:** `useClimate()` now exposes `aridityAt(lng, lat)`. It compares dry cells within two cells (D/S count 1, P counts ½) with humid ones (T/V/M/B count double). Tundra and ice are neutral, so an all-cold window (Puna, Tibet) counts as arid. `isSnowy` lifts the latitude snowline by up to 2,000 m with aridity. The full lift applies below 35° and fades to nothing by 45°.
+  - Offline peak counts (all peaks ≥2,500 m, snowy before → after):
+    - Atacama Andes 36→8 of 39; Bolivia 26→4/29; N Argentina 36→13/43; Peru 25→12/37 (Cordillera Blanca, Vilcanota and Vilcabamba stay white).
+    - Iran 9→3/67; Afghanistan 21→7/40 (NE Hindu Kush keeps 5/6).
+    - Unchanged: Nepal/Everest, Alaska, Alps, Cascades, Kilimanjaro, Mt Kenya, Patagonia, Pamir, Karakoram.
+  - The Tibetan interior barely changes (84/89): its sampled peaks really are 5,200–6,400 m.
+- **Savanna by region:** `savannaAt` picks `Cerrado` in the Americas (gnarled shrubby trees and grass tufts), `Eucalypt` in Australia and New Guinea (tall pale trunks, loose blue-green crowns), and `Acacia` elsewhere. The new symbols share a `Canopy` helper that draws every outline before every fill, so overlapping puffs read as one mass.
+- **Prairie:** the generator keeps raw Köppen classes. A temperate cell becomes P when all of these hold:
+  - it is reached from a dry cell within 6 steps,
+  - its class is not maritime (Cfb/Cfc/Csb/Csc/Cwc),
+  - and it is more than 3 cells from the sea.
+  - `GRASSLANDS` boxes add the Pontic steppe, the Pampas/Campos and the eastern Great Plains.
+  - Cell changes:
+    - Spain north of 42.5°N: P26→0. W Washington/Cascades: P29→1. Vic/NSW: P160→80.
+    - Southern Ukraine: P33→179. Pampas: P69→223. Great Plains: P196→322.
+- **Tints:** the masks get two 3×3 blurs. Contours at 0.2/0.5/0.8 are stacked at 45% fill-opacity (group at 85%), so each climate fades over about a degree and stair-steps never show. Tints are still clipped to the coastline, with no filters. `climate-grid.json` is now ~168 KB, lazy-loaded.
+- **Hover:** regions with no photos within 100 km of the cursor no longer show a "No photos from X yet" bloom, just the hover highlight.
+- **`selectSpaced`:** takes an optional `drawn` predicate, so bare ground spots still claim space but don't count toward the limit.
+- **Credits:** a mono line under the Atlas map credits AWS Terrain Tiles, Natural Earth and Köppen–Geiger, linking Kottek et al. (2006) via its DOI and giving the full citation in the title.
+- **Verified:** tsc and eslint pass. Playwright symbol census before/after (`scratchpad/fix.js`), hover checks for Libya, Australia and central/eastern Nevada, and screenshots.
+
+## 2026-11-15: Galar-Style Atlas Map
+
+**Status:** Local on `feature/photo-map-variants`, not pushed. `cities.tsx` (`CityModel`, `cityTier`) was built in parallel by another agent.
+
+- **Look (ported from the "Galar Town Map" mockup, plus the cloud frame and landmark plates from the watercolor one):**
+  - Flat lime land with darker green elevation bands; crisp Köppen tints (sand deserts with an edge, khaki steppe over high ground, white ice).
+  - Sea: wave glyphs from a `<pattern>`, a dark teal offshore ring over a pale shallow band, white foam coast, and the raised land edge kept.
+  - Grey highland patches with slate massifs, red-rock mesas or outcrops on desert peaks, and single cones for isolated volcanoes.
+  - Forest blobs filled with biome tree textures, plus humps, dunes and cacti (Americas only), savanna trees and tundra tufts on open ground.
+  - Nunito (`next/font`, scoped to the map section as `--font-map`) on cream name plates.
+- **`scripts/generate-map-features.js` → `src/data/map-features.json` (~92 KB):**
+  - **Highlands:** cells whose highest zoom-4 pixel is ≥2,200 m, minus ice, blurred and contoured, with a 1 deg² minimum area. Each patch carries a `dry` flag and its ≥2,500 m peaks, stored as `[lng, lat, elevation, surrounding mean elevation]`. Peaks outside every patch become isolated volcanoes, at most one per 1.5°.
+  - **Forests:** pine (boreal, montane M above 1,800 m, semi-arid ranges above 2,000 m), broadleaf (M) or jungle (T), below a latitude treeline.
+    - Value noise leaves 40% of forest-climate ground as meadow.
+    - The blurred mask is zeroed within 0.25° of desert or prairie, so no blob spills into them.
+- **Client (`atlas-map.tsx`, `galar.tsx`, `map-shared.tsx` `useMapFeatures`):**
+  - **Stops:** towns within 34 px merge into one stop, shown as a `CityModel` with a count badge.
+  - **Routes:** the MST is kept, numbered in visit order and drawn as metro lines with the elbow on land. Badges are collision-culled with labels, and bridges mark river crossings. Dashed bowed arcs join route groups at world view.
+  - **Cursor and player:** corner brackets mark the selected stop, and the bucket-hat player sits at the latest place with a 2-step bob (disabled for reduced motion).
+  - **Overlays:** a navy header plate (coarse region lookup by view centre and zoom), a cream info panel (visit #, routes, Open photos → lightbox), cream controls, and CSS paper grain plus an SVG cloud frame, all outside the zoom group.
+  - **Region hit targets:** countries and states are invisible hit paths projected once. Only the hovered one is outlined, above the tints, which fixes Libya.
+- **Level of detail:**
+  - Ground spots are a jittered grid at a fixed screen pitch over the current view, with per-view budgets (mountains 32–36, hills 12–24, ground 45–90).
+  - At world view each highland is capped at about one massif per 5,000 px² of patch, so the Andes show 2 instead of a column.
+  - Peaks and hills require land polygons of at least 15,000 km², so Hawaii and other specks get none.
+  - Land, forest and highland are rasterized once into one RGB bitmap (2 px per map unit), so hit tests are pixel reads. `isPointInPath` was ~35 ms per settle.
+  - Symbols keep at least 0.7 screen px per unit (`MIN_SYMBOL_PX`), so phones stay legible. The info panel is hidden below `sm` (the filmstrip covers it).
+- **Snow:** aridity takes `coldIsDry`, so tundra counts as dry on a high plateau (surroundings ≥3,000 m) unless the summit rises more than ~1,500 m above it. The plateau lift is up to 1,500 m more.
+- **Census (all ≥2,500 m peaks, snowy):**
+  - Dry or plateau: Atacama 2/36, Bolivia 4/25, N Argentina 7/39, Iran 3/61, Tibet interior 18/145 (was 84/89 of sampled peaks).
+  - Snowy ranges: Himalaya crest 12/12, Alps 12/16, Alaska 17/17, Cascades 2/2, Kilimanjaro 1/1, Mt Kenya 1/1, Patagonia 2/2.
+  - Forest samples in desert 0 and in prairie 0. In-browser: Kenya 73 and Tanzania 86 acacias per view.
+- **Performance (dev server, Playwright ctrl+wheel pinch + drag, 2× DPR):** frames during live zoom stay at the headless 30 fps cap (p95 33.4 ms, same as idle). Long tasks occur only at gesture end (React settle, 56–127 ms in dev, mostly `jsxDEV`). The production build compiles.
+- **Removed:** admin borders, the dashed-ellipse selection, the old `Town`/`Hill`/`Pines`/`Jungle`/`Meadow` symbols and the World text button.
+
+## 2026-11-15: Atlas Chosen, Other Map Variants Removed
+
+**Status:** Local on `feature/photo-map-variants`, not pushed.
+
+- **Decision:** the owner picked the Galar-style Atlas. `PhotoMapSection` now renders only `AtlasMap` under the heading; the dev-only variant switcher is gone. Nunito (`--font-map`) is still loaded there for the Atlas plates.
+- **Removed:**
+  - `globe-map.tsx`, `journey-map.tsx`, `globe-atlas-map.tsx`, and `flat-map.tsx` (only Journey used `FlatMap`). The `Region` type moved to `map-shared.tsx`, and `WorldShapes` now uses it.
+  - From `map-shared.tsx`: `ViewBox`, `WORLD_VIEW`, `viewForBounds`, `viewBoxString` and `useVisitedRegions`, which only the removed variants used. `formatMonth` is no longer exported. `PhotoBloom`, `PlaceStrip` and `usePhotoLightbox` stay, because the Atlas uses them.
+  - The `cobe` dependency (Globe only).
+- **Kept:** all `src/data` map files, their generator scripts and the `gm-*`/`map-*` CSS are used by the Atlas. The flagged `gm-band-*`, `gm-climate-*` and `gm-forest-*` classes are built from template strings.
+- **Gotcha:** `next build` sometimes fails with "next/font/google queries have exactly one entry". Google Fonts intermittently returns `fonts.gstatic.com/l/font?kit=…&skey=…` URLs, and the Next 16.1.1 Turbopack font loader can't parse them. Fixed by self-hosting Nunito: `@fontsource-variable/nunito` plus `next/font/local` (variable weight 200–1000) in `photo-map-section.tsx`. The production build passes without contacting Google Fonts for the map face.
+- **Verified:** tsc and eslint (pre-existing issues only), and the production build. Playwright on `/photography/` checked that there is no switcher, the zoom buttons work, clicking Nevada zooms to it, hovering a place fans out its photos, and both the info panel's "Open photos" and the gallery thumbnails open the lightbox. The credits render, there is no overflow at 390 px, and there are no page errors or 404s.

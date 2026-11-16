@@ -110,7 +110,7 @@ export function ClusteredGallery({ clusters }: ClusteredGalleryProps) {
             {/* Masonry Grid */}
             <div className="columns-1 sm:columns-2 lg:columns-3 gap-4">
               {cluster.photos.map((photo, photoIndex) => {
-                const src = photo.full || photo.thumb;
+                const src = photo.thumb || photo.full;
                 if (!src) return null;
 
                 return (
