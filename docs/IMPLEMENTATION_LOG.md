@@ -741,7 +741,7 @@ Load Photos → Load Metadata → Merge Metadata with Photos
 
 ## 2026-11-15: Photo Map Variants (Local Preview)
 
-**Status:** Local preview on `feature/photo-map-variants` (from `main` after PR #31). Not pushed; awaiting the user's pick.
+**Status:** Local preview on `feature/photo-map-variants` (from `main` after PR #31). Superseded: the Atlas was picked and the other variants and the switcher were removed (see "Atlas Chosen" below).
 
 - `src/lib/photo-geo.ts` reads GPS + capture time from each photo's EXIF at build/render time (`exifr`), rounds coordinates to 0.05° (~5 km), and groups photos within 60 km into date-ordered places. Reads the first 256 KB of each file and passes bytes to exifr: exifr's own file loading fails inside Next's server bundle ("Couldn't load fs"), and its `pick` option drops the raw GPS tags that `latitude`/`longitude` are computed from.
 - Map section on Photography with a dev-only switcher between four variants (`src/components/photography/map/`):
@@ -888,3 +888,16 @@ Load Photos → Load Metadata → Merge Metadata with Photos
   - Forest samples in desert 0 and in prairie 0. In-browser: Kenya 73 and Tanzania 86 acacias per view.
 - **Performance (dev server, Playwright ctrl+wheel pinch + drag, 2× DPR):** frames during live zoom stay at the headless 30 fps cap (p95 33.4 ms, same as idle). Long tasks occur only at gesture end (React settle, 56–127 ms in dev, mostly `jsxDEV`). The production build compiles.
 - **Removed:** admin borders, the dashed-ellipse selection, the old `Town`/`Hill`/`Pines`/`Jungle`/`Meadow` symbols and the World text button.
+
+## 2026-11-15: Atlas Chosen, Other Map Variants Removed
+
+**Status:** Local on `feature/photo-map-variants`, not pushed.
+
+- **Decision:** the owner picked the Galar-style Atlas. `PhotoMapSection` now renders only `AtlasMap` under the heading; the dev-only variant switcher is gone. Nunito (`--font-map`) is still loaded there for the Atlas plates.
+- **Removed:**
+  - `globe-map.tsx`, `journey-map.tsx`, `globe-atlas-map.tsx`, and `flat-map.tsx` (only Journey used `FlatMap`). The `Region` type moved to `map-shared.tsx`, and `WorldShapes` now uses it.
+  - From `map-shared.tsx`: `ViewBox`, `WORLD_VIEW`, `viewForBounds`, `viewBoxString` and `useVisitedRegions`, which only the removed variants used. `formatMonth` is no longer exported. `PhotoBloom`, `PlaceStrip` and `usePhotoLightbox` stay, because the Atlas uses them.
+  - The `cobe` dependency (Globe only).
+- **Kept:** all `src/data` map files, their generator scripts and the `gm-*`/`map-*` CSS are used by the Atlas. The flagged `gm-band-*`, `gm-climate-*` and `gm-forest-*` classes are built from template strings.
+- **Gotcha:** `next build` sometimes fails with "next/font/google queries have exactly one entry". Google Fonts intermittently returns `fonts.gstatic.com/l/font?kit=…&skey=…` URLs, and the Next 16.1.1 Turbopack font loader can't parse them. Re-running the build works. If CI hits it often, self-host Nunito with `next/font/local`.
+- **Verified:** tsc and eslint (pre-existing issues only), and the production build. Playwright on `/photography/` checked that there is no switcher, the zoom buttons work, clicking Nevada zooms to it, hovering a place fans out its photos, and both the info panel's "Open photos" and the gallery thumbnails open the lightbox. The credits render, there is no overflow at 390 px, and there are no page errors or 404s.

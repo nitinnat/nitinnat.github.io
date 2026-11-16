@@ -8,7 +8,6 @@ import "d3-transition";
 import { easeCubicInOut } from "d3-ease";
 import { zoom, zoomIdentity, type ZoomBehavior, type ZoomTransform } from "d3-zoom";
 import type { GeoPhoto, Place } from "@/lib/photo-geo";
-import type { Region } from "./flat-map";
 import {
   EASE_OUT,
   MAP_HEIGHT,
@@ -26,6 +25,7 @@ import {
   useTerrainBands,
   useWorldShapes,
   type ClimateGroup,
+  type Region,
 } from "./map-shared";
 import { Acacia, Cactus, Cerrado, Dunes, Eucalypt, Hump, Massif, Mesa, Tufts, selectSpaced, usePeaks } from "./terrain";
 import { CityModel, cityTier, type CityTier } from "./cities";

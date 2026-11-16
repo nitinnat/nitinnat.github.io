@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { geoContains, geoEqualEarth, geoPath } from "d3-geo";
+import { geoEqualEarth, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
 import type { Feature, Geometry } from "geojson";
 import type { GeometryCollection, Topology } from "topojson-specification";
@@ -23,15 +23,17 @@ export function project(place: { lat: number; lng: number }): [number, number] {
   return projection([place.lng, place.lat]) ?? [0, 0];
 }
 
+export type Region = Feature<Geometry, { name: string }>;
+
 export interface WorldShapes {
-  land: Feature<Geometry, { name: string }>[];
-  countries: Feature<Geometry, { name: string }>[];
-  states: Feature<Geometry, { name: string }>[];
+  land: Region[];
+  countries: Region[];
+  states: Region[];
 }
 
 // Map outlines are imported lazily so they never weigh on the page's first load.
 // Antarctica would only be a strip along the bottom edge of the map.
-function withoutAntarctica(land: Feature<Geometry, { name: string }>) {
+function withoutAntarctica(land: Region) {
   if (land.geometry.type !== "MultiPolygon") return land;
   const coordinates = land.geometry.coordinates.filter((polygon) => polygon[0].some(([, lat]) => lat > -60));
   return { ...land, geometry: { ...land.geometry, coordinates } };
@@ -289,7 +291,7 @@ export function useTerrainBands() {
   return bands;
 }
 
-export function formatMonth(iso: string | null) {
+function formatMonth(iso: string | null) {
   return iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "";
 }
 
@@ -298,27 +300,6 @@ export function placeDates(place: Place) {
   const end = formatMonth(place.end);
   return start === end ? start : `${start} – ${end}`;
 }
-
-export interface ViewBox {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
-
-export const WORLD_VIEW: ViewBox = { x: 0, y: 0, w: MAP_WIDTH, h: MAP_HEIGHT };
-
-// Fits [x0, y0, x1, y1] map bounds into a padded view with the map's aspect ratio.
-export function viewForBounds([[x0, y0], [x1, y1]]: [[number, number], [number, number]], minWidth = 120): ViewBox {
-  const pad = 0.35;
-  let w = Math.max((x1 - x0) * (1 + pad * 2), minWidth);
-  let h = Math.max((y1 - y0) * (1 + pad * 2), (minWidth * MAP_HEIGHT) / MAP_WIDTH);
-  if (w / h > MAP_WIDTH / MAP_HEIGHT) h = (w * MAP_HEIGHT) / MAP_WIDTH;
-  else w = (h * MAP_WIDTH) / MAP_HEIGHT;
-  return { x: (x0 + x1) / 2 - w / 2, y: (y0 + y1) / 2 - h / 2, w, h };
-}
-
-export const viewBoxString = ({ x, y, w, h }: ViewBox) => `${x} ${y} ${w} ${h}`;
 
 interface BloomProps {
   photos: GeoPhoto[];
@@ -455,16 +436,4 @@ export function PlaceStrip({ place, onOpen }: { place: Place | null; onOpen: (ph
       </AnimatePresence>
     </div>
   );
-}
-
-export function useVisitedRegions(places: Place[], shapes: WorldShapes | null) {
-  return useMemo(() => {
-    const visited = (features: Feature<Geometry, { name: string }>[] = []) =>
-      new Set(
-        features
-          .filter((f) => places.some((p) => geoContains(f, [p.lng, p.lat])))
-          .map((f) => f.properties.name),
-      );
-    return { countries: visited(shapes?.countries), states: visited(shapes?.states) };
-  }, [places, shapes]);
 }
