@@ -912,3 +912,17 @@ Load Photos → Load Metadata → Merge Metadata with Photos
 - **Gotcha:** the timeline dialog is rendered inside the About `prose` article, so prose heading styles overrode its own classes. The dialog panel is now `not-prose`.
 - **Left alone:** nav and brand, buttons, badges, the SVG project visuals (mono diagram labels), the unused `skills-bars`, `skills-grid`, `dynamic-tagline` and `photo-journey` components, and `photography/map/` (its "The map" heading is still sans).
 - **Verified:** tsc and eslint (pre-existing warnings only). Playwright in dark mode at 1440 and 390 px on `/`, `/about`, `/photography` and `/blog` showed no horizontal overflow and no console errors.
+
+## 2026-11-19: Calmer Photo Fan on the Atlas Map
+
+**Status:** Local on `fix/map-photo-hover`, not pushed.
+
+- **Bug:** hovering a town fanned out its photos, but they flickered away before they could be clicked. Moving off the town toward a photo entered the invisible region path underneath, and `showRegion` replaced the bloom straight away (new key, so AnimatePresence exited it and sprang a new one in). Over the sea, the empty gap between the town and the photos (radius 118 px) let the 220 ms close timer fire. Every hover also swapped instantly, and the thumbnails sprang out from the anchor with a bounce, so they were moving targets.
+- **Fix:**
+  - `PhotoBloom` draws a transparent, pointer-active wedge from the anchor to the photos, so the pointer stays inside the bloom on the way. It has a hole the size of the town (`hole`, from the bloom's `tier`), which keeps the town hoverable and clickable.
+  - Hover intent through a single timer: a bloom opens after 80 ms, an open bloom gives way to a different target only after 200 ms, and it closes 300 ms after the pointer leaves. A target with the same key as the open bloom is ignored, so a "Nearest" bloom no longer follows the cursor. Clicking or zooming cancels anything pending, so tap-to-focus doesn't reopen a bloom.
+  - Motion: thumbnails travel from 60% of their offset with a 200 ms ease-out (no spring), staggered from the middle outward (0/30/60 ms). They exit in place in 120 ms. Reduced motion keeps only the fades.
+- **Verified (Playwright, 1440 px, hover a town, then 15 steps to each of its thumbnails):**
+  - Breckenridge: 3 remounts and 5 of 5 legs lost the bloom before; 0 and 0 after. Thumbnail click: no lightbox before, lightbox after. New York lost 2 of 5 legs, and Goa remounted as "India" on 1 of 2 legs; both are clean after.
+  - A sweep across North America and back mounted 5 blooms before and 3 after (only towns the pointer passed over). Hovering India still opens its bloom, and leaving the map closes it. A New Jersey "Nearest: New York" bloom holds still while the pointer travels to a photo, which then opens.
+  - Clicking a town with its bloom open still focuses it. Tapping a town on a 390 px touch viewport focuses it and leaves no bloom. Reduced motion passes the same checks. tsc is clean, and eslint reports only the existing `<img>` warnings.

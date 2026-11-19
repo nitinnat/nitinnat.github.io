@@ -52,6 +52,7 @@ interface Bloom {
   anchor: [number, number] | { x: number; y: number };
   photos: GeoPhoto[];
   caption: string;
+  tier?: CityTier;
 }
 
 type Bounds = [[number, number], [number, number]];
@@ -61,6 +62,11 @@ type Box = { x0: number; x1: number; y0: number; y1: number };
 const EARTH_KM = 6371;
 // Photos are only suggested when this close to the point under the cursor.
 const NEARBY_KM = 100;
+// Hover intent (ms): a bloom opens after a short pause, and an open one only gives way to another
+// target after a longer one, so the pointer can cross the map on its way to the photos.
+const OPEN_DELAY = 80;
+const SWITCH_DELAY = 200;
+const CLOSE_DELAY = 300;
 const MAX_ZOOM = 48;
 const TOWN_ZOOM = 2;
 const ROUTE_ZOOM = 1.5;
@@ -189,7 +195,7 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
   const pixelRef = useRef(1);
   const symbolRef = useRef(1);
   const hintTimer = useRef<number | undefined>(undefined);
-  const closeTimer = useRef<number | undefined>(undefined);
+  const hoverTimer = useRef<number | undefined>(undefined);
 
   // The live transform is written to the DOM while zooming; React only sees it once at rest.
   const [settled, setSettled] = useState<ZoomTransform>(zoomIdentity);
@@ -222,7 +228,10 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
         if (event.type.startsWith("touch")) return event.touches.length > 1;
         return !event.button;
       })
-      .on("start", () => setBloom(null))
+      .on("start", () => {
+        window.clearTimeout(hoverTimer.current);
+        setBloom(null);
+      })
       .on("zoom", ({ transform }) => {
         worldRef.current!.setAttribute("transform", transform.toString());
         // Only the symbol layer reads --k, so zooming restyles symbols, not every region path.
@@ -539,53 +548,64 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
     return { labelled, badges, shownLandmarks };
   }, [stops, routes, landmarkPoints, settled, k, pixel, symbol]);
 
-  const keepOpen = () => window.clearTimeout(closeTimer.current);
-  const scheduleClose = () => {
+  const keepOpen = () => window.clearTimeout(hoverTimer.current);
+  const later = (action: () => void, delay: number) => {
     keepOpen();
-    closeTimer.current = window.setTimeout(() => {
+    hoverTimer.current = window.setTimeout(action, delay);
+  };
+  const scheduleClose = () =>
+    later(() => {
       setBloom(null);
       setHighlighted(null);
       setHovered(null);
-    }, 220);
+    }, CLOSE_DELAY);
+  const hoverTo = (key: string | null, show: () => void) => {
+    if (bloom && key === bloom.key) keepOpen();
+    else later(show, bloom ? SWITCH_DELAY : OPEN_DELAY);
   };
   const placesIn = (region: Region) => places.filter((p) => geoContains(region, [p.lng, p.lat]));
   const largest = (list: Place[]) => list.reduce((a, b) => (b.photos.length > a.photos.length ? b : a));
 
-  const showStop = ({ place, x, y }: Stop) => {
-    keepOpen();
-    setHighlighted(null);
-    setHovered(place);
-    setBloom({ key: place.id, anchor: [x, y], photos: place.photos, caption: `${place.name} · ${placeDates(place)}` });
-  };
+  const showStop = ({ place, x, y, tier }: Stop) =>
+    hoverTo(place.id, () => {
+      setHighlighted(null);
+      setHovered(place);
+      setBloom({ key: place.id, anchor: [x, y], tier, photos: place.photos, caption: `${place.name} · ${placeDates(place)}` });
+    });
 
-  const showRegion = (region: Region, event: PointerEvent) => {
-    keepOpen();
-    setHighlighted(region);
+  const regionBloom = (region: Region, event: PointerEvent): Bloom | null => {
     const inside = placesIn(region);
     if (inside.length > 0) {
       const photos = inside.flatMap((p) => p.photos);
-      setBloom({ key: region.properties.name, anchor: project(largest(inside)), photos, caption: `${region.properties.name} · ${photos.length} photos` });
-      return;
+      const main = largest(inside);
+      return { key: region.properties.name, anchor: project(main), tier: stopOf(main)?.tier, photos, caption: `${region.properties.name} · ${photos.length} photos` };
     }
     const box = containerRef.current!.getBoundingClientRect();
     const [mapX, mapY] = settled.invert([(event.clientX - box.left) / pixel, (event.clientY - box.top) / pixel]);
     const cursor = projection.invert?.([mapX, mapY]) ?? geoCentroid(region);
     const nearest = places.reduce((a, b) => (geoDistance(cursor, [b.lng, b.lat]) < geoDistance(cursor, [a.lng, a.lat]) ? b : a));
     const km = Math.round(geoDistance(cursor, [nearest.lng, nearest.lat]) * EARTH_KM);
-    setBloom(
-      km <= NEARBY_KM
-        ? {
-            key: region.properties.name,
-            anchor: { x: event.clientX - box.left, y: event.clientY - box.top },
-            photos: nearest.photos.slice(0, 3),
-            caption: `Nearest: ${nearest.name} · ${km.toLocaleString()} km`,
-          }
-        : null,
-    );
+    return km <= NEARBY_KM
+      ? {
+          key: region.properties.name,
+          anchor: { x: event.clientX - box.left, y: event.clientY - box.top },
+          photos: nearest.photos.slice(0, 3),
+          caption: `Nearest: ${nearest.name} · ${km.toLocaleString()} km`,
+        }
+      : null;
+  };
+
+  const showRegion = (region: Region, event: PointerEvent) => {
+    const next = regionBloom(region, event);
+    hoverTo(next?.key ?? null, () => {
+      setHighlighted(region);
+      setBloom(next);
+    });
   };
 
   const focusStop = ({ place, members }: Stop) => {
     setSelected(place);
+    keepOpen();
     setBloom(null);
     const points = members.map(project);
     const xs = points.map(([x]) => x);
@@ -596,6 +616,7 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
   const focusRegion = (region: Region) => {
     const inside = placesIn(region);
     if (inside.length > 0) setSelected(largest(inside));
+    keepOpen();
     setBloom(null);
     zoomTo(pathFor.bounds(region), 14);
   };
@@ -873,12 +894,15 @@ export function AtlasMap({ places, initialFocus = null }: { places: Place[]; ini
           <AnimatePresence>
             {bloom && width > 0 && (() => {
               const { x, y } = Array.isArray(bloom.anchor) ? toScreen(bloom.anchor) : bloom.anchor;
+              const up = y >= 180;
+              const town = bloom.tier && TOWN_SIZE[bloom.tier];
               return (
                 <motion.div key={bloom.key} className="absolute z-30" style={{ left: x, top: y }} exit={{ opacity: 1 }}>
                   <PhotoBloom
                     photos={bloom.photos}
                     caption={bloom.caption}
-                    direction={y < 180 ? "down" : "up"}
+                    direction={up ? "up" : "down"}
+                    hole={town ? (up ? town.h : 8) * symbol * pixel : 0}
                     onOpen={(photo) => lightbox.open(bloom.photos, photo)}
                   />
                 </motion.div>

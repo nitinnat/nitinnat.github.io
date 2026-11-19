@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { geoEqualEarth, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
 import type { Feature, Geometry } from "geojson";
@@ -305,18 +305,25 @@ interface BloomProps {
   photos: GeoPhoto[];
   caption?: string;
   direction?: "up" | "down";
+  // Radius around the anchor left open so the town underneath stays hoverable and clickable.
+  hole?: number;
   onOpen: (photo: GeoPhoto) => void;
 }
 
-// Thumbnails fan out from the anchor point (the parent positions this at the place).
-export function PhotoBloom({ photos, caption, direction = "up", onOpen }: BloomProps) {
+// Thumbnails fan out from the anchor point (the parent positions this at the place). A transparent
+// wedge under the fan bridges the anchor and the photos, so the pointer stays inside the bloom on its way.
+export function PhotoBloom({ photos, caption, direction = "up", hole = 0, onOpen }: BloomProps) {
+  const reduce = useReducedMotion();
   const shown = photos.slice(0, 5);
   const spread = shown.length === 1 ? 0 : 120;
   const radius = 118;
+  const middle = (shown.length - 1) / 2;
+  const reveal = (index: number) => ({ duration: 0.2, ease: EASE_OUT, delay: reduce ? 0 : Math.abs(index - middle) * 0.03 });
 
   return (
     <div className="pointer-events-none absolute left-0 top-0 z-30">
       <svg className="absolute overflow-visible" width="1" height="1" aria-hidden="true">
+        <path d={wedge(hole, radius, direction === "up" ? -90 : 90, spread / 2 + 25)} className="pointer-events-auto fill-transparent" />
         {shown.map((photo, index) => {
           const { dx, dy } = fanOffset(index, shown.length, spread, radius, direction);
           return (
@@ -328,26 +335,27 @@ export function PhotoBloom({ photos, caption, direction = "up", onOpen }: BloomP
               y2={dy}
               className="stroke-cyan-700/60 dark:stroke-cyan-300/60"
               strokeWidth={1}
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
+              initial={reduce ? { opacity: 0 } : { pathLength: 0 }}
+              animate={{ opacity: 1, pathLength: 1 }}
               exit={{ opacity: 0, transition: { duration: 0.12 } }}
-              transition={{ duration: 0.35, ease: EASE_OUT, delay: index * 0.035 }}
+              transition={reveal(index)}
             />
           );
         })}
       </svg>
       {shown.map((photo, index) => {
         const { dx, dy, tilt } = fanOffset(index, shown.length, spread, radius, direction);
+        const from = reduce ? 1 : 0.6;
         return (
           <motion.button
             key={photo.id}
             type="button"
             onClick={() => onOpen(photo)}
             className="pointer-events-auto absolute -ml-12 -mt-9 h-[72px] w-24 overflow-hidden rounded-md border border-white/70 bg-muted shadow-xl ring-1 ring-black/10"
-            initial={{ opacity: 0, scale: 0.5, x: 0, y: 0, rotate: 0 }}
+            initial={{ opacity: 0, scale: reduce ? 1 : 0.9, x: dx * from, y: dy * from, rotate: tilt }}
             animate={{ opacity: 1, scale: 1, x: dx, y: dy, rotate: tilt }}
-            exit={{ opacity: 0, scale: 0.6, x: 0, y: 0, transition: { duration: 0.16, ease: EASE_OUT } }}
-            transition={{ type: "spring", duration: 0.5, bounce: 0.25, delay: index * 0.035 }}
+            exit={{ opacity: 0, scale: reduce ? 1 : 0.96, transition: { duration: 0.12, ease: EASE_OUT } }}
+            transition={reveal(index)}
             whileHover={{ scale: 1.08, rotate: 0, zIndex: 10 }}
             aria-label={`Open ${photo.alt}`}
           >
@@ -359,10 +367,10 @@ export function PhotoBloom({ photos, caption, direction = "up", onOpen }: BloomP
         <motion.p
           className="absolute -translate-x-1/2 whitespace-nowrap rounded-full bg-background/90 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-foreground shadow-md backdrop-blur"
           style={{ top: direction === "up" ? 14 : -40 }}
-          initial={{ opacity: 0, y: direction === "up" ? -4 : 4 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: 0.12 } }}
-          transition={{ duration: 0.25, ease: EASE_OUT, delay: 0.1 }}
+          transition={{ duration: 0.2, ease: EASE_OUT }}
         >
           {caption}
         </motion.p>
@@ -380,6 +388,13 @@ function fanOffset(index: number, count: number, spread: number, radius: number,
     dy: Math.sin(radians) * radius,
     tilt: (index - (count - 1) / 2) * 4,
   };
+}
+
+// An annular sector of `half` degrees either side of `centre`.
+function wedge(inner: number, outer: number, centre: number, half: number) {
+  const at = (r: number, deg: number) => `${(Math.cos((deg * Math.PI) / 180) * r).toFixed(1)} ${(Math.sin((deg * Math.PI) / 180) * r).toFixed(1)}`;
+  const [from, to] = [centre - half, centre + half];
+  return `M${at(outer, from)}A${outer} ${outer} 0 0 1 ${at(outer, to)}L${at(inner, to)}A${inner} ${inner} 0 0 0 ${at(inner, from)}Z`;
 }
 
 export function usePhotoLightbox() {
